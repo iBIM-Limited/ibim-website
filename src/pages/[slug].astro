@@ -1,18 +1,30 @@
 ---
 import Base from '../layouts/Base.astro';
-import { services } from '../data/services';
+import { allServices, services, localServices } from '../data/services';
 
 export function getStaticPaths() {
-  return services.map((service, i) => ({ params: { slug: service.slug }, props: { service, i } }));
+  return allServices.map((service) => ({ params: { slug: service.slug }, props: { service } }));
 }
-const { service, i } = Astro.props;
-const next = services[(i + 1) % services.length];
-const prev = services[(i - 1 + services.length) % services.length];
+const { service } = Astro.props;
+const group = service.local ? localServices : services;
+const i = group.findIndex((s) => s.slug === service.slug);
+const next = group[(i + 1) % group.length];
+const prev = group[(i - 1 + group.length) % group.length];
+const jsonLd = service.local ? {
+  '@context': 'https://schema.org',
+  '@type': 'Service',
+  name: service.title,
+  serviceType: service.serviceType,
+  description: service.description,
+  url: `https://www.i-bim.co.uk/${service.slug}`,
+  areaServed: [{ '@type': 'City', name: 'Preston' }, { '@type': 'AdministrativeArea', name: 'Lancashire' }],
+  provider: { '@type': 'ProfessionalService', name: 'iBIM', url: 'https://www.i-bim.co.uk/', telephone: '+44 7825 885167' },
+} : undefined;
 ---
-<Base title={service.title} description={service.description}>
+<Base title={service.title} description={service.description} jsonLd={jsonLd}>
   <section class="wrap svc-hero">
     <div class="svc-hero__copy">
-      <p class="crumb"><a href="/#lifecycle">Project lifecycle</a> <span aria-hidden="true">/</span> {service.stage}</p>
+      <p class="crumb"><a href={service.local ? '/#local' : '/#lifecycle'}>{service.local ? 'Preston and Lancashire' : 'Project lifecycle'}</a> <span aria-hidden="true">/</span> {service.stage}</p>
       <h1>{service.title}</h1>
       <p class="lead">{service.lead}</p>
       <a class="button" href="/contact">Talk to us about this</a>
@@ -34,6 +46,23 @@ const prev = services[(i - 1 + services.length) % services.length];
       <div class="includes">
         <h3>What this covers</h3>
         <ul>{service.includes.map((x) => <li>{x}</li>)}</ul>
+      </div>
+    )}
+    {service.explainer && (
+      <div class="explainer">
+        <h2>{service.explainer.title}</h2>
+        <div class="explainer__body">
+          {service.explainer.body.map((x) => <p>{x}</p>)}
+          {service.explainer.list && <ul>{service.explainer.list.map((x) => <li>{x}</li>)}</ul>}
+        </div>
+      </div>
+    )}
+    {service.questions && (
+      <div class="explainer">
+        <h2>Common questions</h2>
+        <dl class="questions">
+          {service.questions.map((x) => <div><dt>{x.q}</dt><dd>{x.a}</dd></div>)}
+        </dl>
       </div>
     )}
   </section>

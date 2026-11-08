@@ -1,6 +1,6 @@
 ---
 import Base from '../layouts/Base.astro';
-import { services } from '../data/services';
+import { services, localServices } from '../data/services';
 
 const initial = 'capture';
 const targets = [
@@ -11,7 +11,7 @@ const targets = [
 ];
 const sectors = ['Residential', 'Commercial', 'Civil Engineering & Infrastructure', 'Industrial'];
 ---
-<Base title="iBIM | BIM Consultancy" description="iBIM is a BIM consultancy offering end-to-end BIM lifecycle consulting: advisory and implementation, reality capture and modelling, information management, 4D and 5D, project management and digital twins." sheetName="Home">
+<Base title="BIM Consultancy and Architectural Drawings in Preston | iBIM" description="iBIM provides BIM consultancy, architectural drawings, planning submissions and building regulations drawings in Preston, across Lancashire and throughout the UK." sheetName="Home">
   <section class="wrap hero" id="lifecycle">
     <div class="hero__copy">
       <h1>Simplifying AEC with integrated digital solutions</h1>
@@ -46,6 +46,16 @@ const sectors = ['Residential', 'Commercial', 'Civil Engineering & Infrastructur
         ))}
       </div>
     </div>
+  </section>
+
+  <section class="wrap local" id="local">
+    <div class="local__head">
+      <h2>BIM and architectural work in Preston and Lancashire</h2>
+      <p>From drawings for a planning application to BIM across a whole project.</p>
+    </div>
+    <ul class="local__list">
+      {localServices.map((s) => <li><a href={`/${s.slug}`}><strong>{s.title}</strong><span>{s.description}</span></a></li>)}
+    </ul>
   </section>
 
   <section class="approach">

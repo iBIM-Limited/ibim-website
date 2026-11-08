@@ -29,7 +29,7 @@ const organisation = {
   description: 'BIM consultancy offering end-to-end BIM lifecycle consulting for architecture, engineering, construction and operations.',
   telephone: contact.phone,
   email: contact.email,
-  areaServed: 'GB',
+  areaServed: [{ '@type': 'City', name: 'Preston' }, { '@type': 'AdministrativeArea', name: 'Lancashire' }, { '@type': 'Country', name: 'United Kingdom' }],
   sameAs: [contact.linkedin],
 };
 ---

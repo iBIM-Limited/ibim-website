@@ -1,6 +1,7 @@
 {
   "$schema": "./node_modules/wrangler/config-schema.json",
   "name": "ibim-website",
+  "account_id": "4a0e0622ac1b16fb26d756daf8e9b1f3",
   "main": "worker/index.js",
   "compatibility_date": "2026-10-01",
   "assets": {
@@ -11,7 +12,10 @@
     "html_handling": "auto-trailing-slash"
   },
   "observability": { "enabled": true },
-  // At switch-over: create the D1 database and add it here, plus the custom domains.
+  "d1_databases": [
+    { "binding": "DB", "database_name": "ibim-enquiries", "database_id": "f216721c-9b8d-4505-99e6-91789a9701a2", "migrations_dir": "migrations" }
+  ],
+  // Custom domains are added at switch-over.
   "env": {
     "local": {
       "name": "ibim-website-local",

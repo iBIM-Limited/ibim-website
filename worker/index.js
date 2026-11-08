@@ -1,7 +1,6 @@
 // Serves the static site, redirects old addresses and receives form submissions.
 
 const CANONICAL_HOST = 'www.i-bim.co.uk';
-const NOTIFY_TO = 'jack@i-bim.co.uk';
 
 // Template shop pages from the old site. 410 tells search engines they are gone for good.
 const GONE = new Set([
@@ -103,9 +102,15 @@ async function handleEnquiry(request, env, url) {
   ).bind(kind, data.first_name, data.last_name, data.company, data.job_title, data.email, data.message, ipHash).run();
 
   // The enquiry is already saved, so a mail failure must not lose it or fail the visitor's request.
-  if (env.EMAIL) {
+  if (env.NOTIFY_URL && env.NOTIFY_KEY) {
     try {
-      await env.EMAIL.send(notification(kind, data));
+      const res = await fetch(env.NOTIFY_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ key: env.NOTIFY_KEY, ...notification(kind, data) }),
+      });
+      const result = await res.json();
+      if (!result.ok) throw new Error('Notification script rejected the request');
       await env.DB.prepare('UPDATE enquiries SET emailed = 1 WHERE id = ?').bind(saved.meta.last_row_id).run();
     } catch (err) {
       console.error('Notification email failed', err);
@@ -121,8 +126,6 @@ function notification(kind, d) {
   if (d.job_title) lines.push(`Job title: ${d.job_title}`);
   if (d.message) lines.push('', d.message);
   return {
-    to: NOTIFY_TO,
-    from: { email: 'website@i-bim.co.uk', name: 'iBIM website' },
     replyTo: d.email,
     subject: kind === 'waitlist' ? `Digital twin waiting list: ${name}` : `Website enquiry: ${name}`,
     text: lines.join('\n'),
