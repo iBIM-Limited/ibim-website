@@ -10,7 +10,7 @@ export type Service = {
   steps: { title: string; body: string }[];
   includes?: string[];
   stage: string;
-  local?: boolean;
+  group?: 'architectural';
   serviceType?: string;
   explainer?: { title: string; body: string[]; list?: string[]; note?: string };
   questions?: { q: string; a: string }[];
@@ -19,6 +19,7 @@ export type Service = {
 export const services: Service[] = [
   {
     slug: 'bim-advisory',
+    questions: [{ q: 'What is BIM?', a: 'Building Information Modelling is a way of creating and managing information about a building or asset through a shared digital model, so everyone works from the same information.' }],
     state: 'advise',
     stage: 'Advise',
     name: 'BIM Advisory & Implementation',
@@ -34,6 +35,7 @@ export const services: Service[] = [
   },
   {
     slug: 'reality-capture-and-3d-modelling-services',
+    questions: [{ q: 'What is scan to BIM?', a: 'A building or site is captured with laser scanning or other survey methods, and that data is then used to create a 3D model of what exists.' }],
     state: 'capture',
     stage: 'Capture',
     name: 'Reality Capture & 3D Modelling',
@@ -50,6 +52,7 @@ export const services: Service[] = [
   },
   {
     slug: 'information-management',
+    questions: [{ q: 'What is a Common Data Environment?', a: 'A Common Data Environment, or CDE, is an agreed place and process for managing project information, so teams can share it and know which version is current.' }],
     state: 'information',
     stage: 'Coordinate',
     name: 'BIM Information Management',
@@ -66,6 +69,7 @@ export const services: Service[] = [
   },
   {
     slug: 'construction-sequencing-and-cost-consultancy-4d5d',
+    questions: [{ q: 'What are 4D and 5D BIM?', a: '4D links a model to the construction programme, so you can see how the sequence works. 5D adds cost information, so you can see how design and programme changes affect the budget.' }],
     state: 'sequence',
     stage: 'Time and cost',
     name: 'Construction Sequencing & Cost (4D/5D)',
@@ -81,6 +85,7 @@ export const services: Service[] = [
   },
   {
     slug: 'project-management',
+    questions: [{ q: 'What is integrated project delivery?', a: 'It is an approach that brings the client, designers and contractors together early and shares information and decisions across the team, instead of working in separate stages.' }],
     state: 'delivery',
     stage: 'Deliver',
     name: 'Project Management & Integrated Project Delivery',
@@ -96,6 +101,7 @@ export const services: Service[] = [
   },
   {
     slug: 'digital-twins-and-fm-consultancy',
+    questions: [{ q: 'What is a digital twin?', a: 'A digital twin is a virtual model of a physical asset that is connected to data about how the asset is performing, so it can support operational decisions.' }],
     state: 'twin',
     stage: 'Operate',
     name: 'Digital Twins & FM Consultancy',
@@ -111,17 +117,17 @@ export const services: Service[] = [
   },
 ];
 
-// Local pages. They state what is required by law or guidance, and hold no invented projects, prices or credentials.
-export const localServices: Service[] = [
+// General architectural services. They state what guidance requires, and hold no invented projects, prices or credentials.
+export const architecturalServices: Service[] = [
   {
-    slug: 'architectural-drawings-preston',
-    state: 'advise', stage: 'Architectural drawings', local: true,
+    slug: 'architectural-drawings',
+    state: 'drawings', stage: 'Architectural drawings', group: 'architectural',
     serviceType: 'Architectural drawing services',
-    name: 'Architectural Drawings in Preston',
+    name: 'Architectural Drawings',
     short: 'Architectural Drawings',
-    title: 'Architectural Drawings in Preston',
-    description: 'Architectural drawings for homes and commercial buildings in Preston and Lancashire, from measured surveys to planning and building regulations packages.',
-    lead: 'We produce architectural drawings for homes and commercial buildings in Preston and across Lancashire, from a survey of what exists through to drawings ready for planning or building regulations.',
+    title: 'Architectural Drawings',
+    description: 'Architectural drawings for homeowners, developers, land owners and contractors, from measured surveys to planning and building regulations packages.',
+    lead: 'We produce architectural drawings for homes and commercial buildings, from a survey of what exists through to drawings ready for planning or building regulations.',
     steps: [
       { title: 'Survey what is there', body: 'We record the existing building and site, using measured survey and laser scanning where the project needs it.' },
       { title: 'Draw the proposal', body: 'We develop existing and proposed plans, elevations and sections, and can model the design in 3D so you can review it before anything is submitted.' },
@@ -129,19 +135,20 @@ export const localServices: Service[] = [
     ],
     includes: ['Existing plans and elevations', 'Proposed plans and elevations', 'Sections', 'Location and site plans', '3D models'],
     questions: [
+      { q: 'What drawings do I need for my project?', a: 'It depends on the work and the approvals it needs. Most projects start with drawings of what exists and what is proposed. Planning and building regulations then need different information, so tell us what you are planning and we’ll advise.' },
       { q: 'Are you architects?', a: 'iBIM provides architectural drawing and BIM services. In the UK, only people registered with the Architects Registration Board can use the title architect. Ask us who will work on your project and what qualifications they hold.' },
       { q: 'How much do architectural drawings cost?', a: 'It depends on the size of the building, what already exists and which approvals you need. Tell us about the project and we’ll give you a quote.' },
     ],
   },
   {
-    slug: 'planning-drawings-preston',
-    state: 'information', stage: 'Planning', local: true,
+    slug: 'planning-submissions',
+    state: 'planning', stage: 'Planning', group: 'architectural',
     serviceType: 'Planning application drawings and submissions',
-    name: 'Planning Drawings and Submissions in Preston',
+    name: 'Planning Submissions',
     short: 'Planning Submissions',
-    title: 'Planning Drawings and Submissions in Preston',
-    description: 'Planning drawings and application submissions for projects in Preston and Lancashire, prepared to meet national requirements and the council’s local list.',
-    lead: 'We prepare planning drawings and submit applications for projects in Preston and across Lancashire, so your application has what the council needs to validate and assess it.',
+    title: 'Planning Drawings and Submissions',
+    description: 'Planning drawings and application submissions, prepared to meet national requirements and your council’s local validation list.',
+    lead: 'We prepare planning drawings and submit applications, so your application has what the council needs to validate and assess it.',
     steps: [
       { title: 'Check what you need', body: 'We look at your site and proposal, and work out which application and supporting documents it is likely to need.' },
       { title: 'Prepare the application', body: 'We produce the drawings and bring together the form, plans and supporting information.' },
@@ -149,7 +156,7 @@ export const localServices: Service[] = [
     ],
     explainer: {
       title: 'What a planning application needs',
-      body: ['National guidance sets a minimum for every application. Your council can also ask for more through its local list. In Preston, that’s Preston City Council for sites within the city’s boundary.'],
+      body: ['National guidance sets a minimum for every application. Your council can also ask for more through its local validation list, so requirements vary by area.'],
       list: [
         'A completed application form and the correct fee',
         'A location plan, typically at 1:1250 or 1:2500, with the site outlined in red and any other land you own in blue',
@@ -159,21 +166,22 @@ export const localServices: Service[] = [
       ],
     },
     questions: [
-      { q: 'Can you guarantee planning permission?', a: 'No. The council makes the decision. We can make sure your application is complete and clearly presented, and tell you about any concerns we see.' },
+      { q: 'What drawings do I need for a planning application?', a: 'At minimum, a location plan. Most proposals also need further plans and drawings to show what is proposed, and your council’s local list may ask for more.' },
       { q: 'Do I need planning permission?', a: 'Not every project does, and the answer depends on the building, its location and the work. We can look at your proposal, and the council can confirm the position formally.' },
+      { q: 'Can you guarantee planning permission?', a: 'No. The council makes the decision. We can make sure your application is complete and clearly presented, and tell you about any concerns we see.' },
     ],
   },
   {
-    slug: 'building-regulations-drawings-preston',
-    state: 'sequence', stage: 'Building regulations', local: true,
+    slug: 'building-regulations-drawings',
+    state: 'regs', stage: 'Building regulations', group: 'architectural',
     serviceType: 'Building regulations drawings',
-    name: 'Building Regulations Drawings in Preston',
+    name: 'Building Regulations Drawings',
     short: 'Building Regulations',
-    title: 'Building Regulations Drawings in Preston',
-    description: 'Building regulations drawings for projects in Preston and Lancashire, with the construction detail your builder and building control body need.',
-    lead: 'We produce building regulations drawings for projects in Preston and across Lancashire, with the construction information your builder and building control body need.',
+    title: 'Building Regulations Drawings',
+    description: 'Building regulations drawings with the construction detail your builder and building control body need.',
+    lead: 'We produce building regulations drawings with the construction information your builder and building control body need.',
     steps: [
-      { title: 'Review the approved design', body: 'We start from your planning drawings or existing design, and identify which parts of the regulations affect the work.' },
+      { title: 'Review the design', body: 'We start from your planning drawings or existing design, and identify which parts of the regulations affect the work.' },
       { title: 'Develop the technical detail', body: 'We add the sections, construction details and notes that show how the work is intended to meet the requirements.' },
       { title: 'Support your application', body: 'We prepare the package for your building control body and tell you early if you need information from others, such as a structural engineer.' },
     ],
@@ -189,29 +197,14 @@ export const localServices: Service[] = [
       { q: 'What is the difference between full plans and a building notice?', a: 'With full plans, your drawings are checked before work starts. With a building notice, work is inspected as it goes, without an approved set of plans. A building notice can’t be used for all work, so check before choosing it.' },
     ],
   },
-  {
-    slug: 'bim-consultancy-preston',
-    state: 'capture', stage: 'BIM', local: true,
-    serviceType: 'BIM consultancy',
-    name: 'BIM Consultancy in Preston',
-    short: 'BIM in Preston',
-    title: 'BIM Consultancy and Modelling in Preston',
-    description: 'BIM consultancy, 3D modelling, reality capture and information management for construction projects in Preston, Lancashire and across the UK.',
-    lead: 'We provide BIM consultancy and modelling for construction projects in Preston, across Lancashire and throughout the UK, from first assessment through to digital twins.',
-    steps: [
-      { title: 'Assess your needs', body: 'We look at your project or business, its current workflows and what you need BIM to achieve.' },
-      { title: 'Capture and model', body: 'We use laser scanning, drones and survey data to create 3D models across architecture, MEP, structure, FF&E and civils.' },
-      { title: 'Manage the information', body: 'We set up a common data environment, carry out clash detection and coordination reviews, and can act as your Project Information Manager.' },
-    ],
-    includes: ['BIM advisory and implementation', 'Scan to BIM', '3D modelling', 'Information management', '4D and 5D', 'Digital twins'],
-  },
 ];
 
-export const allServices = [...services, ...localServices];
+export const allServices = [...architecturalServices, ...services];
 
 export const sheets = [
   { path: '/', name: 'Home' },
   ...allServices.map((s) => ({ path: `/${s.slug}`, name: s.short })),
+  { path: '/preston-lancashire', name: 'Preston and Lancashire' },
   { path: '/software-development', name: 'Software Development' },
   { path: '/about', name: 'About' },
   { path: '/contact', name: 'Contact' },

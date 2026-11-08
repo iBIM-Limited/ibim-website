@@ -1,0 +1,42 @@
+---
+import Base from '../layouts/Base.astro';
+import { architecturalServices, services } from '../data/services';
+const checklist = 'https://www.preston.gov.uk/article/5129/Validation-Checklist-for-Planning-and-Other-Applications';
+---
+<Base title="BIM and Architectural Services in Preston and Lancashire" description="BIM consultancy, architectural drawings, planning submissions and building regulations drawings for projects in Preston and across Lancashire.">
+  <section class="wrap page-head">
+    <h1>BIM and architectural services in Preston and Lancashire</h1>
+    <p class="lead">We work with homeowners, developers, land owners, construction companies and M&amp;E contractors on projects in Preston and across Lancashire, as well as the wider UK.</p>
+    <a class="button" href="/contact">Talk to us about your project</a>
+  </section>
+
+  <section class="wrap steps-section">
+    <div class="split">
+      <h2>Architectural and planning work</h2>
+      <ul class="link-list">
+        {architecturalServices.map((s) => <li><a href={`/${s.slug}`}><strong>{s.title}</strong><span>{s.description}</span></a></li>)}
+      </ul>
+    </div>
+    <div class="split">
+      <h2>BIM and digital services</h2>
+      <ul class="link-list link-list--plain">
+        {services.map((s) => <li><a href={`/${s.slug}`}>{s.name}</a></li>)}
+      </ul>
+    </div>
+    <div class="split">
+      <h2>Planning applications in Preston</h2>
+      <div class="split__body">
+        <p>Applications for sites within Preston go to Preston City Council. Its validation checklist, adopted in October 2024, is for applicants and agents. It has national requirements, which are mandatory, and local requirements set by the council, which depend on the nature of your proposal.</p>
+        <p><a href={checklist} rel="noopener">Read Preston City Council’s validation checklist</a></p>
+        <p>Elsewhere in Lancashire, your site’s own local council decides the application and publishes its own requirements, so what you need can vary by area.</p>
+      </div>
+    </div>
+    <div class="split">
+      <h2>Common questions</h2>
+      <dl class="questions">
+        <div><dt>Do you only work in Preston?</dt><dd>No. We work across Lancashire and the wider UK, and this page is for anyone looking for help locally.</dd></div>
+        <div><dt>Which council handles my planning application?</dt><dd>Usually the local council for the area where the site is. If you’re not sure, tell us the address and we’ll help you check.</dd></div>
+      </dl>
+    </div>
+  </section>
+</Base>

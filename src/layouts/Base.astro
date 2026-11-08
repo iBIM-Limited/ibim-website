@@ -3,23 +3,20 @@ import '@fontsource-variable/archivo/wdth.css';
 import '@fontsource-variable/instrument-sans';
 import '@fontsource/space-mono/400.css';
 import '../styles/site.css';
-import { services, sheets, contact } from '../data/services';
+import { allServices, architecturalServices, services, contact } from '../data/services';
 
 interface Props {
   title: string;
   description: string;
   noindex?: boolean;
   jsonLd?: object;
-  sheetName?: string;
 }
-const { title, description, noindex = false, jsonLd, sheetName } = Astro.props;
+const { title, description, noindex = false, jsonLd } = Astro.props;
 const path = Astro.url.pathname.replace(/\.html$/, '').replace(/\/$/, '') || '/';
 const canonical = new URL(path, Astro.site).toString().replace(/\/$/, path === '/' ? '/' : '');
 const fullTitle = path === '/' ? title : `${title} | iBIM`;
-const index = sheets.findIndex((s) => s.path === path);
-const sheet = index >= 0 ? sheets[index] : null;
 const year = new Date().getFullYear();
-const servicesActive = services.some((s) => `/${s.slug}` === path);
+const servicesActive = allServices.some((s) => `/${s.slug}` === path);
 const organisation = {
   '@context': 'https://schema.org',
   '@type': 'ProfessionalService',
@@ -52,7 +49,7 @@ const organisation = {
     <meta property="og:image" content="https://www.i-bim.co.uk/img/og.png" />
     <meta name="twitter:card" content="summary_large_image" />
     <script type="application/ld+json" set:html={JSON.stringify(jsonLd ?? organisation)} />
-    <script is:inline src="/js/site.js" defer></script>
+    <script is:inline src="/js/site.js?v=2" defer></script>
   </head>
   <body>
     <a class="skip" href="#main">Skip to content</a>
@@ -64,9 +61,16 @@ const organisation = {
           <nav aria-label="Main">
             <details class="sub" data-sub open={servicesActive ? true : undefined}>
               <summary aria-current={servicesActive ? 'true' : undefined}>Services</summary>
-              <ul>
-                {services.map((s) => <li><a href={`/${s.slug}`} aria-current={`/${s.slug}` === path ? 'page' : undefined}>{s.name}</a></li>)}
-              </ul>
+              <div class="sub__panel">
+                <p class="sub__label">Architectural</p>
+                <ul>
+                  {architecturalServices.map((s) => <li><a href={`/${s.slug}`} aria-current={`/${s.slug}` === path ? 'page' : undefined}>{s.name}</a></li>)}
+                </ul>
+                <p class="sub__label">BIM and digital</p>
+                <ul>
+                  {services.map((s) => <li><a href={`/${s.slug}`} aria-current={`/${s.slug}` === path ? 'page' : undefined}>{s.name}</a></li>)}
+                </ul>
+              </div>
             </details>
             <a href="/software-development" aria-current={path === '/software-development' ? 'page' : undefined}>Software</a>
             <a href="/about" aria-current={path === '/about' ? 'page' : undefined}>About</a>
@@ -105,16 +109,10 @@ const organisation = {
           <span class="tb__label">Our values</span>
           <span>Trust, partner, innovate</span>
         </div>
-        <div class="tb tb--sheet">
-          <span class="tb__label">This sheet</span>
-          <span>{sheetName ?? sheet?.name ?? title}</span>
+        <div class="tb">
+          <span class="tb__label">Areas we cover</span>
+          <a href="/preston-lancashire">Preston and Lancashire</a>
         </div>
-        {sheet && (
-          <div class="tb">
-            <span class="tb__label">Sheet number</span>
-            <span class="mono">{String(index + 1).padStart(2, '0')} of {String(sheets.length).padStart(2, '0')}</span>
-          </div>
-        )}
         <div class="tb">
           <span class="tb__label">Issued</span>
           <span>© {year} iBIM. <a href="/privacy">Privacy</a></span>

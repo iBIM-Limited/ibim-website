@@ -19,7 +19,7 @@ const SECURITY_HEADERS = {
     "frame-src https://www.youtube-nocookie.com; connect-src 'self'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'",
 };
 
-const LIMITS = { first_name: 100, last_name: 100, company: 150, job_title: 100, email: 200, message: 5000 };
+const LIMITS = { first_name: 100, last_name: 100, company: 150, job_title: 100, email: 200, message: 5000, source_page: 200, referrer: 200, heard: 200 };
 const REQUIRED = {
   contact: ['email', 'message'],
   waitlist: ['first_name', 'last_name', 'company', 'email', 'job_title'],
@@ -33,7 +33,12 @@ export default {
       url.hostname = CANONICAL_HOST;
       return Response.redirect(url.toString(), 301);
     }
-    const path = url.pathname.replace(/\/+$/, '') || '/';
+    // One address per page: no trailing slash and no .html.
+    if (url.pathname !== '/' && /(\/|\.html)$/.test(url.pathname)) {
+      url.pathname = url.pathname.replace(/(\/index)?\.html$/, '').replace(/\/+$/, '') || '/';
+      return Response.redirect(url.toString(), 301);
+    }
+    const path = url.pathname;
 
     if (path === '/httpswwwi-bimcoukcontact') {
       return Response.redirect(new URL('/contact', url).toString(), 301);
@@ -54,7 +59,7 @@ function secure(response, url) {
   for (const [k, v] of Object.entries(SECURITY_HEADERS)) res.headers.set(k, v);
   if (url.hostname !== CANONICAL_HOST) res.headers.set('X-Robots-Tag', 'noindex, nofollow');
   if (/\.(js|css|png|jpg|woff2?)$/.test(url.pathname)) {
-    res.headers.set('Cache-Control', url.pathname.startsWith('/_astro/') ? 'public, max-age=31536000, immutable' : 'public, max-age=86400');
+    res.headers.set('Cache-Control', url.pathname.startsWith('/_astro/') ? 'public, max-age=31536000, immutable' : 'public, max-age=3600');
   }
   return res;
 }
@@ -98,8 +103,8 @@ async function handleEnquiry(request, env, url) {
   if (recent.n >= 5) return json({ error: 'Too many messages from this connection. Try again in an hour, or call +44 7825 885167.' }, 429);
 
   const saved = await env.DB.prepare(
-    'INSERT INTO enquiries (kind, first_name, last_name, company, job_title, email, message, ip_hash) VALUES (?, ?, ?, ?, ?, ?, ?, ?)'
-  ).bind(kind, data.first_name, data.last_name, data.company, data.job_title, data.email, data.message, ipHash).run();
+    'INSERT INTO enquiries (kind, first_name, last_name, company, job_title, email, message, ip_hash, source_page, referrer, heard) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)'
+  ).bind(kind, data.first_name, data.last_name, data.company, data.job_title, data.email, data.message, ipHash, data.source_page, data.referrer, data.heard).run();
 
   // The enquiry is already saved, so a mail failure must not lose it or fail the visitor's request.
   if (env.NOTIFY_URL && env.NOTIFY_KEY) {
@@ -124,7 +129,10 @@ function notification(kind, d) {
   const lines = [`Name: ${name}`, `Email: ${d.email}`];
   if (d.company) lines.push(`Company: ${d.company}`);
   if (d.job_title) lines.push(`Job title: ${d.job_title}`);
-  if (d.message) lines.push('', d.message);
+  if (d.message) lines.push('', d.message, '');
+  if (d.heard) lines.push(`Heard about us: ${d.heard}`);
+  if (d.source_page) lines.push(`Sent from: ${d.source_page}`);
+  if (d.referrer) lines.push(`Arrived from: ${d.referrer}`);
   return {
     replyTo: d.email,
     subject: kind === 'waitlist' ? `Digital twin waiting list: ${name}` : `Website enquiry: ${name}`,

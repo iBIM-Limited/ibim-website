@@ -1,21 +1,23 @@
 ---
 import Base from '../layouts/Base.astro';
-import { services, localServices } from '../data/services';
+import { allServices, services } from '../data/services';
 
 const initial = 'capture';
-const targets = [
-  { value: '33%', title: 'Lower costs', body: 'Reduction in the initial cost of construction and the whole life cost of built assets.' },
-  { value: '50%', title: 'Faster delivery', body: 'Reduction in the overall time from inception to completion, for new-build and refurbished assets.' },
-  { value: '50%', title: 'Lower emissions', body: 'Reduction in greenhouse gas emissions in the built environment.' },
-  { value: '50%', title: 'Improvement in exports', body: 'Reduction in the trade gap between total exports and total imports for construction products and materials.' },
+const byStage = Object.fromEntries(allServices.map((s) => [s.slug, s]));
+const audiences = [
+  { name: 'Homeowners', need: 'Drawings and approvals for your project.', links: ['architectural-drawings', 'planning-submissions', 'building-regulations-drawings'] },
+  { name: 'Developers', need: 'Drawings, approvals and coordination across a scheme.', links: ['planning-submissions', 'building-regulations-drawings', 'bim-advisory'] },
+  { name: 'Land owners', need: 'Site information and a route through planning.', links: ['planning-submissions', 'reality-capture-and-3d-modelling-services'] },
+  { name: 'Construction companies', need: 'Coordination, sequencing and cost on site and in the office.', links: ['information-management', 'construction-sequencing-and-cost-consultancy-4d5d', 'reality-capture-and-3d-modelling-services'] },
+  { name: 'M&E companies', need: 'MEP modelling and coordination with other disciplines.', links: ['reality-capture-and-3d-modelling-services', 'information-management'] },
 ];
 const sectors = ['Residential', 'Commercial', 'Civil Engineering & Infrastructure', 'Industrial'];
 ---
-<Base title="BIM Consultancy and Architectural Drawings in Preston | iBIM" description="iBIM provides BIM consultancy, architectural drawings, planning submissions and building regulations drawings in Preston, across Lancashire and throughout the UK." sheetName="Home">
+<Base title="BIM Consultancy and Architectural Services | iBIM" description="BIM consultancy, architectural drawings, planning submissions and building regulations for homeowners, developers, land owners, contractors and M&amp;E firms.">
   <section class="wrap hero" id="lifecycle">
     <div class="hero__copy">
-      <h1>Simplifying AEC with integrated digital solutions</h1>
-      <p class="lead">Our collaborative approach to real-time decision-making gives you more control, with transparency and efficiency.</p>
+      <h1>BIM consultancy and architectural drawings</h1>
+      <p class="lead">For homeowners, developers, land owners, construction companies and M&amp;E contractors. Our collaborative approach gives you more control, with transparency and efficiency.</p>
       <div class="actions">
         <a class="button" href="/contact">Talk to us about a project</a>
         <a class="textlink" href="/about">About iBIM</a>
@@ -48,13 +50,18 @@ const sectors = ['Residential', 'Commercial', 'Civil Engineering & Infrastructur
     </div>
   </section>
 
-  <section class="wrap local" id="local">
-    <div class="local__head">
-      <h2>BIM and architectural work in Preston and Lancashire</h2>
-      <p>From drawings for a planning application to BIM across a whole project.</p>
-    </div>
-    <ul class="local__list">
-      {localServices.map((s) => <li><a href={`/${s.slug}`}><strong>{s.title}</strong><span>{s.description}</span></a></li>)}
+  <section class="wrap who" id="who">
+    <h2>Who we work with</h2>
+    <ul class="who__list">
+      {audiences.map((a) => (
+        <li>
+          <h3>{a.name}</h3>
+          <p>{a.need}</p>
+          <ul class="who__links">
+            {a.links.map((slug) => <li><a href={`/${slug}`}>{byStage[slug].short}</a></li>)}
+          </ul>
+        </li>
+      ))}
     </ul>
   </section>
 
@@ -71,19 +78,6 @@ const sectors = ['Residential', 'Commercial', 'Civil Engineering & Infrastructur
     </div>
   </section>
 
-  <section class="wrap targets">
-    <div class="targets__head">
-      <h2>What the industry is aiming for</h2>
-      <p>The UK Government set these targets for construction in its Construction 2025 strategy. BIM is one of the ways the industry can work towards them.</p>
-    </div>
-    <dl class="targets__grid">
-      {targets.map((t) => (
-        <div><dd class="targets__value">{t.value}</dd><dt>{t.title}</dt><dd>{t.body}</dd></div>
-      ))}
-    </dl>
-    <p class="small">Source: HM Government, Construction 2025 (2013). These are national targets, not iBIM project results.</p>
-  </section>
-
   <section class="wrap sectors">
     <h2>Sectors we work in</h2>
     <ul>{sectors.map((s) => <li>{s}</li>)}</ul>
@@ -98,5 +92,5 @@ const sectors = ['Residential', 'Commercial', 'Civil Engineering & Infrastructur
       <a class="button button--ink" href="/contact">Contact iBIM</a>
     </div>
   </section>
-  <script is:inline src="/js/model.js" defer></script>
+  <script is:inline src="/js/model.js?v=3" defer></script>
 </Base>

@@ -1,37 +1,39 @@
 ---
 import Base from '../layouts/Base.astro';
-import { allServices, services, localServices } from '../data/services';
+import { allServices, architecturalServices, services, contact } from '../data/services';
 
 export function getStaticPaths() {
   return allServices.map((service) => ({ params: { slug: service.slug }, props: { service } }));
 }
 const { service } = Astro.props;
-const group = service.local ? localServices : services;
-const i = group.findIndex((s) => s.slug === service.slug);
-const next = group[(i + 1) % group.length];
-const prev = group[(i - 1 + group.length) % group.length];
-const jsonLd = service.local ? {
+const isArchitectural = service.group === 'architectural';
+const peers = isArchitectural ? architecturalServices : services;
+const i = peers.findIndex((s) => s.slug === service.slug);
+const next = peers[(i + 1) % peers.length];
+const prev = peers[(i - 1 + peers.length) % peers.length];
+const jsonLd = {
   '@context': 'https://schema.org',
   '@type': 'Service',
   name: service.title,
-  serviceType: service.serviceType,
+  serviceType: service.serviceType ?? service.title,
   description: service.description,
   url: `https://www.i-bim.co.uk/${service.slug}`,
-  areaServed: [{ '@type': 'City', name: 'Preston' }, { '@type': 'AdministrativeArea', name: 'Lancashire' }],
-  provider: { '@type': 'ProfessionalService', name: 'iBIM', url: 'https://www.i-bim.co.uk/', telephone: '+44 7825 885167' },
-} : undefined;
+  areaServed: [{ '@type': 'AdministrativeArea', name: 'Lancashire' }, { '@type': 'Country', name: 'United Kingdom' }],
+  provider: { '@type': 'ProfessionalService', name: 'iBIM', url: 'https://www.i-bim.co.uk/', telephone: contact.phone },
+};
 ---
 <Base title={service.title} description={service.description} jsonLd={jsonLd}>
   <section class="wrap svc-hero">
     <div class="svc-hero__copy">
-      <p class="crumb"><a href={service.local ? '/#local' : '/#lifecycle'}>{service.local ? 'Preston and Lancashire' : 'Project lifecycle'}</a> <span aria-hidden="true">/</span> {service.stage}</p>
+      <p class="crumb"><a href={isArchitectural ? '/#who' : '/#lifecycle'}>{isArchitectural ? 'Architectural services' : 'Project lifecycle'}</a> <span aria-hidden="true">/</span> {service.stage}</p>
       <h1>{service.title}</h1>
       <p class="lead">{service.lead}</p>
       <a class="button" href="/contact">Talk to us about this</a>
+      <p class="small">We work across Lancashire and the wider UK. <a href="/preston-lancashire">Preston and Lancashire</a></p>
     </div>
     <figure class="model model--page" data-model data-state={service.state}>
-      <canvas role="img" aria-label={`Illustrated building model showing the ${service.stage.toLowerCase()} stage of a project.`}></canvas>
-      <figcaption class="small">Illustrative model. Drag to orbit.</figcaption>
+      <canvas role="img" aria-label={`Illustration for ${service.stage.toLowerCase()}.`}></canvas>
+      <figcaption class="small">{isArchitectural ? 'Illustrative drawing, not a real project.' : 'Illustrative model. Drag to orbit.'}</figcaption>
     </figure>
   </section>
 
@@ -49,16 +51,16 @@ const jsonLd = service.local ? {
       </div>
     )}
     {service.explainer && (
-      <div class="explainer">
+      <div class="split">
         <h2>{service.explainer.title}</h2>
-        <div class="explainer__body">
+        <div class="split__body">
           {service.explainer.body.map((x) => <p>{x}</p>)}
           {service.explainer.list && <ul>{service.explainer.list.map((x) => <li>{x}</li>)}</ul>}
         </div>
       </div>
     )}
     {service.questions && (
-      <div class="explainer">
+      <div class="split">
         <h2>Common questions</h2>
         <dl class="questions">
           {service.questions.map((x) => <div><dt>{x.q}</dt><dd>{x.a}</dd></div>)}
@@ -67,9 +69,9 @@ const jsonLd = service.local ? {
     )}
   </section>
 
-  <nav class="wrap pager" aria-label="Other lifecycle stages">
-    <a href={`/${prev.slug}`}><span class="small">Previous stage</span>{prev.short}</a>
-    <a href={`/${next.slug}`} class="pager__next"><span class="small">Next stage</span>{next.short}</a>
+  <nav class="wrap pager" aria-label={isArchitectural ? 'Other architectural services' : 'Other lifecycle stages'}>
+    <a href={`/${prev.slug}`}><span class="small">{isArchitectural ? 'Related service' : 'Previous stage'}</span>{prev.short}</a>
+    <a href={`/${next.slug}`} class="pager__next"><span class="small">{isArchitectural ? 'Related service' : 'Next stage'}</span>{next.short}</a>
   </nav>
-  <script is:inline src="/js/model.js" defer></script>
+  <script is:inline src="/js/model.js?v=3" defer></script>
 </Base>

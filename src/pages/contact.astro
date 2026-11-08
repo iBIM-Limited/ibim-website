@@ -3,11 +3,11 @@ import Base from '../layouts/Base.astro';
 import Form from '../components/Form.astro';
 import { contact } from '../data/services';
 ---
-<Base title="Contact iBIM" description="Contact iBIM for BIM solutions tailored to your planning, design, construction and operations needs." sheetName="Contact">
+<Base title="Contact iBIM" description="Contact iBIM for BIM solutions tailored to your planning, design, construction and operations needs.">
   <section class="wrap contact">
     <div class="contact__intro">
       <h1>Contact us</h1>
-      <p class="lead">Speak to us about BIM, architectural drawings, planning submissions or building regulations, in Preston, across Lancashire or further afield.</p>
+      <p class="lead">Speak to us about BIM, architectural drawings, planning submissions or building regulations.</p>
       <dl class="details">
         <div><dt>Telephone or WhatsApp</dt><dd><a href={contact.phoneHref}>{contact.phone}</a></dd></div>
         <div><dt>Email</dt><dd><a href={`mailto:${contact.email}`}>{contact.email}</a></dd></div>

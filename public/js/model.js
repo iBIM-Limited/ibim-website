@@ -63,8 +63,8 @@
   for (let i = 0; i < N(1000); i++) pt(rnd() * W, rnd() * D, H);
   for (let i = 0; i < N(600); i++) pt(9 + rnd() * 12, 4 + rnd() * 10, H + 1.8);
   for (let i = 0; i < N(2600); i++) { const x = -7 + rnd() * (W + 14), y = -5 + rnd() * (D + 13); if (x < 0 || x > W || y < 0 || y > D) pt(x, y, 0); }
-  const aMin = Math.min(...points.map((p) => p.a));
-  const aMax = Math.max(...points.map((p) => p.a));
+  // Sorted by angle, so a share of the array is the same share of the visible scan.
+  points.sort((a, b) => a.a - b.a);
 
   // Scan intensity ramp: the colours a scanner viewer uses, and only ever used here.
   const ramp = (t) => {
@@ -75,6 +75,7 @@
   };
   const rampCache = Array.from({ length: 32 }, (_, i) => ramp(i / 31));
 
+  const DURATION = { advise: 4, capture: 5, information: 6.5, sequence: 12.5, delivery: 7.8, twin: 6, drawings: 2, planning: 2, regs: 2 };
   const PHASES = ['Substructure', 'Level 1', 'Level 2', 'Level 3', 'Level 4', 'Level 5', 'Envelope', 'Services'];
   const CLASHES = [{ x: 12.2, y: 9, z: FH * 3 - 0.9 }, { x: 24.1, y: 9, z: FH * 2 - 0.9 }, { x: 6.1, y: 9, z: FH * 4 - 0.9 }];
   const SENSORS = [
@@ -174,7 +175,79 @@
     }
     const sortEnd = (a, b) => (a[1] < b[1] ? a : b);
 
+    // Flat drawing sheets for architectural pages, set out on a 640 by 480 grid.
+    function sheet(t, drawing) {
+      const p = reduced ? 1 : ease(Math.min(1, t / 1.6));
+      const fit = Math.min(width / 640, height / 480);
+      ctx.save();
+      ctx.translate((width - 640 * fit) / 2, (height - 480 * fit) / 2);
+      ctx.scale(fit, fit);
+      const stroke = (w, color = C.ink) => { ctx.lineWidth = w; ctx.strokeStyle = color; };
+      const seg = (...pts) => { ctx.beginPath(); pts.forEach(([x, y], i) => (i ? ctx.lineTo(x, y) : ctx.moveTo(x, y))); ctx.stroke(); };
+      const box = (x, y, w, h) => { ctx.beginPath(); ctx.rect(x, y, w, h); ctx.stroke(); };
+      const note = (text, x, y, align) => label(text, x, y, { size: 13, align });
+      ctx.globalAlpha = p;
+      drawing({ stroke, seg, box, note });
+      ctx.restore();
+      ctx.globalAlpha = 1;
+    }
+
     const render = {
+      drawings(t) {
+        sheet(t, ({ stroke, seg, box, note }) => {
+          ctx.fillStyle = C.tint; ctx.fillRect(40, 240, 250, 90);
+          stroke(4); box(40, 70, 250, 170);
+          seg([165, 70], [165, 170], [290, 170]);
+          stroke(3, C.greenDark); seg([40, 240], [40, 330], [290, 330], [290, 240]);
+          stroke(1); ctx.beginPath(); ctx.arc(165, 170, 34, 0, Math.PI / 2); ctx.stroke();
+          seg([165, 170], [165, 204]);
+          stroke(1, C.line); seg([40, 50], [290, 50]); seg([40, 44], [40, 56]); seg([290, 44], [290, 56]);
+          note('Plan', 40, 360); note('Proposed extension', 165, 285, 'center');
+          stroke(3); seg([350, 330], [600, 330]); box(375, 190, 200, 140);
+          seg([365, 190], [475, 105], [585, 190]);
+          stroke(1.5); box(400, 215, 50, 40); box(500, 215, 50, 40); box(400, 275, 50, 40); box(500, 275, 32, 55);
+          note('Elevation', 350, 360);
+        });
+      },
+      planning(t) {
+        sheet(t, ({ stroke, seg, box, note }) => {
+          const BLUE = '#2553a8';
+          stroke(1.5, C.line); seg([20, 395], [620, 395]); seg([20, 430], [620, 430]);
+          stroke(1, C.ink);
+          [[50, 305, 70, 60], [145, 300, 80, 65], [440, 305, 75, 60], [535, 300, 70, 65], [60, 165, 95, 75], [490, 165, 100, 80], [230, 45, 110, 60], [395, 45, 90, 60]].forEach((b) => box(...b));
+          ctx.fillStyle = C.tint; ctx.fillRect(265, 225, 80, 80);
+          stroke(1.5); box(265, 225, 80, 80);
+          stroke(3, C.clash); box(240, 145, 130, 240);
+          stroke(3, BLUE); box(370, 145, 80, 150);
+          note('Application site', 305, 410, 'center'); note('Other land owned', 455, 130, 'center');
+          stroke(2); seg([585, 110], [585, 55]); seg([573, 74], [585, 55], [597, 74]);
+          note('N', 585, 40, 'center');
+          stroke(2); seg([40, 455], [160, 455]); seg([40, 448], [40, 462]); seg([100, 450], [100, 460]); seg([160, 448], [160, 462]);
+          note('Scale bar', 175, 455);
+        });
+      },
+      regs(t) {
+        sheet(t, ({ stroke, seg, box, note }) => {
+          stroke(2); seg([30, 370], [400, 370]);
+          ctx.fillStyle = C.tint; ctx.fillRect(70, 370, 170, 60);
+          stroke(1.5); box(70, 370, 170, 60);
+          stroke(3); box(120, 110, 22, 260); box(170, 110, 22, 260);
+          stroke(2, C.greenDark); ctx.beginPath();
+          for (let y = 112, i = 0; y <= 368; y += 8, i++) { const x = i % 2 ? 150 : 162; i ? ctx.lineTo(x, y) : ctx.moveTo(x, y); }
+          ctx.stroke();
+          stroke(3); seg([192, 345], [400, 345]);
+          stroke(2.5, C.clash); seg([112, 352], [200, 352]);
+          stroke(3); seg([95, 110], [290, 25], [400, 75]);
+          stroke(2); seg([120, 110], [400, 110]);
+          stroke(2, C.greenDark); ctx.beginPath();
+          for (let x = 200, i = 0; x <= 396; x += 10, i++) { const y = i % 2 ? 96 : 106; i ? ctx.lineTo(x, y) : ctx.moveTo(x, y); }
+          ctx.stroke();
+          stroke(1);
+          [['Roof insulation', 300, 100, 80], ['Cavity insulation', 156, 220, 200], ['Floor structure', 390, 345, 290], ['Damp-proof course', 200, 352, 350], ['Foundation', 240, 400, 410]].forEach(([text, x, y, ly]) => {
+            seg([x, y], [440, ly]); note(text, 446, ly);
+          });
+        });
+      },
       advise(t) {
         setOutGrid();
         const k = reduced ? 1 : ease(Math.min(1, t / 2));
@@ -195,12 +268,13 @@
         });
       },
       capture(t) {
-        const period = 7;
-        const k = reduced ? 1 : Math.min(1, (t % (period + 2)) / period);
-        const sweep = aMin + (aMax - aMin) * k;
+        // Opens part-way through the scan, so the first frame already shows the building.
+        const k = reduced ? 1 : Math.min(1, 0.55 + 0.45 * (t / 5));
+        const shown = Math.floor(points.length * k);
+        const sweep = points[Math.max(0, shown - 1)].a;
         const size = Math.max(1.2, scale * 0.13);
-        for (const p of points) {
-          if (p.a > sweep) continue;
+        for (let n = 0; n < shown; n++) {
+          const p = points[n];
           const s = project(p.x, p.y, p.z);
           ctx.fillStyle = rampCache[Math.floor(p.i * 31)];
           ctx.fillRect(s[0], s[1], size, size);
@@ -326,7 +400,10 @@
       frame = 0;
       if (!visible || !width) return;
       ctx.clearRect(0, 0, width, height);
-      const t = (now - started) / 1000;
+      // Each stage plays once and holds. Dragging redraws the final frame.
+      const length = DURATION[state] ?? 4;
+      const elapsed = (now - started) / 1000;
+      const t = Math.min(elapsed, length);
       // The 4D view makes room for its programme chart.
       const fit = Math.min(width / 54, height / 38);
       const planned = state === 'sequence';
@@ -335,7 +412,7 @@
       oy = planned ? height * 0.5 : height * 0.7;
       (render[state] || render.advise)(t);
       dirty = false;
-      if (!reduced) frame = requestAnimationFrame(draw);
+      if (!reduced && elapsed < length) frame = requestAnimationFrame(draw);
     }
     const request = () => { if (!frame && visible) frame = requestAnimationFrame(draw); };
 
@@ -350,13 +427,12 @@
     canvas.addEventListener('pointerdown', (e) => {
       drag = { x: e.clientX, yaw };
       canvas.setPointerCapture(e.pointerId);
-      root.dispatchEvent(new CustomEvent('modelinteract'));
     });
     canvas.addEventListener('pointermove', (e) => {
       if (!drag) return;
       yaw = drag.yaw + (e.clientX - drag.x) * 0.008;
       cosY = Math.cos(yaw); sinY = Math.sin(yaw);
-      if (reduced) { frame = 0; request(); }
+      request();
     });
     const end = () => { drag = null; };
     canvas.addEventListener('pointerup', end);
@@ -384,24 +460,12 @@
 
       const stops = [...document.querySelectorAll('[data-stop]')];
       const panels = [...document.querySelectorAll('[data-panel]')];
-      const order = stops.map((s) => s.dataset.stop);
-      let timer = 0;
       const select = (name) => {
         stops.forEach((s) => s.setAttribute('aria-pressed', String(s.dataset.stop === name)));
         panels.forEach((p) => { p.hidden = p.dataset.panel !== name; });
         model.set(name);
       };
-      const stopAuto = () => { clearInterval(timer); timer = 0; };
-      stops.forEach((s) => s.addEventListener('click', () => { stopAuto(); select(s.dataset.stop); }));
-      root.addEventListener('modelinteract', stopAuto);
-      if (!reduced) {
-        let current = order.indexOf(root.dataset.state);
-        timer = setInterval(() => {
-          if (document.hidden || root.getBoundingClientRect().bottom < 0) return;
-          current = (current + 1) % order.length;
-          select(order[current]);
-        }, 10000);
-      }
+      stops.forEach((s) => s.addEventListener('click', () => select(s.dataset.stop)));
     });
   }
 

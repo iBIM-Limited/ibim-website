@@ -1,10 +1,13 @@
 ---
 interface Props { kind: 'contact' | 'waitlist' }
 const { kind } = Astro.props;
+const page = Astro.url.pathname.replace(/\.html$/, '');
 const success = kind === 'waitlist' ? 'You’re on the waiting list. We’ll email you when there’s news.' : 'Message sent. We’ll reply as soon as we can.';
 ---
 <form class="form" method="post" action="/api/enquiry" data-enquiry data-success={success} novalidate>
   <input type="hidden" name="kind" value={kind} />
+  <input type="hidden" name="source_page" value={page} />
+  <input type="hidden" name="referrer" value="" />
   <div class="trap" aria-hidden="true">
     <label for={`${kind}-website`}>Leave this empty</label>
     <input id={`${kind}-website`} name="website" tabindex="-1" autocomplete="off" />
@@ -24,6 +27,7 @@ const success = kind === 'waitlist' ? 'You’re on the waiting list. We’ll ema
       <div class="field field--wide"><label for="wl-email">Work email <span class="req">(required)</span></label><input id="wl-email" name="email" type="email" required autocomplete="email" /></div>
     </>
   )}
+  <div class="field field--wide"><label for={`${kind}-heard`}>How did you hear about us? <span class="req">(optional)</span></label><input id={`${kind}-heard`} name="heard" /></div>
   <div class="form__foot field--wide">
     <button class="button" type="submit">{kind === 'waitlist' ? 'Join the waiting list' : 'Send message'}</button>
     <p class="small">We use these details only to respond to you. See our <a href="/privacy">privacy notice</a>.</p>

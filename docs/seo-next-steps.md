@@ -1,6 +1,6 @@
 # iBIM website: SEO structure and next steps
 
-Status: planning document, 8 Nov 2026, revised after self-review. Nothing here is approved unless it says so.
+Status: 8 Nov 2026. Jack approved the section 2 structure. It is built on the test site, not on production. The tables in section 1 describe the state before that work. Council guides, the DNS switch, account changes and paid services remain unapproved.
 
 **Recommendation:** finish launch first, aiming to go live by about 27 Nov. Use general service pages, a plain-English home page that routes each audience, and one Preston and Lancashire page. Do not start a local page pilot until the site is live and the gates in section 3 pass.
 
@@ -292,8 +292,6 @@ Do not start until Jack approves the decision below. Commit the current work fir
 - Nothing depends on Hostinger any more
 - The site has been stable for about a week
 
-## Decision needed from Jack
+## Decision record
 
-**Approve the section 2 structure?** General service pages in the menu, a home page routing all 5 audiences with no Preston on it, and the 4 Preston pages merged into 1 local page, reachable from the footer and service pages.
-
-This would replace "keep the 4 pages in the sitemap". The audience question is settled **[J]**, and everything else can follow from this decision.
+Jack approved the section 2 structure on 8 Nov 2026, including merging the 4 Preston pages into 1 local page **[J]**. This replaces his earlier request to keep the 4 pages in the sitemap.

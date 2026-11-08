@@ -53,6 +53,10 @@
       button.disabled = true;
       show('Sending…', 'pending');
       try {
+        const from = document.referrer ? new URL(document.referrer).hostname : '';
+        form.elements.referrer.value = from === location.hostname ? '' : from;
+      } catch { /* A malformed referrer is left blank. */ }
+      try {
         const res = await fetch(form.action, { method: 'POST', body: new FormData(form), headers: { Accept: 'application/json' } });
         const body = await res.json().catch(() => ({}));
         if (!res.ok) return fail(body.error || 'The message didn’t send. Call +44 7825 885167 or email jack@i-bim.co.uk.', body.missing);
