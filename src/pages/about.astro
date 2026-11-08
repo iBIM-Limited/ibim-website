@@ -1,0 +1,29 @@
+---
+import Base from '../layouts/Base.astro';
+const values = ['Trust', 'Partner', 'Innovate'];
+---
+<Base title="About iBIM" description="iBIM helps organisations in the built environment use BIM processes to improve collaboration and efficiency and achieve sustainable outcomes." sheetName="About">
+  <section class="wrap page-head">
+    <h1>Giving back to construction with advanced BIM solutions</h1>
+  </section>
+  <section class="wrap statements">
+    <div>
+      <h2>Our mission</h2>
+      <p>To enable organisations in the built environment with cutting-edge digital solutions, integrating BIM processes to drive collaboration, optimise efficiency and enable sustainable outcomes across every project lifecycle.</p>
+    </div>
+    <div>
+      <h2>Our vision</h2>
+      <p>To be the leading force in transforming the construction industry through innovative digital methodologies, fostering seamless collaboration and setting the benchmark for sustainable and intelligent project delivery and operation.</p>
+    </div>
+  </section>
+  <section class="wrap values">
+    <h2>Our values</h2>
+    <ul>{values.map((v) => <li>{v}</li>)}</ul>
+  </section>
+  <section class="cta">
+    <div class="wrap cta__grid">
+      <div><h2>Work with us</h2><p>Tell us what you’re planning and we’ll help you work out where to start.</p></div>
+      <a class="button button--ink" href="/contact">Contact iBIM</a>
+    </div>
+  </section>
+</Base>

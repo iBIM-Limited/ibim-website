@@ -1,0 +1,92 @@
+---
+import Base from '../layouts/Base.astro';
+import { services } from '../data/services';
+
+const initial = 'capture';
+const targets = [
+  { value: '33%', title: 'Lower costs', body: 'Reduction in the initial cost of construction and the whole life cost of built assets.' },
+  { value: '50%', title: 'Faster delivery', body: 'Reduction in the overall time from inception to completion, for new-build and refurbished assets.' },
+  { value: '50%', title: 'Lower emissions', body: 'Reduction in greenhouse gas emissions in the built environment.' },
+  { value: '50%', title: 'Improvement in exports', body: 'Reduction in the trade gap between total exports and total imports for construction products and materials.' },
+];
+const sectors = ['Residential', 'Commercial', 'Civil Engineering & Infrastructure', 'Industrial'];
+---
+<Base title="iBIM | BIM Consultancy" description="iBIM is a BIM consultancy offering end-to-end BIM lifecycle consulting: advisory and implementation, reality capture and modelling, information management, 4D and 5D, project management and digital twins." sheetName="Home">
+  <section class="wrap hero" id="lifecycle">
+    <div class="hero__copy">
+      <h1>Simplifying AEC with integrated digital solutions</h1>
+      <p class="lead">Our collaborative approach to real-time decision-making gives you more control, with transparency and efficiency.</p>
+      <div class="actions">
+        <a class="button" href="/contact">Talk to us about a project</a>
+        <a class="textlink" href="/about">About iBIM</a>
+      </div>
+    </div>
+
+    <figure class="model model--hero" data-model data-state={initial} data-lifecycle>
+      <canvas role="img" aria-label="Illustrated building model that changes with each stage of the project lifecycle."></canvas>
+      <figcaption class="small">Illustrative model. Drag to orbit.</figcaption>
+    </figure>
+
+    <div class="lifecycle">
+      <h2>End-to-end BIM lifecycle consulting</h2>
+      <div class="stops" role="group" aria-label="Choose a lifecycle stage">
+        {services.map((s) => (
+          <button type="button" class="stop" data-stop={s.state} aria-pressed={s.state === initial ? 'true' : 'false'}>
+            <span class="stop__stage">{s.stage}</span>
+            <span class="stop__name">{s.short}</span>
+          </button>
+        ))}
+      </div>
+      <div class="stop-panels">
+        {services.map((s) => (
+          <div class="stop-panel" data-panel={s.state} hidden={s.state !== initial}>
+            <p>{s.lead}</p>
+            <a class="textlink" href={`/${s.slug}`}>See {s.name}</a>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <section class="approach">
+    <div class="wrap approach__grid">
+      <h2>A holistic view of the industry</h2>
+      <div class="approach__body">
+        <p>We take on the challenges people face day to day: eliminating silos, enabling smarter decisions and saving costs, with a green approach.</p>
+        <button type="button" class="video" data-video="ly6469N83WA" aria-label="Play the iBIM video about BIM. Loads from YouTube.">
+          <img src="/img/video-bim.jpg" alt="" width="480" height="360" loading="lazy" />
+          <span class="video__play">Play video (YouTube)</span>
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <section class="wrap targets">
+    <div class="targets__head">
+      <h2>What the industry is aiming for</h2>
+      <p>The UK Government set these targets for construction in its Construction 2025 strategy. BIM is one of the ways the industry can work towards them.</p>
+    </div>
+    <dl class="targets__grid">
+      {targets.map((t) => (
+        <div><dd class="targets__value">{t.value}</dd><dt>{t.title}</dt><dd>{t.body}</dd></div>
+      ))}
+    </dl>
+    <p class="small">Source: HM Government, Construction 2025 (2013). These are national targets, not iBIM project results.</p>
+  </section>
+
+  <section class="wrap sectors">
+    <h2>Sectors we work in</h2>
+    <ul>{sectors.map((s) => <li>{s}</li>)}</ul>
+  </section>
+
+  <section class="cta">
+    <div class="wrap cta__grid">
+      <div>
+        <h2>Bring us your next project</h2>
+        <p>Speak to us about planning, design, construction or operations.</p>
+      </div>
+      <a class="button button--ink" href="/contact">Contact iBIM</a>
+    </div>
+  </section>
+  <script is:inline src="/js/model.js" defer></script>
+</Base>

@@ -1,0 +1,21 @@
+---
+import Base from '../layouts/Base.astro';
+import { contact } from '../data/services';
+---
+<Base title="Privacy notice" description="How iBIM handles the personal information you send through this website." sheetName="Privacy">
+  <section class="wrap page-head"><h1>Privacy notice</h1></section>
+  <section class="wrap prose">
+    <h2>What we collect</h2>
+    <p>When you send a form on this website, we collect the details you enter, such as your name, email address, company, job title and message. We also store a one-way scrambled version of your internet address to limit spam.</p>
+    <h2>How we use it</h2>
+    <p>We use your details to respond to your enquiry or to contact you about the digital twin platform waiting list. We rely on our legitimate interest in responding to people who contact us, or on your consent when you join the waiting list.</p>
+    <h2>Who handles it</h2>
+    <p>This website and its form data are hosted by Cloudflare. Email is handled by Google. We don’t sell your details.</p>
+    <h2>Cookies and tracking</h2>
+    <p>This website doesn’t set advertising or analytics cookies. If you choose to play the video, it loads from YouTube, which may then set its own cookies.</p>
+    <h2>How long we keep it</h2>
+    <p>We keep enquiries for up to two years unless we start working together, or until you ask us to delete them.</p>
+    <h2>Your rights</h2>
+    <p>You can ask to see, correct or delete your information, or object to how we use it, by emailing <a href={`mailto:${contact.email}`}>{contact.email}</a>. You can also complain to the <a href="https://ico.org.uk/make-a-complaint/" rel="noopener">Information Commissioner’s Office</a>.</p>
+  </section>
+</Base>

@@ -1,0 +1,46 @@
+---
+import Base from '../layouts/Base.astro';
+import { services } from '../data/services';
+
+export function getStaticPaths() {
+  return services.map((service, i) => ({ params: { slug: service.slug }, props: { service, i } }));
+}
+const { service, i } = Astro.props;
+const next = services[(i + 1) % services.length];
+const prev = services[(i - 1 + services.length) % services.length];
+---
+<Base title={service.title} description={service.description}>
+  <section class="wrap svc-hero">
+    <div class="svc-hero__copy">
+      <p class="crumb"><a href="/#lifecycle">Project lifecycle</a> <span aria-hidden="true">/</span> {service.stage}</p>
+      <h1>{service.title}</h1>
+      <p class="lead">{service.lead}</p>
+      <a class="button" href="/contact">Talk to us about this</a>
+    </div>
+    <figure class="model model--page" data-model data-state={service.state}>
+      <canvas role="img" aria-label={`Illustrated building model showing the ${service.stage.toLowerCase()} stage of a project.`}></canvas>
+      <figcaption class="small">Illustrative model. Drag to orbit.</figcaption>
+    </figure>
+  </section>
+
+  <section class="wrap steps-section">
+    <h2>How we work</h2>
+    <ol class="steps">
+      {service.steps.map((step) => (
+        <li><h3>{step.title}</h3><p>{step.body}</p></li>
+      ))}
+    </ol>
+    {service.includes && (
+      <div class="includes">
+        <h3>What this covers</h3>
+        <ul>{service.includes.map((x) => <li>{x}</li>)}</ul>
+      </div>
+    )}
+  </section>
+
+  <nav class="wrap pager" aria-label="Other lifecycle stages">
+    <a href={`/${prev.slug}`}><span class="small">Previous stage</span>{prev.short}</a>
+    <a href={`/${next.slug}`} class="pager__next"><span class="small">Next stage</span>{next.short}</a>
+  </nav>
+  <script is:inline src="/js/model.js" defer></script>
+</Base>
