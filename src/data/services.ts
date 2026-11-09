@@ -147,12 +147,12 @@ export const architecturalServices: Service[] = [
     name: 'Planning submissions',
     short: 'Planning submissions',
     title: 'Planning drawings and submissions',
-    description: 'Planning drawings and application submissions, prepared to meet national requirements and your council’s local validation list.',
-    lead: 'We prepare planning drawings and submit applications, so your application has what the council needs to validate and assess it.',
+    description: 'Planning drawings and application submissions, handled in house or with planning consultants we work with, to meet national and local requirements.',
+    lead: 'We prepare planning drawings and manage applications, in house or with planning consultants we work with, so your application has what the council needs to validate and assess it.',
     steps: [
       { title: 'Check what you need', body: 'We look at your site and proposal, and work out which application and supporting documents it is likely to need.' },
       { title: 'Prepare the application', body: 'We produce the drawings and bring together the form, plans and supporting information.' },
-      { title: 'Submit and respond', body: 'We submit the application and deal with questions from the planning officer about the drawings.' },
+      { title: 'Submit and respond', body: 'The application is submitted, and questions from the planning officer are dealt with, by us or by a planning consultant we work with.' },
     ],
     explainer: {
       title: 'What a planning application needs',
@@ -168,6 +168,7 @@ export const architecturalServices: Service[] = [
     questions: [
       { q: 'What drawings do I need for a planning application?', a: 'At minimum, a location plan. Most proposals also need further plans and drawings to show what is proposed, and your council’s local list may ask for more.' },
       { q: 'Do I need planning permission?', a: 'Not every project does, and the answer depends on the building, its location and the work. We can look at your proposal, and the council can confirm the position formally.' },
+      { q: 'Who handles the planning work?', a: 'Sometimes we handle it in house, and sometimes we work with planning consultants, depending on the project. We’ll tell you who is involved before work starts.' },
       { q: 'Can you guarantee planning permission?', a: 'No. The council makes the decision. We can make sure your application is complete and clearly presented, and tell you about any concerns we see.' },
     ],
   },
@@ -205,7 +206,7 @@ export const sheets = [
   { path: '/', name: 'Home' },
   ...allServices.map((s) => ({ path: `/${s.slug}`, name: s.short })),
   { path: '/preston-lancashire', name: 'Preston and Lancashire' },
-  { path: '/software-development', name: 'Software development' },
+  { path: '/software-development', name: 'Software and automation' },
   { path: '/about', name: 'About' },
   { path: '/contact', name: 'Contact' },
   { path: '/privacy', name: 'Privacy' },
