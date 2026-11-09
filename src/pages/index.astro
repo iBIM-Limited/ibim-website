@@ -5,8 +5,8 @@ import { allServices, services } from '../data/services';
 const initial = 'capture';
 const byStage = Object.fromEntries(allServices.map((s) => [s.slug, s]));
 const audiences = [
-  { name: 'Homeowners', need: 'Drawings and approvals for your project.', links: ['architectural-drawings', 'planning-submissions', 'building-regulations-drawings'] },
-  { name: 'Developers', need: 'Drawings, approvals and coordination across a scheme.', links: ['planning-submissions', 'building-regulations-drawings', 'bim-advisory'] },
+  { name: 'Homeowners', need: 'Drawings and approvals for your project.', links: ['architectural-drawings', 'planning-submissions', 'building-regulations-drawings', '3d-visuals-and-real-time-visualisation'] },
+  { name: 'Developers', need: 'Drawings, approvals and coordination across a scheme.', links: ['planning-submissions', 'building-regulations-drawings', '3d-visuals-and-real-time-visualisation', 'bim-advisory'] },
   { name: 'Land owners', need: 'Site information and a route through planning.', links: ['planning-submissions', 'reality-capture-and-3d-modelling-services'] },
   { name: 'Construction companies', need: 'Coordination, sequencing and cost on site and in the office.', links: ['information-management', 'construction-sequencing-and-cost-consultancy-4d5d', 'reality-capture-and-3d-modelling-services'] },
   { name: 'M&E companies', need: 'MEP modelling and coordination with other disciplines.', links: ['reality-capture-and-3d-modelling-services', 'information-management'] },
@@ -17,16 +17,16 @@ const sectors = ['Residential', 'Commercial', 'Civil engineering and infrastruct
   <section class="wrap hero" id="lifecycle">
     <div class="hero__copy">
       <h1>We help you plan, design and deliver building projects</h1>
-      <p class="lead">Architectural, planning and BIM services, backed by software and automation, for homeowners, developers, land owners, construction and M&amp;E companies.</p>
+      <p class="lead">Architectural, planning, BIM and 3D visual services, backed by software and automation, for homeowners, developers, land owners, construction and M&amp;E companies.</p>
       <div class="actions">
         <a class="button" href="/contact">Talk to us about a project</a>
         <a class="textlink" href="/about">About iBIM</a>
       </div>
     </div>
 
-    <figure class="model model--hero" data-model data-state={initial} data-lifecycle>
-      <canvas role="img" aria-label="Illustrated building model that changes with each stage of the project lifecycle."></canvas>
-      <figcaption class="small">Illustrative model. Drag to orbit.</figcaption>
+    <figure class="model model--hero" data-model data-state="journey" data-lifecycle>
+      <canvas role="img" aria-label="A building shown first as a laser scan point cloud, then a 3D model, then a finished 3D visual that you can move around."></canvas>
+      <figcaption class="small">Illustrative model. Drag to look around.</figcaption>
     </figure>
 
     <div class="lifecycle">
@@ -92,5 +92,5 @@ const sectors = ['Residential', 'Commercial', 'Civil engineering and infrastruct
       <a class="button button--ink" href="/contact">Contact iBIM</a>
     </div>
   </section>
-  <script is:inline src="/js/model.js?v=3" defer></script>
+  <script is:inline src="/js/model.js?v=4" defer></script>
 </Base>

@@ -36,7 +36,7 @@ export const services: Service[] = [
   {
     slug: 'reality-capture-and-3d-modelling-services',
     questions: [{ q: 'What is scan to BIM?', a: 'A building or site is captured with laser scanning or other survey methods, and that data is then used to create a 3D model of what exists.' }],
-    state: 'capture',
+    state: 'journey',
     stage: 'Capture',
     name: 'Reality capture and 3D modelling',
     short: 'Reality capture',
@@ -196,6 +196,26 @@ export const architecturalServices: Service[] = [
     questions: [
       { q: 'Who checks building regulations work?', a: 'You can usually use the local authority’s building control team or a registered building control approver. Higher-risk buildings follow a separate route through the Building Safety Regulator.' },
       { q: 'What is the difference between full plans and a building notice?', a: 'With full plans, your drawings are checked before work starts. With a building notice, work is inspected as it goes, without an approved set of plans. A building notice can’t be used for all work, so check before choosing it.' },
+    ],
+  },
+  {
+    slug: '3d-visuals-and-real-time-visualisation',
+    state: 'visual', stage: '3D visuals', group: 'architectural',
+    serviceType: '3D visualisation and real-time space visualisation',
+    name: '3D visuals and real-time visualisation',
+    short: '3D visuals',
+    title: '3D visuals and real-time space visualisation',
+    description: '3D visuals and real-time space visualisation, so you can understand a building or space and make decisions before it is built or changed.',
+    lead: 'We turn surveys and models into 3D visuals and real-time views of a space, so you can understand a design and make decisions before work starts.',
+    steps: [
+      { title: 'Start from real information', body: 'We work from your drawings, an existing model or point cloud data captured on site.' },
+      { title: 'Build the 3D model', body: 'We create or develop a 3D model of the building or space.' },
+      { title: 'Show the space', body: 'We produce 3D visuals and real-time views, so clients, planners and project teams can see what is proposed.' },
+    ],
+    includes: ['3D visuals', 'Real-time space visualisation', 'Point cloud to model'],
+    questions: [
+      { q: 'What is real-time visualisation?', a: 'It is a view of a 3D model that you can move around and explore as you choose, instead of looking at a fixed image.' },
+      { q: 'Do I need a BIM model first?', a: 'No. We can start from drawings or a survey and build what the project needs.' },
     ],
   },
 ];

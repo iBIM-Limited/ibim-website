@@ -3,7 +3,7 @@
   const css = getComputedStyle(document.documentElement);
   const token = (name) => css.getPropertyValue(name).trim();
   const C = {
-    ink: token('--ink'), green: token('--green'), greenDark: token('--green-dark'),
+    ink: token('--ink'), muted: token('--muted'), green: token('--green'), greenDark: token('--green-dark'),
     tint: token('--tint'), line: token('--line'), paper: token('--paper'), clash: token('--clash'),
   };
   const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -75,7 +75,7 @@
   };
   const rampCache = Array.from({ length: 32 }, (_, i) => ramp(i / 31));
 
-  const DURATION = { advise: 4, capture: 5, information: 6.5, sequence: 12.5, delivery: 7.8, twin: 6, drawings: 2, planning: 2, regs: 2 };
+  const DURATION = { journey: 13.5, visual: 6, advise: 4, capture: 5, information: 6.5, sequence: 12.5, delivery: 7.8, twin: 6, drawings: 2, planning: 2, regs: 2 };
   const PHASES = ['Substructure', 'Level 1', 'Level 2', 'Level 3', 'Level 4', 'Level 5', 'Envelope', 'Services'];
   const CLASHES = [{ x: 12.2, y: 9, z: FH * 3 - 0.9 }, { x: 24.1, y: 9, z: FH * 2 - 0.9 }, { x: 6.1, y: 9, z: FH * 4 - 0.9 }];
   const SENSORS = [
@@ -88,7 +88,7 @@
     const canvas = root.querySelector('canvas');
     const ctx = canvas.getContext('2d');
     let state = root.dataset.state, started = performance.now();
-    let yaw = 0.62, width = 0, height = 0, scale = 1, ox = 0, oy = 0, visible = true, frame = 0, dirty = true;
+    let yaw = 0.62, baseYaw = 0.62, master = 1, width = 0, height = 0, scale = 1, ox = 0, oy = 0, visible = true, frame = 0, dirty = true;
     let cosY = Math.cos(yaw), sinY = Math.sin(yaw);
 
     const project = (x, y, z) => {
@@ -118,7 +118,7 @@
         { pts: [p(x + w, y, z), p(x + w, y + d, z), p(x + w, y + d, z + h), p(x + w, y, z + h)], nx: 1, ny: 0, shade: 0.86 },
         { pts: [p(x, y, z), p(x, y + d, z), p(x, y + d, z + h), p(x, y, z + h)], nx: -1, ny: 0, shade: 0.86 },
       ];
-      ctx.globalAlpha = style.alpha ?? 1;
+      ctx.globalAlpha = (style.alpha ?? 1) * master;
       for (const f of faces) {
         if (f.nx * sinY + f.ny * cosY <= 0) continue;
         path(f.pts);
@@ -128,7 +128,7 @@
       path([p(x, y, z + h), p(x + w, y, z + h), p(x + w, y + d, z + h), p(x, y + d, z + h)]);
       if (style.fill) { ctx.fillStyle = style.fill; ctx.fill(); }
       if (style.stroke) { ctx.strokeStyle = style.stroke; ctx.lineWidth = style.lw || 0.6; ctx.stroke(); }
-      ctx.globalAlpha = 1;
+      ctx.globalAlpha = master;
     }
     function path(pts) {
       ctx.beginPath();
@@ -192,7 +192,95 @@
       ctx.globalAlpha = 1;
     }
 
+    // The finished visual: same geometry, shown as materials, ground and planting.
+    const TREES = [[-6, -3], [-7, 13], [36, -2], [37, 11], [8, -7], [24, -7], [-5, 24], [20, 25], [34, 25]];
+    function visualScene() {
+      const corner = (x, y) => project(x, y, 0);
+      path([corner(-11, -9), corner(41, -9), corner(41, 29), corner(-11, 29)]);
+      ctx.globalAlpha = master; ctx.fillStyle = '#e4ecdf'; ctx.fill();
+      path([corner(2, 18), corner(W + 12, 18), corner(W + 12, 28), corner(2, 28)]);
+      ctx.fillStyle = '#d5d6d0'; ctx.fill();
+      // Soft building shadow on the ground.
+      path([corner(W, 0), corner(W + 9, 3), corner(W + 9, D + 3), corner(W, D)]);
+      ctx.globalAlpha = master * 0.14; ctx.fillStyle = '#26302a'; ctx.fill();
+      ctx.globalAlpha = master;
+      const trunk = '#6b5a45';
+      const items = [
+        ...boxes.filter((b) => b.type !== 'duct' && b.type !== 'beam' && b.type !== 'column' && b.type !== 'core').map((b) => ({ b })),
+        ...TREES.map((t) => ({ tree: t })),
+      ].map((it) => {
+        const [x, y] = it.b ? [it.b.x + it.b.w / 2, it.b.y + it.b.d / 2] : it.tree;
+        const z = it.b ? it.b.z + it.b.h / 2 : 0;
+        return { ...it, k: project(x, y, 0)[2] + z * 1.2 };
+      }).sort((a, c) => a.k - c.k);
+      for (const it of items) {
+        if (it.tree) {
+          const base = project(it.tree[0], it.tree[1], 0), top = project(it.tree[0], it.tree[1], 3.2);
+          ctx.strokeStyle = trunk; ctx.lineWidth = Math.max(1.5, scale * 0.28); line(base, top);
+          const crown = project(it.tree[0], it.tree[1], 5);
+          ctx.fillStyle = C.green; ctx.beginPath(); ctx.arc(crown[0], crown[1], scale * 2.1, 0, 7); ctx.fill();
+          ctx.fillStyle = C.greenDark; ctx.globalAlpha = master * 0.35; ctx.beginPath(); ctx.arc(crown[0] + scale * 0.6, crown[1] + scale * 0.6, scale * 1.4, 0, 7); ctx.fill(); ctx.globalAlpha = master;
+        } else if (it.b.type === 'glass') {
+          drawBox(it.b, { fill: '#a9cfdf', side: '#7fb0c9', stroke: '#47606e', lw: 0.5 });
+        } else if (it.b.type === 'plant') {
+          drawBox(it.b, { fill: '#c9ccc8', side: '#a7aba6', stroke: '#5d625d', lw: 0.5 });
+        } else {
+          drawBox(it.b, { fill: '#f3f2ee', side: '#d9d8d2', stroke: '#6f716c', lw: 0.4 });
+        }
+      }
+    }
+
+    function journeyLabels(active) {
+      const names = ['Point cloud', '3D model', '3D visual', 'Real-time view'];
+      names.forEach((name, i) => {
+        const y = 16 + i * 20;
+        ctx.globalAlpha = 1;
+        ctx.fillStyle = i === active ? C.green : C.tint;
+        ctx.beginPath(); ctx.arc(18, y, 5, 0, 7); ctx.fill();
+        label(name, 30, y, { color: i === active ? C.ink : C.muted, size: 11 });
+      });
+    }
+
     const render = {
+      journey(t0) {
+        const t = reduced ? DURATION.journey : t0;
+        const seg = (a, b) => ease(clamp((t - a) / (b - a)));
+        const cloud = 1 - seg(3.6, 6.2);
+        const wire = seg(3.4, 5.4) * (1 - seg(6.2, 8.4));
+        const solid = seg(6.2, 8.6);
+        yaw = baseYaw + 0.62 * seg(9.4, 13.5);
+        cosY = Math.cos(yaw); sinY = Math.sin(yaw);
+        if (solid > 0) { master = solid; visualScene(); master = 1; }
+        if (wire > 0) {
+          master = wire;
+          for (const b of sorted()) {
+            if (b.type === 'glass') continue;
+            if (b.type === 'duct') drawBox(b, { stroke: C.greenDark, lw: 0.6 });
+            else if (b.type === 'slab') drawBox(b, { stroke: C.ink, lw: 0.35, alpha: 0.35 });
+            else drawBox(b, { stroke: C.ink, lw: 0.5, alpha: 0.8 });
+          }
+          master = 1;
+        }
+        if (cloud > 0) {
+          const shown = Math.floor(points.length * Math.min(1, 0.55 + 0.45 * (t / 3)));
+          const size = Math.max(1.2, scale * 0.13);
+          ctx.globalAlpha = cloud;
+          for (let n = 0; n < shown; n++) {
+            const p = points[n], s = project(p.x, p.y, p.z);
+            ctx.fillStyle = rampCache[Math.floor(p.i * 31)];
+            ctx.fillRect(s[0], s[1], size, size);
+          }
+          ctx.globalAlpha = 1;
+        }
+        ctx.globalAlpha = 1;
+        journeyLabels(t < 3.9 ? 0 : t < 7 ? 1 : t < 9.4 ? 2 : 3);
+      },
+      visual(t) {
+        const g = reduced ? 1 : ease(clamp(t / 1.2));
+        yaw = baseYaw + (reduced ? 0.4 : 0.4 * ease(clamp(t / 6)));
+        cosY = Math.cos(yaw); sinY = Math.sin(yaw);
+        master = g; visualScene(); master = 1; ctx.globalAlpha = 1;
+      },
       drawings(t) {
         sheet(t, ({ stroke, seg, box, note }) => {
           ctx.fillStyle = C.tint; ctx.fillRect(40, 240, 250, 90);
@@ -425,11 +513,12 @@
 
     let drag = null;
     canvas.addEventListener('pointerdown', (e) => {
-      drag = { x: e.clientX, yaw };
+      drag = { x: e.clientX, yaw, base: baseYaw };
       canvas.setPointerCapture(e.pointerId);
     });
     canvas.addEventListener('pointermove', (e) => {
       if (!drag) return;
+      baseYaw = drag.base + (e.clientX - drag.x) * 0.008;
       yaw = drag.yaw + (e.clientX - drag.x) * 0.008;
       cosY = Math.cos(yaw); sinY = Math.sin(yaw);
       request();
@@ -442,7 +531,7 @@
     request();
     return {
       set(next) {
-        state = next; started = performance.now();
+        state = next; started = performance.now(); baseYaw = yaw;
         if (frame) { cancelAnimationFrame(frame); frame = 0; }
         request();
       },
