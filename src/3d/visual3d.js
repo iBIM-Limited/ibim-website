@@ -439,7 +439,7 @@ export function mount(root, { mode = 'journey', onReady }) {
   onReady?.();
 
   return {
-    show() { active = true; photo.style.opacity = '0'; root.classList.add('model--has-3d'); labels.hidden = false; t = reduced ? LENGTH : start; offset = t; running = !reduced; apply(t); clock.start(); needsDraw = true; wake(); },
-    hide() { active = false; running = false; root.classList.remove('model--has-3d'); labels.hidden = true; },
+    show() { active = true; photo.hidden = false; photo.style.transition = ''; photo.style.opacity = '0'; root.classList.add('model--has-3d'); labels.hidden = false; t = reduced ? LENGTH : start; offset = t; running = !reduced; apply(t); clock.start(); needsDraw = true; wake(); },
+    hide() { active = false; running = false; photo.style.transition = 'none'; photo.style.opacity = '0'; photo.hidden = true; root.classList.remove('model--has-3d'); labels.hidden = true; },
   };
 }

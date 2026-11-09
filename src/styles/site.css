@@ -240,7 +240,7 @@ a:hover { color: var(--green-dark); }
 
 /* Real-time 3D scene, layered over the fallback drawing */
 .model { position: relative; }
-.model__3d { display: none; }
+.model > .model__3d { display: none; }
 .model--has-3d > canvas:first-child { visibility: hidden; }
 .model--has-3d > .model__3d { display: block; position: absolute; top: 0; left: 0; width: 100%; }
 .model--hero .model__3d { aspect-ratio: 5 / 4; }
