@@ -29,7 +29,10 @@ export default {
   async fetch(request, env) {
     const url = new URL(request.url);
 
-    if (url.hostname === 'i-bim.co.uk') {
+    // One redirect to the single HTTPS www address.
+    const onOurDomain = url.hostname === 'i-bim.co.uk' || url.hostname === CANONICAL_HOST;
+    if (onOurDomain && (url.protocol === 'http:' || url.hostname === 'i-bim.co.uk')) {
+      url.protocol = 'https:';
       url.hostname = CANONICAL_HOST;
       return Response.redirect(url.toString(), 301);
     }

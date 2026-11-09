@@ -15,7 +15,11 @@
   "d1_databases": [
     { "binding": "DB", "database_name": "ibim-enquiries", "database_id": "f216721c-9b8d-4505-99e6-91789a9701a2", "migrations_dir": "migrations" }
   ],
-  // Custom domains are added at switch-over.
+  // Worker routes serve the site on the proxied records, so no DNS records change.
+  "routes": [
+    { "pattern": "www.i-bim.co.uk/*", "zone_name": "i-bim.co.uk" },
+    { "pattern": "i-bim.co.uk/*", "zone_name": "i-bim.co.uk" }
+  ],
   "env": {
     "local": {
       "name": "ibim-website-local",
