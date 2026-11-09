@@ -217,4 +217,6 @@ export const contact = {
   email: 'jack@i-bim.co.uk',
   hours: '8.30 am to 5.30 pm',
   linkedin: 'https://www.linkedin.com/company/ibim-ltd/',
+  companyNumber: '16143866',
+  registeredOffice: '12 Greenfields Crescent, Wesham, Preston, England, PR4 3EH',
 };

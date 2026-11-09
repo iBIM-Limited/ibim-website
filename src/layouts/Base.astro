@@ -21,6 +21,7 @@ const organisation = {
   '@context': 'https://schema.org',
   '@type': 'ProfessionalService',
   name: 'iBIM',
+  legalName: 'iBIM Limited',
   url: 'https://www.i-bim.co.uk/',
   logo: 'https://www.i-bim.co.uk/img/ibim-logo.png',
   description: 'BIM consultancy offering end-to-end BIM lifecycle consulting for architecture, engineering, construction and operations.',
@@ -115,8 +116,9 @@ const organisation = {
         </div>
         <div class="tb">
           <span class="tb__label">Issued</span>
-          <span>© {year} iBIM. <a href="/privacy">Privacy</a></span>
+          <span>© {year} iBIM Limited. <a href="/privacy">Privacy</a></span>
         </div>
+        <p class="tb tb--legal small">iBIM Limited. Registered in England and Wales, company number {contact.companyNumber}. Registered office: {contact.registeredOffice}.</p>
       </div>
     </footer>
   </body>
