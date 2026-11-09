@@ -1,6 +1,6 @@
 ---
 import Base from '../layouts/Base.astro';
-import { allServices, services } from '../data/services';
+import { allServices, recentWork, services } from '../data/services';
 
 const initial = 'journey';
 const byStage = Object.fromEntries(allServices.map((s) => [s.slug, s]));
@@ -62,6 +62,13 @@ const sectors = ['Residential', 'Commercial', 'Civil engineering and infrastruct
           </ul>
         </li>
       ))}
+    </ul>
+  </section>
+
+  <section class="wrap who" id="work">
+    <h2>Recent work</h2>
+    <ul class="link-list">
+      {recentWork.map((w) => <li><a href={`/${w.slug}`}><strong>{w.title}</strong><span>{w.body}</span></a></li>)}
     </ul>
   </section>
 

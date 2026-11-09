@@ -48,7 +48,7 @@ export const services: Service[] = [
       { title: 'Create 3D models', body: 'We turn captured data into precise, reliable 3D representations, using automation. This covers projects and manufacturers who want to digitally productise what they offer.' },
       { title: 'Align and validate', body: 'We make sure disciplines stay consistent with each other and visualise designs for stakeholder approval.' },
     ],
-    includes: ['Architecture', 'MEP', 'Structural', 'FF&E', 'Civil'],
+    includes: ['Point cloud to floor plan conversion', 'Architecture', 'MEP', 'Structural', 'FF&E', 'Civil'],
   },
   {
     slug: 'information-management',
@@ -136,7 +136,7 @@ export const architecturalServices: Service[] = [
     includes: ['Existing plans and elevations', 'Proposed plans and elevations', 'Sections', 'Location and site plans', '3D models'],
     questions: [
       { q: 'What drawings do I need for my project?', a: 'It depends on the work and the approvals it needs. Most projects start with drawings of what exists and what is proposed. Planning and building regulations then need different information, so tell us what you are planning and we’ll advise.' },
-      { q: 'Are you architects?', a: 'iBIM provides architectural drawing and BIM services. In the UK, only people registered with the Architects Registration Board can use the title architect. Ask us who will work on your project and what qualifications they hold.' },
+      { q: 'Are you architects?', a: 'iBIM provides architectural drawing and BIM services. In the UK, only people registered with the Architects Registration Board can use the title architect. Our director, Jack Ward, holds a BSc (Hons) in Building Surveying and a Postgraduate Diploma in BIM and Project Management.' },
       { q: 'How much do architectural drawings cost?', a: 'It depends on the size of the building, what already exists and which approvals you need. Tell us about the project and we’ll give you a quote.' },
     ],
   },
@@ -218,6 +218,13 @@ export const architecturalServices: Service[] = [
       { q: 'Do I need a BIM model first?', a: 'No. We can start from drawings or a survey and build what the project needs.' },
     ],
   },
+];
+
+// Real work supplied by Jack. Add detail only when he confirms it.
+export const recentWork = [
+  { title: 'Point cloud to floor plan conversions', body: 'Turning point cloud survey data into floor plans.', slug: 'reality-capture-and-3d-modelling-services' },
+  { title: 'Planning drawings for a house in Lytham', body: 'Drawings prepared for a residential planning application.', slug: 'planning-submissions' },
+  { title: '3D visuals for projects', body: 'Showing what a project will look like before work starts.', slug: '3d-visuals-and-real-time-visualisation' },
 ];
 
 export const allServices = [...architecturalServices, ...services];
