@@ -2,7 +2,7 @@
 import Base from '../layouts/Base.astro';
 import { allServices, services } from '../data/services';
 
-const initial = 'capture';
+const initial = 'journey';
 const byStage = Object.fromEntries(allServices.map((s) => [s.slug, s]));
 const audiences = [
   { name: 'Homeowners', need: 'Drawings and approvals for your project.', links: ['architectural-drawings', 'planning-submissions', 'building-regulations-drawings', '3d-visuals-and-real-time-visualisation'] },
@@ -25,8 +25,8 @@ const sectors = ['Residential', 'Commercial', 'Civil engineering and infrastruct
     </div>
 
     <figure class="model model--hero" data-model data-state="journey" data-lifecycle>
-      <canvas role="img" aria-label="A building shown first as a laser scan point cloud, then a 3D model, then a finished 3D visual that you can move around."></canvas>
-      <figcaption class="small">Illustrative model. Drag to look around.</figcaption>
+      <canvas role="img" aria-label="A building shown first as a laser scan point cloud, then a 3D model, then a realistic render you can explore in real time."></canvas>
+      <figcaption class="small">Illustrative render, not a real project. Drag for the real-time view.</figcaption>
     </figure>
 
     <div class="lifecycle">
@@ -92,5 +92,5 @@ const sectors = ['Residential', 'Commercial', 'Civil engineering and infrastruct
       <a class="button button--ink" href="/contact">Contact iBIM</a>
     </div>
   </section>
-  <script is:inline src="/js/model.js?v=4" defer></script>
+  <script is:inline src="/js/model.js?v=8" defer></script>
 </Base>

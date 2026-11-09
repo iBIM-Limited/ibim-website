@@ -88,7 +88,7 @@
     const canvas = root.querySelector('canvas');
     const ctx = canvas.getContext('2d');
     let state = root.dataset.state, started = performance.now();
-    let yaw = 0.62, baseYaw = 0.62, master = 1, width = 0, height = 0, scale = 1, ox = 0, oy = 0, visible = true, frame = 0, dirty = true;
+    let real = null, yaw = 0.62, baseYaw = 0.62, master = 1, width = 0, height = 0, scale = 1, ox = 0, oy = 0, visible = true, frame = 0, dirty = true;
     let cosY = Math.cos(yaw), sinY = Math.sin(yaw);
 
     const project = (x, y, z) => {
@@ -530,7 +530,9 @@
     resize();
     request();
     return {
+      attach(handle) { real = handle; },
       set(next) {
+        if (real) { if (next === 'journey' || next === 'visual') real.show(); else real.hide(); }
         state = next; started = performance.now(); baseYaw = yaw;
         if (frame) { cancelAnimationFrame(frame); frame = 0; }
         request();
@@ -545,6 +547,23 @@
   function start() {
     document.querySelectorAll('[data-model]').forEach((root) => {
       const model = create(root);
+      // The real-time 3D scene loads after the page, and the drawing stays as the fallback.
+      const mode = root.dataset.state;
+      if (mode === 'journey' || mode === 'visual') {
+        const load = () => import('/js/visual3d.js?v=4')
+          .then((m) => model.attach(m.mount(root, { mode })))
+          .catch((err) => {
+            // No WebGL: finish on the render instead of the drawing.
+            console.warn('3D view unavailable', err);
+            const photo = new Image();
+            photo.src = '/img/ibim-visual.webp?v=1';
+            photo.alt = 'Realistic illustrative render of a glazed office building with a brick base.';
+            photo.className = 'model__photo model__photo--static';
+            root.querySelector('canvas').after(photo);
+          });
+        if (document.readyState === 'complete') setTimeout(load, 200);
+        else addEventListener('load', () => setTimeout(load, 200), { once: true });
+      }
       if (!('lifecycle' in root.dataset)) return;
 
       const stops = [...document.querySelectorAll('[data-stop]')];

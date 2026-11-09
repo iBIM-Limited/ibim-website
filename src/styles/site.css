@@ -124,7 +124,7 @@ a:hover { color: var(--green-dark); }
 @media (min-width: 620px) { .stops { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
 @media (min-width: 980px) {
   .hero { grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); column-gap: 3rem; }
-  .hero h1 { font-size: clamp(2.5rem, 3.9vw, 3.5rem); }
+  .hero h1 { font-size: clamp(2.4rem, 3.5vw, 3.1rem); }
   .lifecycle { grid-column: 1 / -1; }
   .stops { grid-template-columns: repeat(6, minmax(0, 1fr)); }
 }
@@ -237,6 +237,22 @@ a:hover { color: var(--green-dark); }
 .form__status[data-kind='error'] { color: var(--clash); background: transparent; border: 2px solid var(--clash); }
 .trap { position: absolute; left: -9999px; width: 1px; height: 1px; overflow: hidden; }
 @media (max-width: 480px) { .form { grid-template-columns: minmax(0, 1fr); } }
+
+/* Real-time 3D scene, layered over the fallback drawing */
+.model { position: relative; }
+.model__3d { display: none; }
+.model--has-3d > canvas:first-child { visibility: hidden; }
+.model--has-3d > .model__3d { display: block; position: absolute; top: 0; left: 0; width: 100%; }
+.model--hero .model__3d { aspect-ratio: 5 / 4; }
+.model--page .model__3d { aspect-ratio: 4 / 3; }
+.model__photo { display: block; position: absolute; top: 0; left: 0; width: 100%; object-fit: cover; opacity: 0; pointer-events: none; transition: opacity 0.35s; }
+.model--hero .model__photo { aspect-ratio: 5 / 4; }
+.model--page .model__photo { aspect-ratio: 4 / 3; }
+.model__photo--static { opacity: 1; }
+.journey-steps { position: absolute; top: 10px; left: 10px; display: none; gap: 2px; padding: 7px 10px; list-style: none; background: var(--paper); font: 400 0.75rem/1.5 var(--mono); color: var(--muted); }
+.model--has-3d > .journey-steps { display: grid; }
+.journey-steps .is-active { color: var(--ink); font-weight: 700; }
+.journey-steps .is-active::before { content: ''; display: inline-block; width: 8px; height: 8px; margin-right: 6px; border-radius: 50%; background: var(--green); }
 
 /* Simple lists */
 .plain-list { display: grid; gap: 0.5rem; padding-left: 1.25rem; list-style: square; }
