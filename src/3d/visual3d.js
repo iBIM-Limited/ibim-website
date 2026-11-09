@@ -1,4 +1,4 @@
-// Real-time 3D scene: laser scan point cloud, then 3D model, then a lit, realistic building.
+// Animated 3D scene: laser scan point cloud, then 3D model, ending on a path-traced render.
 // Bundled to public/js/visual3d.js and loaded after the page, so it never delays the first paint.
 import {
   ACESFilmicToneMapping, BackSide, BoxGeometry, BufferAttribute, BufferGeometry, CanvasTexture, CircleGeometry, Clock, Color,
@@ -7,7 +7,6 @@ import {
   MeshStandardMaterial, Object3D, PCFSoftShadowMap, PerspectiveCamera, Plane, PlaneGeometry, PMREMGenerator, Points,
   PointsMaterial, RepeatWrapping, Scene, SphereGeometry, SRGBColorSpace, Vector3, WebGLRenderer,
 } from 'three';
-import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
 const W = 30, D = 18, FLOORS = 5, FH = 3.6, H = FLOORS * FH, BAY = 3;
 const clamp = (v) => Math.max(0, Math.min(1, v));
@@ -347,18 +346,11 @@ export function mount(root, { mode = 'journey', onReady }) {
   camera.position.set(54, 21, 62);
   const startAngle = Math.atan2(camera.position.x, camera.position.z);
   const radius = Math.hypot(camera.position.x, camera.position.z);
-  const controls = new OrbitControls(camera, canvas);
-  controls.target.copy(target);
-  controls.enableZoom = false; controls.enablePan = false;
-  controls.enableDamping = true; controls.dampingFactor = 0.08;
-  controls.minPolarAngle = 1.2; controls.maxPolarAngle = 1.52;
-  controls.minAzimuthAngle = -0.95; controls.maxAzimuthAngle = 1.15;
-  canvas.style.touchAction = 'pan-y';
 
   const labels = document.createElement('ol');
   labels.className = 'journey-steps';
   labels.setAttribute('aria-hidden', 'true');
-  ['Point cloud', '3D model', 'Realistic visual', 'Real-time view'].forEach((t) => { const li = document.createElement('li'); li.textContent = t; labels.append(li); });
+  ['Point cloud', '3D model', 'Realistic visual'].forEach((t) => { const li = document.createElement('li'); li.textContent = t; labels.append(li); });
   if (mode === 'journey') root.append(labels);
   root.classList.add('model--has-3d');
   base.after(canvas);
@@ -374,7 +366,7 @@ export function mount(root, { mode = 'journey', onReady }) {
   const start = mode === 'visual' ? 6 : 0;
   const LENGTH = 10.4;
   const END_ANGLE = 0.45, END_HEIGHT = 9;
-  let t = reduced ? LENGTH : start, running = !reduced, touched = false, visible = true, active = true, needsDraw = true, offset = 0, raf = 0;
+  let t = reduced ? LENGTH : start, running = !reduced, visible = true, active = true, needsDraw = true, offset = 0, raf = 0;
 
   function apply(time) {
     const seg = (a, b) => ease(clamp((time - a) / (b - a)));
@@ -392,7 +384,7 @@ export function mount(root, { mode = 'journey', onReady }) {
     leaves.visible = trunks.visible = scene1 > 0.5;
     skyDome.material.opacity = scene1;
     scene.fog.far = 400 + (1 - scene1) * 5000;
-    if (!touched) {
+    {
       // The camera settles exactly on the view of the path-traced render.
       const settle = seg(0, 8.8);
       const angle = startAngle + (END_ANGLE - startAngle) * settle;
@@ -401,7 +393,7 @@ export function mount(root, { mode = 'journey', onReady }) {
       photo.style.opacity = String(seg(8.8, 10.2));
     }
     if (mode === 'journey') {
-      const stage = touched ? 3 : time < 3.9 ? 0 : time < 9.3 ? 1 : 2;
+      const stage = time < 3.9 ? 0 : time < 9.3 ? 1 : 2;
       [...labels.children].forEach((li, i) => li.classList.toggle('is-active', i === stage));
     }
   }
@@ -427,23 +419,10 @@ export function mount(root, { mode = 'journey', onReady }) {
       apply(t);
       needsDraw = true;
     }
-    if (touched && controls.update()) needsDraw = true;
     if (needsDraw) { renderer.render(scene, camera); needsDraw = false; }
-    if (running || touched) raf = requestAnimationFrame(frame);
+    if (running) raf = requestAnimationFrame(frame);
   }
   function wake() { if (!raf && active && visible) raf = requestAnimationFrame(frame); }
-
-  controls.addEventListener('start', () => {
-    touched = true;
-    if (running) running = false;
-    t = LENGTH;
-    apply(t);
-    photo.style.opacity = '0';
-    needsDraw = true;
-    controls.update();
-    wake();
-  });
-  controls.addEventListener('change', () => { needsDraw = true; wake(); });
 
   new ResizeObserver(resize).observe(base);
   new IntersectionObserver(([e]) => {
@@ -460,7 +439,7 @@ export function mount(root, { mode = 'journey', onReady }) {
   onReady?.();
 
   return {
-    show() { active = true; touched = false; photo.style.opacity = '0'; root.classList.add('model--has-3d'); labels.hidden = false; t = reduced ? LENGTH : start; offset = t; running = !reduced; apply(t); clock.start(); needsDraw = true; wake(); },
+    show() { active = true; photo.style.opacity = '0'; root.classList.add('model--has-3d'); labels.hidden = false; t = reduced ? LENGTH : start; offset = t; running = !reduced; apply(t); clock.start(); needsDraw = true; wake(); },
     hide() { active = false; running = false; root.classList.remove('model--has-3d'); labels.hidden = true; },
   };
 }

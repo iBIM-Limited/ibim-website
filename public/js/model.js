@@ -547,19 +547,23 @@
   function start() {
     document.querySelectorAll('[data-model]').forEach((root) => {
       const model = create(root);
-      // The real-time 3D scene loads after the page, and the drawing stays as the fallback.
+      // The 3D animation loads after the page. The render is the fallback and the end frame.
       const mode = root.dataset.state;
-      if (mode === 'journey' || mode === 'visual') {
-        const load = () => import('/js/visual3d.js?v=5')
+      const showRender = () => {
+        const photo = new Image();
+        photo.src = '/img/ibim-visual.webp?v=2';
+        photo.alt = 'Realistic illustrative render of a glazed office building with a brick base, trees and people.';
+        photo.className = 'model__photo model__photo--static';
+        root.querySelector('canvas').after(photo);
+      };
+      if (mode === 'visual') {
+        showRender();
+      } else if (mode === 'journey') {
+        const load = () => import('/js/visual3d.js?v=6')
           .then((m) => model.attach(m.mount(root, { mode })))
           .catch((err) => {
-            // No WebGL: finish on the render instead of the drawing.
-            console.warn('3D view unavailable', err);
-            const photo = new Image();
-            photo.src = '/img/ibim-visual.webp?v=2';
-            photo.alt = 'Realistic illustrative render of a glazed office building with a brick base.';
-            photo.className = 'model__photo model__photo--static';
-            root.querySelector('canvas').after(photo);
+            console.warn('3D animation unavailable', err);
+            showRender();
           });
         if (document.readyState === 'complete') setTimeout(load, 200);
         else addEventListener('load', () => setTimeout(load, 200), { once: true });

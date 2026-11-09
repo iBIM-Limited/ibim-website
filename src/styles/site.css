@@ -101,7 +101,7 @@ a:hover { color: var(--green-dark); }
 .model { min-width: 0; display: grid; gap: 0.25rem; }
 .model canvas { display: block; width: 100%; touch-action: pan-y; cursor: grab; }
 .model canvas:active { cursor: grabbing; }
-.model[data-state='drawings'] canvas, .model[data-state='planning'] canvas, .model[data-state='regs'] canvas { cursor: default; }
+.model[data-state='journey'] canvas, .model[data-state='visual'] canvas, .model[data-state='drawings'] canvas, .model[data-state='planning'] canvas, .model[data-state='regs'] canvas { cursor: default; }
 .model figcaption { text-align: right; }
 .model--hero canvas { aspect-ratio: 5 / 4; }
 .model--page canvas { aspect-ratio: 4 / 3; }
