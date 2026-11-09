@@ -90,8 +90,8 @@ Software, About and Contact stay as they are.
 ### Home page
 
 - Use the title `BIM consultancy and architectural services | iBIM`.
-- Heading, chosen by Jack: "From first drawing to digital twin". The tagline stays in the logo.
-- Follow it with: "Architectural, planning and BIM services for homeowners, developers, land owners, construction and M&E companies."
+- Heading: "We help you plan, design and deliver building projects". Jack asked for plainer wording than "From first drawing to digital twin". The tagline stays in the logo.
+- Follow it with: "Architectural, planning and BIM services, backed by software and automation, for homeowners, developers, land owners, construction and M&E companies."
 - Remove the Preston section.
 - Add a short "Who we work with" section using the routes below.
 - Start the model with its point cloud already visible, play one sequence, and then change only when a visitor chooses a stage.
