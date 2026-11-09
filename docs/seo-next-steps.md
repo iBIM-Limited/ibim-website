@@ -236,7 +236,7 @@ Do not start until Jack approves the decision below. Commit the current work fir
 - **Owns:** `worker/index.js`, `wrangler.jsonc`, `migrations/`, `src/components/Form.astro`, `src/pages/privacy.astro`, `public/js/site.js`, and a new `docs/launch-runbook.md`
 - **Depends on:** Jack authorising the Google script. The runbook can be written now, but no switch happens without separate approval
 - **Acceptance criteria:**
-  - [ ] Free, cookie-free analytics is in place if Jack approves it, and the privacy notice and Content-Security-Policy match
+  - [x] Free, cookie-free analytics is in place (Cloudflare Web Analytics, 9 Nov 2026), and the privacy notice and Content-Security-Policy match
   - [ ] Each enquiry records the page it was sent from
   - [ ] `/about/` and `/index.html` use permanent redirects
   - [ ] The test address is switched off, or stays `noindex`, after launch
