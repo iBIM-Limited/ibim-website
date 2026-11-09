@@ -550,13 +550,13 @@
       // The real-time 3D scene loads after the page, and the drawing stays as the fallback.
       const mode = root.dataset.state;
       if (mode === 'journey' || mode === 'visual') {
-        const load = () => import('/js/visual3d.js?v=4')
+        const load = () => import('/js/visual3d.js?v=5')
           .then((m) => model.attach(m.mount(root, { mode })))
           .catch((err) => {
             // No WebGL: finish on the render instead of the drawing.
             console.warn('3D view unavailable', err);
             const photo = new Image();
-            photo.src = '/img/ibim-visual.webp?v=1';
+            photo.src = '/img/ibim-visual.webp?v=2';
             photo.alt = 'Realistic illustrative render of a glazed office building with a brick base.';
             photo.className = 'model__photo model__photo--static';
             root.querySelector('canvas').after(photo);

@@ -364,7 +364,7 @@ export function mount(root, { mode = 'journey', onReady }) {
   base.after(canvas);
   const photo = document.createElement('img');
   photo.className = 'model__photo';
-  photo.src = '/img/ibim-visual.webp?v=1';
+  photo.src = '/img/ibim-visual.webp?v=2';
   photo.alt = 'Realistic illustrative render of a five-storey glazed office building with a brick base, trees and a road.';
   photo.width = 1600; photo.height = 1280;
   canvas.after(photo);

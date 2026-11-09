@@ -126,7 +126,7 @@ export const architecturalServices: Service[] = [
     name: 'Architectural drawings',
     short: 'Architectural drawings',
     title: 'Architectural drawings',
-    description: 'Architectural drawings for homeowners, developers, land owners and contractors, from measured surveys to planning and building regulations packages.',
+    description: 'Architectural drawings for homeowners, developers, landowners and contractors, from measured surveys to planning and building regulations packages.',
     lead: 'We produce architectural drawings for homes and commercial buildings, from a survey of what exists through to drawings ready for planning or building regulations.',
     steps: [
       { title: 'Survey what is there', body: 'We record the existing building and site, using measured survey and laser scanning where the project needs it.' },
