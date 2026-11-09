@@ -88,7 +88,7 @@
     const canvas = root.querySelector('canvas');
     const ctx = canvas.getContext('2d');
     let state = root.dataset.state, started = performance.now();
-    let real = null, yaw = 0.62, baseYaw = 0.62, master = 1, width = 0, height = 0, scale = 1, ox = 0, oy = 0, visible = true, frame = 0, dirty = true;
+    let real = null, yaw = 0.62, baseYaw = 0.62, master = 1, width = 0, height = 0, scale = 1, ox = 0, oy = 0, visible = true, frame = 0;
     let cosY = Math.cos(yaw), sinY = Math.sin(yaw);
 
     const project = (x, y, z) => {
@@ -106,7 +106,6 @@
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
       scale = Math.min(width / 54, height / 38);
       ox = width / 2; oy = height * 0.7;
-      dirty = true;
     }
 
     function drawBox(b, style) {
@@ -490,7 +489,8 @@
       ctx.clearRect(0, 0, width, height);
       // Each stage plays once and holds. Dragging redraws the final frame.
       const length = DURATION[state] ?? 4;
-      const elapsed = (now - started) / 1000;
+      // The frame clock can read just before the start time, so never go negative.
+      const elapsed = Math.max(0, (now - started) / 1000);
       const t = Math.min(elapsed, length);
       // The 4D view makes room for its programme chart.
       const fit = Math.min(width / 54, height / 38);
@@ -499,7 +499,6 @@
       ox = width / 2;
       oy = planned ? height * 0.5 : height * 0.7;
       (render[state] || render.advise)(t);
-      dirty = false;
       if (!reduced && elapsed < length) frame = requestAnimationFrame(draw);
     }
     const request = () => { if (!frame && visible) frame = requestAnimationFrame(draw); };
@@ -537,7 +536,6 @@
         if (frame) { cancelAnimationFrame(frame); frame = 0; }
         request();
       },
-      get dirty() { return dirty; },
     };
   }
 
@@ -553,6 +551,7 @@
         const photo = new Image();
         photo.src = '/img/ibim-visual.webp?v=2';
         photo.alt = 'Realistic illustrative render of a glazed office building with a brick base, trees and people.';
+        photo.width = 1600; photo.height = 1280;
         photo.className = 'model__photo model__photo--static';
         root.querySelector('canvas').after(photo);
       };
@@ -576,6 +575,7 @@
         stops.forEach((s) => s.setAttribute('aria-pressed', String(s.dataset.stop === name)));
         panels.forEach((p) => { p.hidden = p.dataset.panel !== name; });
         model.set(name);
+        root.scrollIntoView({ block: 'nearest', behavior: reduced ? 'auto' : 'smooth' });
       };
       stops.forEach((s) => s.addEventListener('click', () => select(s.dataset.stop)));
     });

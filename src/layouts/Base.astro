@@ -12,7 +12,7 @@ interface Props {
   jsonLd?: object;
 }
 const { title, description, noindex = false, jsonLd } = Astro.props;
-const path = Astro.url.pathname.replace(/\.html$/, '').replace(/\/$/, '') || '/';
+const path = Astro.url.pathname.replace(/\.html$/, '').replace(/\/(index)?$/, '') || '/';
 const canonical = new URL(path, Astro.site).toString().replace(/\/$/, path === '/' ? '/' : '');
 const fullTitle = path === '/' ? title : `${title} | iBIM`;
 const year = new Date().getFullYear();
@@ -47,7 +47,9 @@ const organisation = {
     <meta property="og:title" content={fullTitle} />
     <meta property="og:description" content={description} />
     <meta property="og:url" content={canonical} />
-    <meta property="og:image" content="https://www.i-bim.co.uk/img/og.png" />
+    <meta property="og:image" content="https://www.i-bim.co.uk/img/og.jpg" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
     <meta name="twitter:card" content="summary_large_image" />
     <script type="application/ld+json" set:html={JSON.stringify(jsonLd ?? organisation)} />
     <script is:inline src="/js/site.js?v=2" defer></script>
