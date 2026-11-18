@@ -13,13 +13,13 @@ const clamp = (v) => Math.max(0, Math.min(1, v));
 
 // Brand easing curve: cubic-bezier(0.2, 0.8, 0.2, 1)
 function ease(t) {
-  let u = t;
+  let u = clamp(t);
   for (let i = 0; i < 6; i++) {
     const x = 3 * (1 - u) * (1 - u) * u * 0.2 + 3 * (1 - u) * u * u * 0.2 + u * u * u;
     const dx = 3 * (1 - u) * (1 - u) * 0.2 + 3 * u * u * 0.8;
     if (Math.abs(x - t) < 1e-4) break;
     u -= (x - t) / (dx || 1);
-    u = Math.max(0, Math.min(1, u));
+    u = clamp(u);
   }
   return 3 * (1 - u) * (1 - u) * u * 0.8 + 3 * (1 - u) * u * u * 1.0 + u * u * u;
 }
@@ -64,7 +64,6 @@ function brickDraw(ctx, size, heightMap) {
   }
 }
 
-// Painted sky: used for the backdrop and for the reflections in the glass.
 function skyTexture() {
   const c = document.createElement('canvas');
   c.width = 1024; c.height = 512;
@@ -104,19 +103,19 @@ export function mount(root, { mode = 'journey', onReady }) {
   canvas.setAttribute('role', 'img');
   canvas.setAttribute('aria-label', base.getAttribute('aria-label') || 'Interactive 3D building');
 
-  const renderer = new WebGLRenderer({ canvas, antialias: true, alpha: false, powerPreference: 'high-performance' });
+  // Alpha true so the CSS drawing grid on .hero-ink shines directly through!
+  const renderer = new WebGLRenderer({ canvas, antialias: true, alpha: true, powerPreference: 'high-performance' });
   const small = Math.min(window.innerWidth, window.innerHeight) < 600;
   renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, small ? 1.5 : 1.75));
   renderer.toneMapping = ACESFilmicToneMapping;
-  renderer.toneMappingExposure = 1.02;
+  renderer.toneMappingExposure = 1.05;
   renderer.outputColorSpace = SRGBColorSpace;
   renderer.shadowMap.enabled = true;
   renderer.shadowMap.type = PCFSoftShadowMap;
   renderer.localClippingEnabled = true;
-  renderer.setClearColor(0x0b0d0b, 1);
+  renderer.setClearColor(0x000000, 0);
 
   const scene = new Scene();
-  scene.background = new Color(0x0b0d0b);
   const sky = skyTexture();
   const pmrem = new PMREMGenerator(renderer);
   scene.environment = pmrem.fromEquirectangular(sky).texture;
@@ -134,7 +133,7 @@ export function mount(root, { mode = 'journey', onReady }) {
   Object.assign(sun.shadow.camera, { left: -62, right: 62, top: 62, bottom: -62, near: 10, far: 190 });
   sun.shadow.bias = -0.0004; sun.shadow.normalBias = 0.03; sun.shadow.radius = 3.5;
   scene.add(sun);
-  scene.add(new HemisphereLight(0xcfe3f5, 0x6a6f58, 0.42));
+  scene.add(new HemisphereLight(0xcfe3f5, 0x6a6f58, 0.45));
 
   const reveal = new Plane(new Vector3(0, -1, 0), 0);
   const world = new Group();
@@ -162,7 +161,6 @@ export function mount(root, { mode = 'journey', onReady }) {
   };
   const box = (w, h, d) => new BoxGeometry(w, h, d);
 
-  // Ground floor in brick, with an entrance, and glazed floors above.
   add(box(W + 0.6, 0.45, D + 0.6), concrete, 0, 0.22, 0);
   const brickFront = box(BAY * 0.86, FH - 0.5, 0.4);
   for (let f = 0; f < FLOORS; f++) {
@@ -171,7 +169,6 @@ export function mount(root, { mode = 'journey', onReady }) {
     add(box(W - 0.6, FH - 0.2, D - 0.6), new MeshStandardMaterial({ color: 0x20262b, roughness: 1, ...clip }), 0, y + FH / 2 + 0.05, 0, building, false);
   }
 
-  // Glass panes and mullions are instanced, so hundreds of parts draw cheaply.
   const paneSpots = [], mullionSpots = [];
   const facadeRun = (fixed, length, axis, out) => {
     const count = Math.round(length / BAY);
@@ -217,7 +214,6 @@ export function mount(root, { mode = 'journey', onReady }) {
   mullions.castShadow = true;
   building.add(mullions);
 
-  // Roof: parapet, plant and louvres. Entrance canopy.
   const top = H + 0.17;
   add(box(W + 0.5, 0.75, 0.3), concrete, 0, top + 0.37, D / 2 + 0.1);
   add(box(W + 0.5, 0.75, 0.3), concrete, 0, top + 0.37, -D / 2 - 0.1);
@@ -229,7 +225,7 @@ export function mount(root, { mode = 'journey', onReady }) {
   add(box(8, 0.22, 2.6), aluminium, 0, 3.15, D / 2 + 1.4);
   for (const x of [-3.7, 3.7]) add(box(0.14, 3, 0.14), aluminium, x, 1.6, D / 2 + 2.4);
 
-  // Site: lawn, paving, road, kerbs, neighbouring buildings and trees.
+  // Site context
   const site = new Group();
   world.add(site);
   const ground = (geo, mat, x, y, z) => {
@@ -270,7 +266,6 @@ export function mount(root, { mode = 'journey', onReady }) {
     m.receiveShadow = false;
   });
 
-  // Trees are clusters of leaf blobs, varied in colour.
   const treeSpots = [[-24, 0], [-25, 13], [-22, -13], [27, -9], [27, 4], [28, 16], [-11, 20], [12, 21], [24, 22], [-26, 25], [-6, -19], [13, -20], [-44, 6], [46, -12], [-52, 30], [55, 36]];
   const leafCount = treeSpots.length * 240;
   const leaves = new InstancedMesh(new IcosahedronGeometry(1, 0), new MeshStandardMaterial({ roughness: 0.78, flatShading: true }), leafCount);
@@ -298,71 +293,119 @@ export function mount(root, { mode = 'journey', onReady }) {
   leaves.castShadow = true; leaves.receiveShadow = true;
   site.add(leaves);
 
-  // Wireframe model stage.
+  // Structural ground setting-out grid in 3D space
+  const gridPos = [];
+  for (let x = -W / 2 - 6; x <= W / 2 + 6; x += 6) {
+    gridPos.push(x, 0.02, -D / 2 - 8, x, 0.02, D / 2 + 8);
+  }
+  for (let z = -D / 2 - 6; z <= D / 2 + 6; z += 6) {
+    gridPos.push(-W / 2 - 8, 0.02, z, W / 2 + 8, 0.02, z);
+  }
+  const gridGeo = new BufferGeometry();
+  gridGeo.setAttribute('position', new BufferAttribute(new Float32Array(gridPos), 3));
+  const groundGrid = new LineSegments(gridGeo, new LineBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.15 }));
+  scene.add(groundGrid);
+
+  // Wireframe model stage: Neutral structural edges + 1 iBIM Green highlighted MEP & Level 3 Datum
   const wirePositions = [];
-  const pushEdges = (w, h, d, x, y, z) => {
+  const wireGreenPositions = [];
+  const pushEdges = (w, h, d, x, y, z, targetArr = wirePositions) => {
     const e = new EdgesGeometry(box(w, h, d));
     const p = e.attributes.position;
-    for (let i = 0; i < p.count; i++) wirePositions.push(p.getX(i) + x, p.getY(i) + y, p.getZ(i) + z);
+    for (let i = 0; i < p.count; i++) targetArr.push(p.getX(i) + x, p.getY(i) + y, p.getZ(i) + z);
     e.dispose();
   };
   for (let f = 0; f < FLOORS; f++) {
-    pushEdges(W, 0.3, D, 0, f * FH + FH - 0.05, 0);
-    for (let x = -W / 2; x <= W / 2; x += 6) for (let z = -D / 2; z <= D / 2; z += 6) pushEdges(0.42, FH - 0.3, 0.42, x, f * FH + FH / 2, z);
-    for (let z = -D / 2; z <= D / 2; z += 6) pushEdges(W, 0.45, 0.28, 0, f * FH + FH - 0.35, z);
-    for (let x = -W / 2; x <= W / 2; x += 6) pushEdges(0.28, 0.45, D, x, f * FH + FH - 0.35, 0);
+    const isHighlightFloor = f === 2;
+    pushEdges(W, 0.3, D, 0, f * FH + FH - 0.05, 0, isHighlightFloor ? wireGreenPositions : wirePositions);
+    for (let x = -W / 2; x <= W / 2; x += 6) {
+      for (let z = -D / 2; z <= D / 2; z += 6) {
+        pushEdges(0.42, FH - 0.3, 0.42, x, f * FH + FH / 2, z, wirePositions);
+      }
+    }
+    for (let z = -D / 2; z <= D / 2; z += 6) pushEdges(W, 0.45, 0.28, 0, f * FH + FH - 0.35, z, wirePositions);
+    for (let x = -W / 2; x <= W / 2; x += 6) pushEdges(0.28, 0.45, D, x, f * FH + FH - 0.35, 0, wirePositions);
+    // Primary MEP duct spine highlighted in green
+    pushEdges(W - 4, 0.55, 1.4, 0, f * FH + FH - 0.9, 0, wireGreenPositions);
   }
-  pushEdges(11, 1.8, 7, -2, top + 0.9, 0);
+  pushEdges(11, 1.8, 7, -2, top + 0.9, 0, wireGreenPositions);
+
   const wireGeo = new BufferGeometry();
   wireGeo.setAttribute('position', new BufferAttribute(new Float32Array(wirePositions), 3));
-  const wire = new LineSegments(wireGeo, new LineBasicMaterial({ color: 0x7bc474, transparent: true, opacity: 0 }));
+  const wire = new LineSegments(wireGeo, new LineBasicMaterial({ color: 0xdde2db, transparent: true, opacity: 0 }));
   scene.add(wire);
 
-  // Point cloud stage: intensity greyscale on ink, no rainbow ramps (4.8)
+  const wireGreenGeo = new BufferGeometry();
+  wireGreenGeo.setAttribute('position', new BufferAttribute(new Float32Array(wireGreenPositions), 3));
+  const wireGreen = new LineSegments(wireGreenGeo, new LineBasicMaterial({ color: 0x7bc474, transparent: true, opacity: 0 }));
+  scene.add(wireGreen);
+
+  // Point cloud stage: intensity greyscale on ink, with live green LiDAR sweep front
   const scanPoints = [];
   const pt = (x, y, z) => {
     const n = (y / H) * 0.72 + 0.12 + (rnd() - 0.5) * 0.14;
     scanPoints.push({ x: x + (rnd() - 0.5) * 0.05, y, z: z + (rnd() - 0.5) * 0.05, n: clamp(n), a: Math.atan2(z - 34, x - 40) });
   };
-  const density = small ? 0.6 : 1;
+  const density = small ? 0.65 : 1.1;
   const N = (n) => Math.round(n * density);
   const onGlass = (u, y) => (u + 900) % BAY > 0.3 && (u + 900) % BAY < BAY - 0.3 && y % FH > 0.65 && y % FH < 3;
-  for (let i = 0; i < N(9000); i++) { const x = (rnd() - 0.5) * W, y = rnd() * H; if (!onGlass(x, y) || rnd() < 0.22) pt(x, y, D / 2); }
-  for (let i = 0; i < N(5400); i++) { const z = (rnd() - 0.5) * D, y = rnd() * H; if (!onGlass(z, y) || rnd() < 0.22) pt(W / 2, y, z); }
+  for (let i = 0; i < N(9500); i++) { const x = (rnd() - 0.5) * W, y = rnd() * H; if (!onGlass(x, y) || rnd() < 0.22) pt(x, y, D / 2); }
+  for (let i = 0; i < N(5800); i++) { const z = (rnd() - 0.5) * D, y = rnd() * H; if (!onGlass(z, y) || rnd() < 0.22) pt(W / 2, y, z); }
   for (let i = 0; i < N(2500); i++) { const x = (rnd() - 0.5) * W, y = rnd() * H; pt(x, y, -D / 2); }
   for (let i = 0; i < N(1800); i++) { const z = (rnd() - 0.5) * D, y = rnd() * H; pt(-W / 2, y, z); }
   for (let i = 0; i < N(5200); i++) pt((rnd() - 0.5) * W, H + 0.2, (rnd() - 0.5) * D);
   for (let i = 0; i < N(1600); i++) { const u = rnd(); pt(-2 + (u - 0.5) * 11, H + 2, (rnd() - 0.5) * 7); }
-  for (let i = 0; i < N(13000); i++) { const x = (rnd() - 0.5) * 90, z = (rnd() - 0.5) * 72; if (Math.abs(x) > W / 2 || Math.abs(z) > D / 2) pt(x, 0.02, z); }
+  for (let i = 0; i < N(11000); i++) { const x = (rnd() - 0.5) * 84, z = (rnd() - 0.5) * 68; if (Math.abs(x) > W / 2 || Math.abs(z) > D / 2) pt(x, 0.02, z); }
   scanPoints.sort((a, b) => a.a - b.a);
-  const pos = new Float32Array(scanPoints.length * 3), col = new Float32Array(scanPoints.length * 3);
+
+  const pos = new Float32Array(scanPoints.length * 3);
+  const col = new Float32Array(scanPoints.length * 3);
+  const baseGrey = new Float32Array(scanPoints.length);
   scanPoints.forEach((p, i) => {
     pos.set([p.x, p.y, p.z], i * 3);
-    const v = 0.4 + p.n * 0.55;
+    const v = 0.42 + p.n * 0.52;
+    baseGrey[i] = v;
     col.set([v, v, v], i * 3);
   });
   const cloudGeo = new BufferGeometry();
   cloudGeo.setAttribute('position', new BufferAttribute(pos, 3));
-  cloudGeo.setAttribute('color', new BufferAttribute(col, 3));
-  const cloud = new Points(cloudGeo, new PointsMaterial({ size: 0.27, vertexColors: true, transparent: true, sizeAttenuation: true, depthWrite: false, toneMapped: false }));
+  const colAttr = new BufferAttribute(col, 3);
+  cloudGeo.setAttribute('color', colAttr);
+  const cloud = new Points(cloudGeo, new PointsMaterial({ size: 0.28, vertexColors: true, transparent: true, sizeAttenuation: true, depthWrite: false, toneMapped: false }));
   scene.add(cloud);
 
   scene.fog = new Fog(0xd8e4ea, 160, 400);
 
   // Camera and controls
-  const camera = new PerspectiveCamera(30, 1.25, 1, 900);
-  const target = new Vector3(0, 7.6, 0);
-  camera.position.set(54, 21, 62);
+  const camera = new PerspectiveCamera(28, 1.25, 1, 900);
+  const target = new Vector3(0, 8.2, 0);
+  camera.position.set(50, 20, 58);
   const startAngle = Math.atan2(camera.position.x, camera.position.z);
   const radius = Math.hypot(camera.position.x, camera.position.z);
 
   const labels = document.createElement('ol');
   labels.className = 'journey-steps';
   labels.setAttribute('aria-hidden', 'true');
-  ['Point cloud', '3D model', 'Visualisation'].forEach((t) => { const li = document.createElement('li'); li.textContent = t; labels.append(li); });
+  ['01 Point cloud', '02 BIM model', '03 Visualisation'].forEach((labelText, index) => {
+    const li = document.createElement('li');
+    li.textContent = labelText;
+    li.dataset.stage = String(index);
+    li.addEventListener('click', () => {
+      const stageTimes = [1.8, 5.0, 10.4];
+      t = stageTimes[index];
+      offset = t;
+      running = index < 2 && !reduced;
+      if (running) clock.start();
+      apply(t);
+      needsDraw = true;
+      wake();
+    });
+    labels.append(li);
+  });
   if (mode === 'journey') root.append(labels);
   root.classList.add('model--has-3d');
   base.after(canvas);
+
   const photo = document.createElement('img');
   photo.className = 'model__photo';
   photo.src = '/img/ibim-visual.webp?v=2';
@@ -373,36 +416,77 @@ export function mount(root, { mode = 'journey', onReady }) {
   const clock = new Clock(false);
   const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
   const start = mode === 'visual' ? 6 : 0;
-  const LENGTH = 10.4;
+  const LENGTH = 11.2;
   const END_ANGLE = 0.45, END_HEIGHT = 9;
   let t = reduced ? LENGTH : start, running = !reduced, visible = true, active = true, needsDraw = true, offset = 0, raf = 0;
+  let prevBandStart = 0, prevBandEnd = 0;
 
   function apply(time) {
     const seg = (a, b) => ease(clamp((time - a) / (b - a)));
-    const cloudAlpha = 1 - seg(3.6, 6.2);
+    const cloudAlpha = 1 - seg(4.2, 6.8);
     cloud.visible = cloudAlpha > 0;
     cloud.material.opacity = cloudAlpha;
-    cloudGeo.setDrawRange(0, Math.floor(scanPoints.length * Math.min(1, 0.55 + 0.45 * (time / 3))));
-    wire.material.opacity = seg(3.4, 5.4) * (1 - seg(6.4, 8.6));
-    wire.visible = wire.material.opacity > 0;
-    const build = seg(6, 8.8);
+
+    const scanProgress = Math.min(1, 0.35 + 0.65 * ease(clamp(time / 3.6)));
+    const shownCount = Math.floor(scanPoints.length * scanProgress);
+    cloudGeo.setDrawRange(0, shownCount);
+
+    // Highlight the active LiDAR scan wave front in iBIM signal green (#7BC474)
+    if (cloud.visible) {
+      for (let i = prevBandStart; i < prevBandEnd; i++) {
+        const v = baseGrey[i];
+        col[i * 3] = v; col[i * 3 + 1] = v; col[i * 3 + 2] = v;
+      }
+      if (scanProgress < 0.995 && !reduced) {
+        const bandWidth = Math.floor(scanPoints.length * 0.045);
+        const bStart = Math.max(0, shownCount - bandWidth);
+        for (let i = bStart; i < shownCount; i++) {
+          const k = (i - bStart) / bandWidth;
+          const v = baseGrey[i];
+          col[i * 3] = v + (0.48 - v) * k;
+          col[i * 3 + 1] = v + (0.77 - v) * k;
+          col[i * 3 + 2] = v + (0.45 - v) * k;
+        }
+        prevBandStart = bStart;
+        prevBandEnd = shownCount;
+      } else {
+        prevBandStart = prevBandEnd = 0;
+      }
+      colAttr.needsUpdate = true;
+    }
+
+    const wireAlpha = seg(3.2, 5.2) * (1 - seg(6.8, 9.0));
+    wire.material.opacity = wireAlpha * 0.65;
+    wireGreen.material.opacity = wireAlpha;
+    wire.visible = wireGreen.visible = wireAlpha > 0;
+
+    // Progressive wireframe draw-on
+    const wireDraw = ease(clamp((time - 3.0) / 2.4));
+    wireGeo.setDrawRange(0, Math.floor((wirePositions.length / 3) * wireDraw));
+    wireGreenGeo.setDrawRange(0, Math.floor((wireGreenPositions.length / 3) * wireDraw));
+
+    groundGrid.material.opacity = (1 - seg(7.0, 9.2)) * 0.16;
+    groundGrid.visible = groundGrid.material.opacity > 0.01;
+
+    const build = seg(6.0, 9.2);
     reveal.constant = build * (H + 3.5);
     building.visible = build > 0;
-    const scene1 = seg(6, 8.4);
+
+    const scene1 = seg(6.4, 9.0);
     fading.forEach((m) => { m.opacity = m === contact.material ? scene1 * 0.85 : scene1; });
     leaves.visible = trunks.visible = scene1 > 0.5;
     skyDome.material.opacity = scene1;
     scene.fog.far = 400 + (1 - scene1) * 5000;
-    {
-      // The camera settles exactly on the view of the path-traced render.
-      const settle = seg(0, 8.8);
-      const angle = startAngle + (END_ANGLE - startAngle) * settle;
-      camera.position.set(Math.sin(angle) * radius, 21 + (END_HEIGHT - 21) * settle, Math.cos(angle) * radius);
-      camera.lookAt(target);
-      photo.style.opacity = String(seg(8.8, 10.2));
-    }
+
+    // Camera settles smoothly onto the exact perspective of the path-traced render
+    const settle = seg(0, 9.2);
+    const angle = startAngle + (END_ANGLE - startAngle) * settle;
+    camera.position.set(Math.sin(angle) * radius, 21 + (END_HEIGHT - 21) * settle, Math.cos(angle) * radius);
+    camera.lookAt(target);
+    photo.style.opacity = String(seg(9.2, 10.8));
+
     if (mode === 'journey') {
-      const stage = time < 3.9 ? 0 : time < 9.3 ? 1 : 2;
+      const stage = time < 3.6 ? 0 : time < 9.0 ? 1 : 2;
       [...labels.children].forEach((li, i) => li.classList.toggle('is-active', i === stage));
     }
   }
@@ -412,8 +496,7 @@ export function mount(root, { mode = 'journey', onReady }) {
     if (!w || !h) return;
     renderer.setSize(w, h, false);
     camera.aspect = w / h;
-    // Keep the whole building in view on narrower shapes.
-    camera.fov = camera.aspect < 1.2 ? 34 : 30;
+    camera.fov = camera.aspect < 1.2 ? 32 : 27;
     camera.updateProjectionMatrix();
     needsDraw = true;
     if (active) wake();

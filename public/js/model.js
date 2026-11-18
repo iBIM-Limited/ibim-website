@@ -314,59 +314,127 @@
         master = g; visualScene(); master = 1; ctx.globalAlpha = 1;
       },
       drawings(t) {
+        // Ground floor plan with a proposed rear extension, drawn to sheet conventions.
         sheet(t, ({ stroke, seg, box, note }) => {
-          ctx.fillStyle = C.tint; ctx.fillRect(40, 240, 250, 90);
-          stroke(4); box(40, 70, 250, 170);
-          seg([165, 70], [165, 170], [290, 170]);
-          stroke(3, C.greenDark); seg([40, 240], [40, 330], [290, 330], [290, 240]);
-          stroke(1); ctx.beginPath(); ctx.arc(165, 170, 34, 0, Math.PI / 2); ctx.stroke();
-          seg([165, 170], [165, 204]);
-          stroke(1, C.line); seg([40, 50], [290, 50]); seg([40, 44], [40, 56]); seg([290, 44], [290, 56]);
-          note('Plan', 40, 360); note('Proposed extension', 165, 285, 'center');
-          stroke(3); seg([350, 330], [600, 330]); box(375, 190, 200, 140);
-          seg([365, 190], [475, 105], [585, 190]);
-          stroke(1.5); box(400, 215, 50, 40); box(500, 215, 50, 40); box(400, 275, 50, 40); box(500, 275, 32, 55);
-          note('Elevation', 350, 360);
+          const wall = (x, y, w, h) => { ctx.fillStyle = C.ink; ctx.fillRect(x, y, w, h); };
+          const gap = (x, y, w, h) => { ctx.fillStyle = C.paper; ctx.fillRect(x, y, w, h); };
+          const small = (text, x, y, align = 'center', color = C.muted) => label(text, x, y, { size: 10, align, color });
+          const win = (x, y, w, h) => { gap(x, y, w, h); stroke(0.75); box(x, y, w, h); w > h ? seg([x, y + h / 2], [x + w, y + h / 2]) : seg([x + w / 2, y], [x + w / 2, y + h]); };
+          const door = (hx, hy, r, a0, a1) => {
+            stroke(0.75); ctx.beginPath(); ctx.arc(hx, hy, r, a0, a1); ctx.stroke();
+            stroke(1.5); seg([hx, hy], [hx + r * Math.cos(a1), hy + r * Math.sin(a1)]);
+          };
+          // Proposed rear extension: the one green element (4.11).
+          ctx.fillStyle = C.tint; ctx.fillRect(120, 40, 180, 70);
+          stroke(3, C.greenDark); box(120, 40, 180, 70);
+          stroke(1, C.greenDark); box(129, 49, 162, 61);
+          label('Proposed extension', 210, 76, { size: 11, align: 'center', color: C.greenDark });
+          // External walls, cut at 1m: solid poché.
+          wall(120, 110, 300, 9); wall(120, 331, 300, 9); wall(120, 110, 9, 230); wall(411, 110, 9, 230);
+          // Internal walls.
+          wall(268, 119, 5, 212); wall(129, 215, 139, 5); wall(273, 200, 138, 5);
+          // Openings: rear wall opened into the extension, shown with removed-wall dashes.
+          gap(140, 110, 115, 9); stroke(0.75); ctx.setLineDash([4, 3]); seg([140, 110], [255, 110]); seg([140, 119], [255, 119]); ctx.setLineDash([]);
+          gap(200, 331, 30, 9); door(230, 331, 30, Math.PI, Math.PI * 1.5);
+          gap(268, 250, 5, 30); door(273, 250, 30, Math.PI * 0.5, Math.PI * 0.5);
+          stroke(0.75); ctx.beginPath(); ctx.arc(273, 250, 30, 0, Math.PI * 0.5); ctx.stroke(); stroke(1.5); seg([273, 250], [303, 250]);
+          gap(160, 215, 30, 5); stroke(0.75); ctx.beginPath(); ctx.arc(160, 220, 30, 0, Math.PI * 0.5); ctx.stroke(); stroke(1.5); seg([160, 220], [160, 250]);
+          gap(300, 200, 30, 5); stroke(0.75); ctx.beginPath(); ctx.arc(330, 205, 30, Math.PI * 0.5, Math.PI); ctx.stroke(); stroke(1.5); seg([330, 205], [330, 235]);
+          win(140, 331, 45, 9); win(320, 331, 70, 9); win(300, 110, 90, 9); win(120, 245, 9, 55); win(411, 230, 9, 70);
+          // Room names.
+          small('KITCHEN', 198, 168); small('LIVING', 198, 290); small('BATHROOM', 342, 158); small('BEDROOM', 342, 270);
+          // Dimension strings, in millimetres.
+          stroke(0.75, C.muted);
+          seg([120, 372], [420, 372]); seg([268, 366], [268, 378]);
+          [[120, 372], [268, 372], [420, 372]].forEach(([x, y]) => seg([x - 4, y + 4], [x + 4, y - 4]));
+          small('4 900', 194, 362); small('5 100', 344, 362);
+          seg([88, 40], [88, 340]); [[88, 40], [88, 110], [88, 340]].forEach(([x, y]) => seg([x - 4, y + 4], [x + 4, y - 4]));
+          small('2 300', 82, 75, 'right'); small('7 700', 82, 225, 'right');
+          // North point, title and scale bar.
+          stroke(1); ctx.beginPath(); ctx.arc(570, 78, 20, 0, 7); ctx.stroke();
+          ctx.fillStyle = C.ink; ctx.beginPath(); ctx.moveTo(570, 56); ctx.lineTo(578, 92); ctx.lineTo(570, 85); ctx.lineTo(562, 92); ctx.closePath(); ctx.fill();
+          label('N', 570, 44, { size: 11, align: 'center' });
+          note('Ground floor plan', 470, 404);
+          small('PROPOSED · 1:100 @ A3', 470, 424, 'left');
+          for (let i = 0; i < 5; i++) { ctx.fillStyle = i % 2 ? C.paper : C.ink; ctx.fillRect(470 + i * 20, 440, 20, 6); }
+          stroke(0.75); box(470, 440, 100, 6); small('0', 470, 456, 'left'); small('5 m', 570, 456, 'right');
         });
       },
       planning(t) {
+        // Front elevation with a proposed single-storey side extension.
         sheet(t, ({ stroke, seg, box, note }) => {
-          stroke(1.5, C.line); seg([20, 395], [620, 395]); seg([20, 430], [620, 430]);
-          stroke(1, C.ink);
-          [[50, 305, 70, 60], [145, 300, 80, 65], [440, 305, 75, 60], [535, 300, 70, 65], [60, 165, 95, 75], [490, 165, 100, 80], [230, 45, 110, 60], [395, 45, 90, 60]].forEach((b) => box(...b));
-          ctx.fillStyle = C.tint; ctx.fillRect(265, 225, 80, 80);
-          stroke(1.5, C.line); box(265, 225, 80, 80);
-          // Exactly one green element: the proposed application site (4.11)
-          stroke(3, C.greenDark); box(240, 145, 130, 240);
-          stroke(2, C.line); box(370, 145, 80, 150);
-          note('Application site', 305, 410, 'center'); note('Other land owned', 455, 130, 'center');
-          stroke(2); seg([585, 110], [585, 55]); seg([573, 74], [585, 55], [597, 74]);
-          note('N', 585, 40, 'center');
-          stroke(2); seg([40, 455], [160, 455]); seg([40, 448], [40, 462]); seg([100, 450], [100, 460]); seg([160, 448], [160, 462]);
-          note('Scale bar', 175, 455);
+          const small = (text, x, y, align = 'left', color = C.muted) => label(text, x, y, { size: 10, align, color });
+          const win = (x, y, w, h) => { stroke(1.5); box(x, y, w, h); stroke(0.75); seg([x + w / 2, y], [x + w / 2, y + h]); seg([x, y + h * 0.35], [x + w, y + h * 0.35]); stroke(2); seg([x - 4, y + h + 3], [x + w + 4, y + h + 3]); };
+          // Brick coursing, kept faint so it reads as texture.
+          ctx.save(); ctx.beginPath(); ctx.rect(150, 200, 260, 180); ctx.clip();
+          stroke(0.5, C.line); for (let y = 206; y < 380; y += 6) seg([150, y], [410, y]);
+          ctx.restore();
+          // Chimney sits behind the ridge, then the roof with tile coursing.
+          stroke(2); box(334, 76, 22, 40); seg([330, 76], [360, 76]);
+          ctx.fillStyle = C.paper; ctx.beginPath(); ctx.moveTo(138, 200); ctx.lineTo(176, 112); ctx.lineTo(384, 112); ctx.lineTo(422, 200); ctx.closePath(); ctx.fill();
+          stroke(2.5); ctx.stroke();
+          stroke(0.5, C.muted);
+          for (let y = 122; y < 200; y += 9) { const k = (y - 112) / 88; seg([176 - 38 * k, y], [384 + 38 * k, y]); }
+          // Main walls.
+          stroke(2.5); box(150, 200, 260, 180);
+          win(178, 228, 60, 48); win(322, 228, 60, 48); win(178, 300, 60, 52);
+          stroke(1.5); box(322, 296, 34, 84); seg([316, 290], [362, 290]);
+          // Proposed side extension: the one green element (4.11).
+          ctx.fillStyle = C.tint; ctx.fillRect(410, 296, 110, 84);
+          stroke(2.5, C.greenDark); seg([410, 296], [520, 296], [520, 380]); seg([406, 290], [524, 290]);
+          stroke(1, C.greenDark); box(438, 318, 58, 40);
+          label('Proposed side extension', 465, 274, { size: 11, align: 'center', color: C.greenDark });
+          // Ground line with hatching.
+          stroke(2.5); seg([40, 380], [600, 380]);
+          stroke(0.75, C.muted); for (let x = 46; x < 600; x += 12) seg([x, 380], [x - 8, 390]);
+          // Level datums.
+          const datum = (y, text) => {
+            stroke(0.5, C.muted); ctx.setLineDash([3, 3]); seg([424, y], [548, y]); ctx.setLineDash([]);
+            ctx.fillStyle = C.ink; ctx.beginPath(); ctx.moveTo(556, y); ctx.lineTo(562, y - 7); ctx.lineTo(550, y - 7); ctx.closePath(); ctx.fill();
+            small(text, 568, y - 4);
+          };
+          datum(112, 'Ridge +7.900'); datum(200, 'Eaves +5.200'); datum(380, 'FFL +0.000');
+          note('Front elevation', 40, 420); small('PROPOSED · 1:100 @ A3', 40, 440);
         });
       },
       regs(t) {
+        // Section through the external wall, floor and roof: the build-up building control checks.
         sheet(t, ({ stroke, seg, box, note }) => {
-          stroke(2); seg([30, 370], [400, 370]);
-          ctx.fillStyle = C.tint; ctx.fillRect(70, 370, 170, 60);
-          stroke(1.5); box(70, 370, 170, 60);
-          stroke(3); box(120, 110, 22, 260); box(170, 110, 22, 260);
-          // Exactly one green element: the insulation lines (4.11)
-          stroke(2, C.greenDark); ctx.beginPath();
-          for (let y = 112, i = 0; y <= 368; y += 8, i++) { const x = i % 2 ? 150 : 162; i ? ctx.lineTo(x, y) : ctx.moveTo(x, y); }
-          ctx.stroke();
-          stroke(3); seg([192, 345], [400, 345]);
-          stroke(2, C.ink); seg([112, 352], [200, 352]);
-          stroke(3); seg([95, 110], [290, 25], [400, 75]);
-          stroke(2); seg([120, 110], [400, 110]);
-          stroke(2, C.greenDark); ctx.beginPath();
-          for (let x = 200, i = 0; x <= 396; x += 10, i++) { const y = i % 2 ? 96 : 106; i ? ctx.lineTo(x, y) : ctx.moveTo(x, y); }
-          ctx.stroke();
-          stroke(1);
-          [['Roof insulation', 300, 100, 80], ['Cavity insulation', 156, 220, 200], ['Floor structure', 390, 345, 290], ['Damp-proof course', 200, 352, 350], ['Foundation', 240, 400, 410]].forEach(([text, x, y, ly]) => {
-            seg([x, y], [440, ly]); note(text, 446, ly);
+          const small = (text, x, y, align = 'left', color = C.muted) => label(text, x, y, { size: 10, align, color });
+          const hatch = (x, y, w, h, step = 8) => {
+            ctx.save(); ctx.beginPath(); ctx.rect(x, y, w, h); ctx.clip();
+            stroke(0.5, C.muted); for (let i = -h; i < w; i += step) seg([x + i, y + h], [x + i + h, y]);
+            ctx.restore(); stroke(1.5); box(x, y, w, h);
+          };
+          const zig = (x0, y0, x1, y1, amp, step) => {
+            const len = Math.hypot(x1 - x0, y1 - y0), ux = (x1 - x0) / len, uy = (y1 - y0) / len, nx = -uy, ny = ux;
+            ctx.beginPath();
+            for (let d = 0, i = 0; d <= len; d += step, i++) { const o = i % 2 ? amp : -amp; const px = x0 + ux * d + nx * o, py = y0 + uy * d + ny * o; i ? ctx.lineTo(px, py) : ctx.moveTo(px, py); }
+            ctx.stroke();
+          };
+          // Ground and foundation.
+          stroke(0.75, C.muted); for (let x = 30; x < 430; x += 12) seg([x, 380], [x - 8, 390]);
+          stroke(2); seg([30, 380], [90, 380]);
+          hatch(84, 404, 96, 40, 6);
+          // Cavity wall: outer and inner leaves, cut, with the cavity between.
+          hatch(104, 150, 18, 254, 7); hatch(142, 150, 18, 254, 7);
+          // Floor: slab on insulation, with the damp-proof course across the wall.
+          hatch(160, 372, 270, 14, 9);
+          stroke(1.5, C.ink); seg([100, 366], [164, 366]);
+          // Roof: rafter, covering, ceiling joist; cut off with a break line.
+          stroke(3); seg([92, 156], [330, 40]); stroke(1.5); seg([88, 146], [326, 30]);
+          stroke(3); seg([142, 150], [430, 150]);
+          stroke(1); seg([430, 140], [436, 146], [424, 154], [430, 160]); seg([430, 366], [436, 372], [424, 380], [430, 392]);
+          // Insulation, one continuous green system (4.11): cavity, loft and floor.
+          stroke(2, C.greenDark);
+          zig(131, 152, 131, 400, 7, 8); zig(166, 142, 426, 142, 5, 10); zig(166, 392, 426, 392, 4, 10);
+          // Leaders to labels.
+          stroke(0.75, C.muted);
+          [['Roof covering', 240, 72, 60], ['Loft insulation', 300, 142, 120], ['Cavity insulation', 131, 260, 200], ['Floor slab', 300, 379, 300], ['Damp-proof course', 160, 366, 340], ['Floor insulation', 380, 392, 380], ['Strip foundation', 180, 424, 420]].forEach(([text, x, y, ly]) => {
+            seg([x, y], [470, ly]); ctx.fillStyle = C.ink; ctx.beginPath(); ctx.arc(x, y, 2, 0, 7); ctx.fill();
+            small(text, 478, ly, 'left', C.ink);
           });
+          note('Section A–A', 30, 30); small('1:20 @ A3', 30, 50);
         });
       },
       advise(t) {
@@ -607,7 +675,7 @@
       if (mode === 'visual') {
         showRender();
       } else if (mode === 'journey') {
-        const load = () => import('/js/visual3d.js?v=7')
+        const load = () => import('/js/visual3d.js?v=8')
           .then((m) => model.attach(m.mount(root, { mode })))
           .catch((err) => {
             console.warn('3D animation unavailable', err);
