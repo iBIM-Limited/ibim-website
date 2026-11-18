@@ -65,7 +65,16 @@ export default {
       const page = await env.ASSETS.fetch(new Request(new URL('/404', url)));
       return secure(new Response(page.body, { status: 410, headers: page.headers }), url);
     }
-    return secure(await env.ASSETS.fetch(request), url);
+
+    let assetResponse;
+    if (request.method === 'HEAD') {
+      const getReq = new Request(request.url, { method: 'GET', headers: request.headers });
+      const getRes = await env.ASSETS.fetch(getReq);
+      assetResponse = new Response(null, { status: getRes.status, headers: getRes.headers });
+    } else {
+      assetResponse = await env.ASSETS.fetch(request);
+    }
+    return secure(assetResponse, url);
   },
 };
 
