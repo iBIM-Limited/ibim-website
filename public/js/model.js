@@ -738,16 +738,16 @@
       const mode = root.dataset.state;
       const showRender = () => {
         const photo = new Image();
-        photo.src = '/img/ibim-visual.webp?v=2';
+        photo.src = '/img/ibim-visual.webp?v=3';
         photo.alt = 'Visualisation · illustrative, not a client project';
-        photo.width = 1600; photo.height = 1280;
+        photo.width = 1200; photo.height = 896;
         photo.className = 'model__photo model__photo--static';
         root.querySelector('canvas').after(photo);
       };
       if (mode === 'visual') {
         showRender();
       } else if (mode === 'journey') {
-        const load = () => import('/js/visual3d.js?v=9')
+        const load = () => import('/js/visual3d.js?v=10')
           .then((m) => model.attach(m.mount(root, { mode })))
           .catch((err) => {
             console.warn('3D animation unavailable', err);
