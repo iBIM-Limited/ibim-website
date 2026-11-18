@@ -50,7 +50,7 @@ export const architecturalServices: Service[] = [
     honestly: 'If you only need a floor plan to sell or let a property, a simple measured plan costs less than a full drawing set. We’ll tell you.',
     typical: { inputs: 'address, access for a survey, any existing drawings', standards: 'drawn to a stated scale, with a north point', timescale: PER_JOB },
     figure: 'plan',
-    figureCaption: 'Plan · existing and proposed',
+    figureCaption: 'Ground floor plan · illustrative, not a client project',
     questions: [
       { q: 'What drawings do I need for my project?', a: 'It depends on the work and the approvals it needs. Most projects start with drawings of what exists and what is proposed. Planning and building regulations then need different information, so tell us what you are planning and we’ll advise.' },
       { q: 'Are you architects?', a: 'No. iBIM provides architectural drawing and BIM services. In the UK, only people registered with the Architects Registration Board can use the title architect. Our director, Jack Ward, holds a BSc (Hons) in Building Surveying and a Postgraduate Diploma in BIM and Project Management.' },
@@ -77,7 +77,7 @@ export const architecturalServices: Service[] = [
     honestly: 'Some work doesn’t need planning permission. If yours may be permitted development, we’ll say so before you pay for a full application. The council can confirm it formally.',
     typical: { inputs: 'address, what you want to build, any pre-application advice', standards: 'national requirements and your council’s local validation list', timescale: PER_JOB },
     figure: 'elevation',
-    figureCaption: 'Elevation · proposed',
+    figureCaption: 'Rear elevation · illustrative, not a client project',
     explainer: {
       title: 'What a planning application needs.',
       body: ['National guidance sets a minimum for every application. Your council can also ask for more through its local validation list, so requirements vary by area.'],
@@ -116,7 +116,7 @@ export const architecturalServices: Service[] = [
     honestly: 'Some small jobs can go ahead under a building notice, without full plans. If that suits your work, we’ll tell you before you pay for a full set.',
     typical: { inputs: 'planning drawings or an agreed design', standards: 'the Building Regulations and Approved Documents', timescale: PER_JOB },
     figure: 'section',
-    figureCaption: 'Section · construction detail',
+    figureCaption: 'Wall section · illustrative, not a client project',
     explainer: {
       title: 'Planning and building regulations are different.',
       body: [
@@ -177,7 +177,7 @@ export const services: Service[] = [
     honestly: 'You don’t need full BIM for every job. If a scan and a 2D pack will do, we’ll say so.',
     typical: { inputs: 'your current templates, software and a recent project', standards: 'BS EN ISO 19650 and the UK BIM Framework', timescale: PER_JOB },
     figure: 'wire',
-    figureCaption: 'Model · federated view',
+    figureCaption: 'BIM advisory · assess, roadmap, implement',
     questions: [{ q: 'What is BIM?', a: 'Building information modelling (BIM) is one shared digital record of a building, used by everyone on the job, so they all work from the same information.' }],
   },
   {
@@ -199,7 +199,7 @@ export const services: Service[] = [
     honestly: 'If you only need two floor plans, a measured survey is cheaper. We’ll tell you.',
     typical: { inputs: 'access, existing drawings if any', standards: 'agreed level of detail, BS EN ISO 19650', timescale: PER_JOB },
     figure: 'cloud',
-    figureCaption: 'Point cloud → model',
+    figureCaption: 'Point cloud · laser scan in progress',
     includes: { title: 'What we model.', items: ['Point cloud to floor plan conversion', 'Architecture', 'MEP', 'Structure', 'FF&E', 'Civils'] },
     questions: [{ q: 'What is scan to BIM?', a: 'A building or site is captured with laser scanning or other survey methods, and that data is used to create a 3D model of what exists.' }],
   },
@@ -222,7 +222,7 @@ export const services: Service[] = [
     honestly: 'On a small project with one designer, a full CDE can be more process than the job needs. A shared folder and a naming convention may do.',
     typical: { inputs: 'the client’s information requirements, the team list and programme', standards: 'BS EN ISO 19650-2', timescale: PER_JOB },
     figure: 'cde',
-    figureCaption: 'CDE · work in progress → shared → published',
+    figureCaption: 'Coordination · clash found, then resolved',
     includes: { title: 'What this covers.', items: ['Project information manager', 'Common data environment', 'Clash detection', 'Auditing', 'Dashboards and reporting'] },
     questions: [{ q: 'What is a common data environment?', a: 'A common data environment (CDE) is the one agreed place project files live, with a process for sharing them, so teams know which version is current.' }],
   },
@@ -245,7 +245,7 @@ export const services: Service[] = [
     honestly: '4D and 5D earn their place on complex or phased sites. On a simple build, a programme and a cost plan are usually enough.',
     typical: { inputs: 'the model, the programme and the cost plan', standards: 'agreed level of detail for quantities', timescale: PER_JOB },
     figure: 'sequence',
-    figureCaption: '4D · sequence by week',
+    figureCaption: '4D · build sequence against the programme',
     questions: [{ q: 'What are 4D and 5D BIM?', a: '4D links a model to the construction programme, so you can see how the sequence works. 5D adds cost, so you can see how design and programme changes affect the budget.' }],
   },
   {
@@ -267,7 +267,7 @@ export const services: Service[] = [
     honestly: 'If your contractor already provides a project manager, you may only need us for the information side.',
     typical: { inputs: 'the brief, budget and team', standards: 'BS EN ISO 19650 for project information', timescale: PER_JOB },
     figure: 'programme',
-    figureCaption: 'Programme · RIBA stages',
+    figureCaption: 'Coordination · architecture, structure and MEP',
     questions: [{ q: 'What is integrated project delivery?', a: 'It is an approach that brings the client, designers and contractors together early and shares information and decisions across the team, instead of working in separate stages.' }],
   },
   {
@@ -289,7 +289,7 @@ export const services: Service[] = [
     honestly: 'Start with the assets you actually maintain. A twin of everything is rarely worth it on day one.',
     typical: { inputs: 'handover files, asset lists and maintenance records', standards: 'BS EN ISO 19650-3', timescale: PER_JOB },
     figure: 'twin',
-    figureCaption: 'Digital twin · selected asset',
+    figureCaption: 'Digital twin · sensors reporting live data',
     questions: [{ q: 'What is a digital twin?', a: 'A digital twin is a live model of a building in use, connected to its data, so it can support operational decisions.' }],
   },
 ];

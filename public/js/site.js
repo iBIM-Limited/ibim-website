@@ -84,17 +84,52 @@
       status.dataset.kind = kind;
     };
 
-    const fail = (message, fieldNames = []) => {
-      showStatus(message, 'error');
-      form.querySelectorAll('[aria-invalid]').forEach((el) => el.removeAttribute('aria-invalid'));
-      fieldNames.forEach((name) => {
-        const field = form.elements[name];
-        if (field) field.setAttribute('aria-invalid', 'true');
+    // Errors sit next to the field they are about (5.8). The status box is kept for errors with no field.
+    const clearErrors = () => {
+      form.querySelectorAll('.field-error').forEach((el) => el.remove());
+      form.querySelectorAll('[aria-invalid]').forEach((el) => {
+        el.removeAttribute('aria-invalid');
+        const ids = (el.getAttribute('aria-describedby') || '').split(' ').filter((id) => id && !id.endsWith('-error'));
+        ids.length ? el.setAttribute('aria-describedby', ids.join(' ')) : el.removeAttribute('aria-describedby');
       });
-      if (fieldNames[0] && form.elements[fieldNames[0]]) {
-        form.elements[fieldNames[0]].focus();
+    };
+    const fail = (message, fieldNames = [], perField = {}) => {
+      clearErrors();
+      const fields = (fieldNames || []).map((name) => form.elements[name]).filter((f) => f && f.id);
+      fields.forEach((field) => {
+        const note = document.createElement('span');
+        note.className = 'field-error';
+        note.id = `${field.id}-error`;
+        note.textContent = perField[field.name] || (fields.length === 1 ? message : 'Please fill this in.');
+        field.closest('.field')?.append(note);
+        field.setAttribute('aria-invalid', 'true');
+        field.setAttribute('aria-describedby', [field.getAttribute('aria-describedby'), note.id].filter(Boolean).join(' '));
+      });
+      if (fields.length) {
+        if (status) status.hidden = true;
+        fields[0].focus();
+      } else {
+        showStatus(message, 'error');
       }
     };
+    form.addEventListener('input', (e) => {
+      if (e.target.getAttribute?.('aria-invalid')) {
+        document.getElementById(`${e.target.id}-error`)?.remove();
+        e.target.removeAttribute('aria-invalid');
+      }
+    });
+
+    // A quote request from a service page arrives as /contact?service=<slug>. Carry it into the enquiry.
+    const about = form.querySelector('[data-about]');
+    const service = new URLSearchParams(location.search).get('service') || '';
+    if (about && form.elements['service'] && /^[a-z0-9-]{1,80}$/.test(service)) {
+      const link = document.querySelector(`.dropdown-menu a[href="/${service}"]`);
+      if (link) {
+        form.elements['service'].value = service;
+        about.textContent = `About: ${link.textContent.trim()}`;
+        about.hidden = false;
+      }
+    }
 
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
@@ -116,7 +151,7 @@
         const required = ['first_name', 'last_name', 'company', 'job_title', 'email'];
         const missing = required.filter((name) => !form.elements[name]?.value.trim());
         if (missing.length) {
-          return fail('Please fill in all required fields and try again.', missing);
+          return fail('Please fill in the fields marked below and try again.', missing);
         }
         if (!isValidEmail(form.elements['email'].value.trim())) {
           return fail('Please enter a valid work email address.', ['email']);
@@ -125,7 +160,8 @@
 
       const submitBtn = form.querySelector('button[type="submit"]');
       if (submitBtn) submitBtn.disabled = true;
-      showStatus('Sending enquiry…', 'pending');
+      clearErrors();
+      showStatus('Sending…', 'pending');
 
       try {
         const from = document.referrer ? new URL(document.referrer).hostname : '';
@@ -149,7 +185,9 @@
         }
 
         form.reset();
-        form.querySelectorAll('[aria-invalid]').forEach((el) => el.removeAttribute('aria-invalid'));
+        // A reset clears the hidden service field, so put it back for a second message.
+        if (form.elements['service'] && about && !about.hidden) form.elements['service'].value = service;
+        clearErrors();
         showStatus(form.dataset.success || 'Thank you. Message sent.', 'ok');
       } catch {
         fail('The message could not be sent. Please check your connection, or call +44 7825 885167.');

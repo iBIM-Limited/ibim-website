@@ -39,6 +39,11 @@ const jsonLd = {
     <header class="service-header">
       <span class="mono eyebrow eyebrow--green">{breadcrumb}</span>
       <h1>{service.name}.</h1>
+      <!-- On phones the side panel is far down the page, so the next step is offered here too (5.1). -->
+      <div class="service-header__actions">
+        <a class="button button--action" href={`/contact?service=${service.slug}`}>Request a quote</a>
+        <a class="service-header__phone" href={contact.phoneHref}>or call {contact.person} on <span class="mono">{contact.phone}</span></a>
+      </div>
     </header>
 
     <!-- Above-the-fold Figure (5.9) -->
@@ -168,7 +173,7 @@ const jsonLd = {
         </div>
 
         <div class="service-panel__actions">
-          <a class="button button--action" href="/contact">Request a quote</a>
+          <a class="button button--action" href={`/contact?service=${service.slug}`}>Request a quote</a>
           <a
             class="button button--secondary"
             href={`mailto:${contact.email}?subject=${encodeURIComponent('Question about ' + service.name)}`}
@@ -205,5 +210,5 @@ const jsonLd = {
     </nav>
   </div>
 
-  <script is:inline src="/js/model.js?v=16" defer></script>
+  <script is:inline src="/js/model.js?v=17" defer></script>
 </Base>

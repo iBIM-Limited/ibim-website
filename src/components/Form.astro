@@ -7,7 +7,7 @@ const { kind } = Astro.props;
 const page = Astro.url.pathname.replace(/\.html$/, '') || '/';
 const success = kind === 'waitlist'
   ? 'You’re on the waiting list. We’ll email you when there’s news.'
-  : 'Message sent. We’ll reply within one working day.';
+  : 'Message sent. Jack Ward will reply within one working day, by email or phone.';
 
 const needOptions = ['Drawings', 'Scan / model', 'BIM support', 'Software', 'Not sure'];
 ---
@@ -23,6 +23,7 @@ const needOptions = ['Drawings', 'Scan / model', 'BIM support', 'Software', 'Not
   <input type="hidden" name="kind" value={kind} />
   <input type="hidden" name="source_page" value={page} />
   <input type="hidden" name="referrer" value="" />
+  {kind === 'contact' && <input type="hidden" name="service" value="" />}
 
   <!-- Honeypot -->
   <div class="trap" aria-hidden="true">
@@ -32,12 +33,13 @@ const needOptions = ['Drawings', 'Scan / model', 'BIM support', 'Software', 'Not
 
   {kind === 'contact' ? (
     <>
+      <p class="form__about" data-about hidden></p>
       <fieldset class="field" style="border: 0; padding: 0; margin: 0;">
         <legend style="margin-bottom: 8px; font-weight: 600; font-size: 14.5px;">What do you need?</legend>
         <div class="radio-group" role="radiogroup" aria-label="What do you need?">
-          {needOptions.map((opt, i) => (
+          {needOptions.map((opt) => (
             <label class="radio-chip">
-              <input type="radio" name="need" value={opt} checked={i === 0 ? true : undefined} />
+              <input type="radio" name="need" value={opt} />
               <span class="radio-chip__label">{opt}</span>
             </label>
           ))}
@@ -64,7 +66,9 @@ const needOptions = ['Drawings', 'Scan / model', 'BIM support', 'Software', 'Not
           name="reply"
           type="text"
           required
-          autocomplete="email tel"
+          autocomplete="email"
+          autocapitalize="none"
+          spellcheck="false"
           placeholder="07123 456789 or name@example.co.uk"
         />
         <span class="field-help" id="contact-reply-help">Enter a full UK number or an email so we can reply.</span>

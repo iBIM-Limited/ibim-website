@@ -1598,3 +1598,101 @@ a.ledger-row:hover .ledger-row__title {
     scroll-behavior: auto !important;
   }
 }
+
+/* ---- Improvement pass, 18 November 2026 ---- */
+
+/* Text links sit at the start of the line, never centred in a stretched column. */
+.button--tertiary {
+  justify-content: flex-start;
+  align-self: flex-start;
+  justify-self: start;
+  text-align: left;
+}
+
+/* Service pages: the next step directly under the heading on phones and tablets (5.1, 5.11). */
+.service-header__actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px 20px;
+  margin-top: 8px;
+}
+.service-header__phone {
+  display: inline-flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0 6px;
+  min-height: 44px;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--color-ink);
+  text-decoration: none;
+}
+.service-header__phone .mono {
+  color: var(--color-signal-text);
+}
+.service-header__phone:hover {
+  text-decoration: underline;
+}
+@media (min-width: 960px) {
+  /* The sticky side panel carries these on wide screens. */
+  .service-header__actions { display: none; }
+}
+
+/* Drawings get a taller frame on phones so their labels stay readable (5.11). */
+@media (max-width: 640px) {
+  .model--page canvas,
+  .model--page > .model__photo {
+    aspect-ratio: 4 / 3;
+  }
+}
+
+/* Form: inline errors and the service an enquiry is about (5.8). */
+.field-error {
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--color-error);
+}
+.form__about {
+  align-self: flex-start;
+  padding: 6px 12px;
+  border-radius: 999px;
+  background: var(--color-tint);
+  color: var(--color-signal-text);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: 0.04em;
+}
+
+/* Tap targets of 44px or more on touch screens (5.11). */
+@media (max-width: 768px) {
+  .ledger-row__links { gap: 0 20px; margin-top: 4px; }
+  .ledger-row__links a,
+  .footer-col li a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+  }
+  .footer-col ul { gap: 0; }
+}
+.site-header__brand {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+}
+.skip-link { min-height: 44px; display: inline-flex; align-items: center; }
+@media (max-width: 768px) {
+  .footer-contact a,
+  .footer-links a,
+  .service-panel__person a,
+  .leadership-sheet__meta a:not(.button),
+  .typical-list dd a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+  }
+  .mobile-sheet a:not(.button),
+  .mobile-sheet summary {
+    min-height: 44px;
+  }
+}

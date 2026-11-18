@@ -34,6 +34,7 @@ const LIMITS = {
   project: 5000,
   reply: 200,
   when: 200,
+  service: 80,
 };
 
 export default {
@@ -76,6 +77,10 @@ export default {
     }
     return secure(assetResponse, url);
   },
+
+  async scheduled(event, env, ctx) {
+    ctx.waitUntil(resendMissed(env));
+  },
 };
 
 function secure(response, url) {
@@ -84,7 +89,9 @@ function secure(response, url) {
   if (url.hostname !== CANONICAL_HOST) res.headers.set('X-Robots-Tag', 'noindex, nofollow');
   // Cache only successful responses, so a brief 404 during a deploy is never cached for a year.
   if (res.ok && /\.(js|css|png|jpg|webp|woff2?)$/.test(url.pathname)) {
-    res.headers.set('Cache-Control', url.pathname.startsWith('/_astro/') ? 'public, max-age=31536000, immutable' : 'public, max-age=3600');
+    // Hashed build files and files requested with a version (?v=3) never change at that address.
+    const versioned = url.pathname.startsWith('/_astro/') || url.searchParams.has('v');
+    res.headers.set('Cache-Control', versioned ? 'public, max-age=31536000, immutable' : 'public, max-age=3600');
   }
   return res;
 }
@@ -138,7 +145,9 @@ async function handleEnquiry(request, env, url) {
     }
 
     data.email = data.reply;
+    if (!/^[a-z0-9-]+$/.test(data.service)) data.service = '';
     const parts = [];
+    if (data.service) parts.push(`Service page: /${data.service}`);
     if (data.need) parts.push(`Need: ${data.need}`);
     if (data.when) parts.push(`When: ${data.when}`);
     if (data.project) parts.push(data.project);
@@ -183,23 +192,46 @@ async function handleEnquiry(request, env, url) {
     data.heard || null
   ).run();
 
-  // Send notification email if configured
-  if (env.NOTIFY_URL && env.NOTIFY_KEY) {
+  // Email Jack. If this fails the enquiry is still saved, and the hourly check below sends it again.
+  await notify(env, saved.meta.last_row_id, notification(kind, data));
+
+  return done();
+}
+
+async function notify(env, id, message) {
+  if (!env.NOTIFY_URL || !env.NOTIFY_KEY) return false;
+  for (let attempt = 1; attempt <= 2; attempt++) {
     try {
       const res = await fetch(env.NOTIFY_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ key: env.NOTIFY_KEY, ...notification(kind, data) }),
+        body: JSON.stringify({ key: env.NOTIFY_KEY, ...message }),
       });
       const result = await res.json();
       if (!result.ok) throw new Error('Notification script rejected the request');
-      await env.DB.prepare('UPDATE enquiries SET emailed = 1 WHERE id = ?').bind(saved.meta.last_row_id).run();
+      await env.DB.prepare('UPDATE enquiries SET emailed = 1 WHERE id = ?').bind(id).run();
+      return true;
     } catch (err) {
-      console.error('Notification email failed', err);
+      console.error(`Notification email failed for enquiry ${id}, attempt ${attempt}`, err);
     }
   }
+  return false;
+}
 
-  return done();
+// Hourly: email any enquiry from the last three days whose notification never went out,
+// so a failed email is never silent. Older rows are left alone.
+async function resendMissed(env) {
+  if (!env.DB || !env.NOTIFY_URL || !env.NOTIFY_KEY) return;
+  const { results } = await env.DB.prepare(
+    "SELECT * FROM enquiries WHERE emailed = 0 AND created_at > datetime('now', '-3 days') AND created_at < datetime('now', '-5 minutes') ORDER BY id LIMIT 10"
+  ).all();
+  for (const row of results) {
+    const d = { ...row };
+    for (const key of Object.keys(d)) if (d[key] == null) d[key] = '';
+    const message = notification(row.kind === 'waitlist' ? 'waitlist' : 'contact', d);
+    message.subject = `${message.subject} (delayed)`;
+    await notify(env, row.id, message);
+  }
 }
 
 function notification(kind, d) {

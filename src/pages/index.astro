@@ -136,14 +136,32 @@ const journeySteps = [
     </div>
   </section>
 
-  <!-- 3. The Organising Idea & Promise Band (1.2, 1.10) -->
-  <section class="promise-band">
-    <div class="container">
-      <div class="promise-band__inner">
-        <h2>Simplifying AEC with integrated digital solutions.</h2>
-        <p>
-          Architecture, engineering and construction (AEC) runs on information: drawings, models, programmes, costs and handover records. Too much of it sits in separate files, with separate teams, or in someone’s inbox. iBIM exists to join it up so you enter information once.
-        </p>
+  <!-- 6. Who We Work With — Editorial Ledger (1.8) -->
+  <section class="section section--bordered" id="who-we-work-with">
+    <div class="container editorial-split">
+      <div class="editorial-split__head editorial-split__head--sticky">
+        <span class="eyebrow eyebrow--green">Who we work with</span>
+        <h2>One supply chain.</h2>
+        <p class="small">Design, build, own and operate.</p>
+      </div>
+
+      <div class="ledger">
+        {audiences.map((a) => (
+          <div class="ledger-row ledger-row--2col">
+            <div>
+              <span class="ledger-row__meta">{a.group}</span>
+              <h3 class="ledger-row__title" style="margin-top: 4px;">{a.name}.</h3>
+            </div>
+            <div>
+              <p class="ledger-row__body">{a.need}</p>
+              <div class="ledger-row__links">
+                {a.links.map((link) => (
+                  <a href={link.href}>{link.name}</a>
+                ))}
+              </div>
+            </div>
+          </div>
+        ))}
       </div>
     </div>
   </section>
@@ -192,32 +210,14 @@ const journeySteps = [
     </div>
   </section>
 
-  <!-- 6. Who We Work With — Editorial Ledger (1.8) -->
-  <section class="section section--bordered" id="who-we-work-with">
-    <div class="container editorial-split">
-      <div class="editorial-split__head editorial-split__head--sticky">
-        <span class="eyebrow eyebrow--green">Who we work with</span>
-        <h2>One supply chain.</h2>
-        <p class="small">Design, build, own and operate.</p>
-      </div>
-
-      <div class="ledger">
-        {audiences.map((a) => (
-          <div class="ledger-row ledger-row--2col">
-            <div>
-              <span class="ledger-row__meta">{a.group}</span>
-              <h3 class="ledger-row__title" style="margin-top: 4px;">{a.name}.</h3>
-            </div>
-            <div>
-              <p class="ledger-row__body">{a.need}</p>
-              <div class="ledger-row__links">
-                {a.links.map((link) => (
-                  <a href={link.href}>{link.name}</a>
-                ))}
-              </div>
-            </div>
-          </div>
-        ))}
+  <!-- 3. The Organising Idea & Promise Band (1.2, 1.10) -->
+  <section class="promise-band">
+    <div class="container">
+      <div class="promise-band__inner">
+        <h2>Simplifying AEC with integrated digital solutions.</h2>
+        <p>
+          Architecture, engineering and construction (AEC) runs on information: drawings, models, programmes, costs and handover records. Too much of it sits in separate files, with separate teams, or in someone’s inbox. iBIM exists to join it up so you enter information once.
+        </p>
       </div>
     </div>
   </section>
@@ -268,5 +268,5 @@ const journeySteps = [
     </div>
   </section>
 
-  <script is:inline src="/js/model.js?v=16" defer></script>
+  <script is:inline src="/js/model.js?v=17" defer></script>
 </Base>

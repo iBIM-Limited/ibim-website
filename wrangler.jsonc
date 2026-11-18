@@ -12,6 +12,8 @@
     "html_handling": "auto-trailing-slash"
   },
   "observability": { "enabled": true },
+  // Hourly: re-send any enquiry whose notification email failed (see resendMissed in worker/index.js).
+  "triggers": { "crons": ["17 * * * *"] },
   "d1_databases": [
     { "binding": "DB", "database_name": "ibim-enquiries", "database_id": "f216721c-9b8d-4505-99e6-91789a9701a2", "migrations_dir": "migrations" }
   ],
@@ -31,6 +33,7 @@
       "name": "ibim-website-preview",
       "routes": [],
       "workers_dev": true,
+      "triggers": { "crons": [] },
       "d1_databases": [
         { "binding": "DB", "database_name": "ibim-enquiries-preview", "database_id": "23d3859c-2c9e-474f-962a-f1098e8ba30a", "migrations_dir": "migrations" }
       ]
