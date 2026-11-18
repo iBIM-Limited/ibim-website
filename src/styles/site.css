@@ -631,8 +631,8 @@ a:hover {
     gap: 32px;
   }
   /* The animation runs to the edge of the screen. */
-  .hero-ink .model--hero { width: auto; margin-right: calc(-1 * (max(0px, (100vw - 1200px) / 2) + max(16px, 4vw))); }
-  .hero-ink .model--hero figcaption { padding-right: max(16px, 4vw); }
+  /* The hero visual stays inside the page width, in line with the navigation above it. */
+  .hero-ink .model--hero { width: 100%; }
 }
 
 /* Seamless hero visual: no frame, the drawing grid shows straight through (Jack, 18 Nov). */
@@ -1696,3 +1696,7 @@ a.ledger-row:hover .ledger-row__title {
     min-height: 44px;
   }
 }
+
+/* Hero visual: stage labels and caption centred on the image. */
+.model--hero .journey-steps { justify-content: center; }
+.model--hero figcaption { text-align: center; }

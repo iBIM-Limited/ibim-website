@@ -338,6 +338,8 @@
           };
           const tick = (x, y) => seg([x - 4, y + 4], [x + 4, y - 4]);
           const Q = Math.PI / 2;
+          // The house is centred on the sheet; the title and scale bar sit beneath it.
+          ctx.save(); ctx.translate(50, 0);
           // Proposed rear extension, the one green element (4.11): three new walls, open to the kitchen.
           ctx.fillStyle = C.tint; ctx.fillRect(129, 49, 135, 61);
           ctx.fillStyle = C.greenDark;
@@ -374,14 +376,15 @@
           small('10000', 270, 362);
           seg([88, 40], [88, 340]); [40, 110, 340].forEach((y) => { seg([82, y], [114, y]); tick(88, y); });
           small('2300', 82, 75, 'right'); small('7700', 82, 225, 'right');
+          ctx.restore();
           // North point, title and a 5 m scale bar (150 px).
-          stroke(1); ctx.beginPath(); ctx.arc(570, 78, 20, 0, 7); ctx.stroke();
-          ctx.fillStyle = C.ink; ctx.beginPath(); ctx.moveTo(570, 56); ctx.lineTo(578, 92); ctx.lineTo(570, 85); ctx.lineTo(562, 92); ctx.closePath(); ctx.fill();
-          label('N', 570, 44, { size: 11, align: 'center' });
-          note('Ground floor plan', 460, 396);
-          small('PROPOSED · ILLUSTRATIVE', 460, 416, 'left');
-          for (let i = 0; i < 5; i++) { ctx.fillStyle = i % 2 ? C.paper : C.ink; ctx.fillRect(460 + i * 30, 436, 30, 6); }
-          stroke(0.75); box(460, 436, 150, 6); small('0', 460, 452, 'left'); small('5 m', 610, 452, 'right');
+          stroke(1); ctx.beginPath(); ctx.arc(540, 78, 20, 0, 7); ctx.stroke();
+          ctx.fillStyle = C.ink; ctx.beginPath(); ctx.moveTo(540, 56); ctx.lineTo(548, 92); ctx.lineTo(540, 85); ctx.lineTo(532, 92); ctx.closePath(); ctx.fill();
+          label('N', 540, 44, { size: 11, align: 'center' });
+          note('Ground floor plan', 170, 412);
+          small('PROPOSED · ILLUSTRATIVE', 170, 432, 'left');
+          for (let i = 0; i < 5; i++) { ctx.fillStyle = i % 2 ? C.paper : C.ink; ctx.fillRect(320 + i * 30, 408, 30, 6); }
+          stroke(0.75); box(320, 408, 150, 6); small('0', 320, 426, 'left'); small('5 m', 470, 426, 'right');
         });
       },
       planning(t) {
@@ -391,6 +394,7 @@
           const small = (text, x, y, align = 'left', color = C.muted) => label(text, x, y, { size: 10, align, color });
           // Window heads line up on each floor: 2.1 m above the floor.
           const openings = [[140, 317, 90, 36], [162, 236, 45, 32], [311, 236, 45, 32]];
+          ctx.save(); ctx.translate(-20, -45); // Centres the elevation on the sheet.
           const win = (x, y, w, h, color = C.ink) => {
             ctx.fillStyle = C.paper; ctx.fillRect(x, y, w, h);
             stroke(1.5, color); box(x, y, w, h);
@@ -432,6 +436,7 @@
           };
           datum(143, 'RIDGE', '+7.900'); datum(224, 'EAVES', '+5.200'); datum(380, 'GROUND', '±0.000', false);
           note('Rear elevation', 40, 420); small('PROPOSED · ILLUSTRATIVE', 40, 440);
+          ctx.restore();
         });
       },
       regs(t) {
