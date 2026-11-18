@@ -200,6 +200,20 @@
       ctx.save();
       ctx.translate((width - 640 * fit) / 2, (height - 480 * fit) / 2);
       ctx.scale(fit, fit);
+
+      // Fine drawing grid behind the linework (Brand rules 3.6, 4.11)
+      ctx.save();
+      ctx.strokeStyle = C.line;
+      ctx.lineWidth = 0.5;
+      ctx.globalAlpha = 0.35 * p;
+      for (let x = 0; x <= 640; x += 32) {
+        ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, 480); ctx.stroke();
+      }
+      for (let y = 0; y <= 480; y += 32) {
+        ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(640, y); ctx.stroke();
+      }
+      ctx.restore();
+
       const stroke = (w, color = C.ink) => { ctx.lineWidth = w; ctx.strokeStyle = color; };
       const seg = (...pts) => { ctx.beginPath(); pts.forEach(([x, y], i) => (i ? ctx.lineTo(x, y) : ctx.moveTo(x, y))); ctx.stroke(); };
       const box = (x, y, w, h) => { ctx.beginPath(); ctx.rect(x, y, w, h); ctx.stroke(); };
@@ -249,7 +263,7 @@
     }
 
     function journeyLabels(active) {
-      const names = ['Point cloud', '3D model', '3D visual', 'Real-time view'];
+      const names = ['Point cloud', '3D model', 'Visualisation', 'Real-time view'];
       names.forEach((name, i) => {
         const y = 16 + i * 20;
         ctx.globalAlpha = 1;
@@ -317,14 +331,14 @@
       },
       planning(t) {
         sheet(t, ({ stroke, seg, box, note }) => {
-          const BLUE = '#2553a8';
           stroke(1.5, C.line); seg([20, 395], [620, 395]); seg([20, 430], [620, 430]);
           stroke(1, C.ink);
           [[50, 305, 70, 60], [145, 300, 80, 65], [440, 305, 75, 60], [535, 300, 70, 65], [60, 165, 95, 75], [490, 165, 100, 80], [230, 45, 110, 60], [395, 45, 90, 60]].forEach((b) => box(...b));
           ctx.fillStyle = C.tint; ctx.fillRect(265, 225, 80, 80);
-          stroke(1.5); box(265, 225, 80, 80);
-          stroke(3, C.clash); box(240, 145, 130, 240);
-          stroke(3, BLUE); box(370, 145, 80, 150);
+          stroke(1.5, C.line); box(265, 225, 80, 80);
+          // Exactly one green element: the proposed application site (4.11)
+          stroke(3, C.greenDark); box(240, 145, 130, 240);
+          stroke(2, C.line); box(370, 145, 80, 150);
           note('Application site', 305, 410, 'center'); note('Other land owned', 455, 130, 'center');
           stroke(2); seg([585, 110], [585, 55]); seg([573, 74], [585, 55], [597, 74]);
           note('N', 585, 40, 'center');
@@ -338,11 +352,12 @@
           ctx.fillStyle = C.tint; ctx.fillRect(70, 370, 170, 60);
           stroke(1.5); box(70, 370, 170, 60);
           stroke(3); box(120, 110, 22, 260); box(170, 110, 22, 260);
+          // Exactly one green element: the insulation lines (4.11)
           stroke(2, C.greenDark); ctx.beginPath();
           for (let y = 112, i = 0; y <= 368; y += 8, i++) { const x = i % 2 ? 150 : 162; i ? ctx.lineTo(x, y) : ctx.moveTo(x, y); }
           ctx.stroke();
           stroke(3); seg([192, 345], [400, 345]);
-          stroke(2.5, C.clash); seg([112, 352], [200, 352]);
+          stroke(2, C.ink); seg([112, 352], [200, 352]);
           stroke(3); seg([95, 110], [290, 25], [400, 75]);
           stroke(2); seg([120, 110], [400, 110]);
           stroke(2, C.greenDark); ctx.beginPath();
