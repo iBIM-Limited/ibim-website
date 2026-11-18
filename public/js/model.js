@@ -406,10 +406,12 @@
           const beam = project(SCANNER.x + Math.cos(sweep) * far, SCANNER.y + Math.sin(sweep) * far, 7);
           ctx.strokeStyle = C.green; ctx.lineWidth = 1; ctx.globalAlpha = 0.55; line(head, beam); ctx.globalAlpha = 1;
         }
-        ctx.strokeStyle = C.ink; ctx.lineWidth = 1.5;
+        // The scan is always shown on ink (4.8), so the scanner and its label are drawn light.
+        const onInk = 'rgba(255, 255, 255, 0.85)';
+        ctx.strokeStyle = onInk; ctx.lineWidth = 1.5;
         for (const [dx, dy] of [[-1.1, 0.3], [1, 0.5], [0.1, -1]]) line(head, project(SCANNER.x + dx, SCANNER.y + dy, 0));
-        ctx.fillStyle = C.ink; ctx.beginPath(); ctx.arc(head[0], head[1] - 4, 5, 0, 7); ctx.fill();
-        label('Laser scan', base[0], base[1] + 18, { align: 'center' });
+        ctx.fillStyle = onInk; ctx.beginPath(); ctx.arc(head[0], head[1] - 4, 5, 0, 7); ctx.fill();
+        label('Laser scan', base[0], base[1] + 18, { align: 'center', color: onInk });
       },
       information(t) {
         setOutGrid(0.5);

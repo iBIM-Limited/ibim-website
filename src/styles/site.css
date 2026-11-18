@@ -636,6 +636,20 @@ a:hover {
 .model--page canvas {
   aspect-ratio: 16 / 10;
 }
+/* Point clouds sit on ink (4.8). */
+.model--page.model--ink {
+  background-color: var(--color-ink);
+  background-image:
+    linear-gradient(to right, rgba(255, 255, 255, 0.06) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.06) 1px, transparent 1px);
+  background-size: 32px 32px;
+  border-color: rgba(255, 255, 255, 0.12);
+}
+.model--page.model--ink figcaption {
+  color: rgba(255, 255, 255, 0.7);
+  background: #0f120f;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
 .model figcaption {
   padding: 8px 12px;
   text-align: right;

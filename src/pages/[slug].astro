@@ -54,7 +54,7 @@ const jsonLd = {
         <figcaption class="mono small">{service.figureCaption}</figcaption>
       </figure>
     ) : (
-      <figure class="service-figure model model--page" data-model data-state={service.figure}>
+      <figure class:list={["service-figure model model--page", { "model--ink drawing-grid": service.figure === 'cloud' }]} data-model data-state={service.figure}>
         <canvas role="img" aria-label={`Technical drawing for ${service.name}.`}></canvas>
         <figcaption class="mono small">{service.figureCaption}</figcaption>
       </figure>
@@ -205,5 +205,5 @@ const jsonLd = {
     </nav>
   </div>
 
-  <script is:inline src="/js/model.js?v=13" defer></script>
+  <script is:inline src="/js/model.js?v=14" defer></script>
 </Base>
