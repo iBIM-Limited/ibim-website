@@ -82,7 +82,8 @@ function secure(response, url) {
   const res = new Response(response.body, response);
   for (const [k, v] of Object.entries(SECURITY_HEADERS)) res.headers.set(k, v);
   if (url.hostname !== CANONICAL_HOST) res.headers.set('X-Robots-Tag', 'noindex, nofollow');
-  if (/\.(js|css|png|jpg|webp|woff2?)$/.test(url.pathname)) {
+  // Cache only successful responses, so a brief 404 during a deploy is never cached for a year.
+  if (res.ok && /\.(js|css|png|jpg|webp|woff2?)$/.test(url.pathname)) {
     res.headers.set('Cache-Control', url.pathname.startsWith('/_astro/') ? 'public, max-age=31536000, immutable' : 'public, max-age=3600');
   }
   return res;

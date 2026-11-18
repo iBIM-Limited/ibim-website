@@ -692,14 +692,15 @@ a:hover {
 }
 .model__photo--static {
   opacity: 1;
-  position: static;
 }
+/* The render always sits over the canvas, at the canvas's shape (fallback and end frame). */
+.model > .model__photo { inset: auto; top: 0; left: 0; height: auto; aspect-ratio: 4 / 3; }
+.model--page > .model__photo { aspect-ratio: 16 / 10; }
 
 /* Layering: the 2D canvas sets the size; the 3D canvas and render sit on top of it. */
 .model > .model__3d { display: none; }
 .model--has-3d > canvas:first-child { visibility: hidden; }
 .model--has-3d > .model__3d { display: block; position: absolute; top: 0; left: 0; width: 100%; }
-.model--has-3d > .model__photo:not(.model__photo--static) { inset: auto; top: 0; left: 0; height: auto; aspect-ratio: 4 / 3; }
 .journey-steps { position: absolute; top: 0; left: 0; right: 0; z-index: 2; display: none; margin: 0; list-style: none; }
 .model--has-3d > .journey-steps { display: flex; }
 
