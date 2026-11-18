@@ -110,7 +110,9 @@
     let real = null, yaw = 0.62, baseYaw = 0.62, master = 1, width = 0, height = 0, scale = 1, ox = 0, oy = 0, visible = true, frame = 0;
     let cosY = Math.cos(yaw), sinY = Math.sin(yaw);
     // Sheet text is enlarged on small screens so labels stay readable (5.11).
-    let textBoost = 1, suspended = false;
+    // The hero's 2D drawing is never shown: the 3D animation fades in over the empty grid instead,
+    // so the view does not jump when it takes over. If 3D is unavailable the render is shown.
+    let textBoost = 1, suspended = root.dataset.state === 'journey';
 
     const project = (x, y, z) => {
       const cx = x - W / 2, cy = y - D / 2;
