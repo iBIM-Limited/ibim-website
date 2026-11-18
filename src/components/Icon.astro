@@ -16,8 +16,9 @@ try {
   const iconPath = path.resolve(`node_modules/lucide-static/icons/${name}.svg`);
   const raw = fs.readFileSync(iconPath, 'utf-8');
   svgContent = raw
-    .replace('<svg', `<svg class="icon icon--${name} ${className}" width="${size}" height="${size}" stroke-width="${strokeWidth}" aria-hidden="true"`)
-    .replace(/stroke-width="2"/, `stroke-width="${strokeWidth}"`);
+    .replace(/<!--[\s\S]*?-->\s*/, '')
+    .replace(/<svg([^>]*)>/, (_m, attrs) =>
+      `<svg${attrs.replace(/\s(class|width|height|stroke-width)="[^"]*"/g, '')} class="icon icon--${name} ${className}" width="${size}" height="${size}" stroke-width="${strokeWidth}" aria-hidden="true" focusable="false">`);
 } catch (e) {
   console.warn(`Icon "${name}" not found`);
 }

@@ -31,9 +31,9 @@ const checklist = 'https://www.preston.gov.uk/article/5129/Validation-Checklist-
         <div class="ledger">
           {architecturalServices.map((s) => (
             <a href={`/${s.slug}`} class="ledger-row">
-              <h3 class="ledger-row__title">{s.name}</h3>
+              <h3 class="ledger-row__title">{s.name}.</h3>
               <p class="ledger-row__body">{s.card}</p>
-              <span class="button button--tertiary">View service</span>
+              <span class="button button--tertiary">View service <span class="arrow" aria-hidden="true">→</span></span>
             </a>
           ))}
         </div>
@@ -49,9 +49,9 @@ const checklist = 'https://www.preston.gov.uk/article/5129/Validation-Checklist-
         <div class="ledger">
           {services.map((s) => (
             <a href={`/${s.slug}`} class="ledger-row">
-              <h3 class="ledger-row__title">{s.name}</h3>
+              <h3 class="ledger-row__title">{s.name}.</h3>
               <p class="ledger-row__body">{s.card}</p>
-              <span class="button button--tertiary">View service</span>
+              <span class="button button--tertiary">View service <span class="arrow" aria-hidden="true">→</span></span>
             </a>
           ))}
         </div>
@@ -89,7 +89,7 @@ const checklist = 'https://www.preston.gov.uk/article/5129/Validation-Checklist-
               </p>
               <div>
                 <a class="button button--tertiary" href="/planning-submissions">
-                  See planning submissions service
+                  See planning submissions service <span class="arrow" aria-hidden="true">→</span>
                 </a>
               </div>
             </div>

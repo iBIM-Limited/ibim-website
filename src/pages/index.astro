@@ -124,11 +124,11 @@ const journeySteps = [
             <div class="pillar-col__icon">
               <Icon name={p.icon} size={28} />
             </div>
-            <h3 class="pillar-col__title">{p.name}</h3>
+            <h3 class="pillar-col__title">{p.name}.</h3>
             <span class="pillar-col__summary">{p.summary}</span>
             <p class="pillar-col__body">{p.body}</p>
             <span class="button button--tertiary">
-              Explore {p.key === 'bim' ? 'BIM and digital' : p.name.toLowerCase()}
+              Explore {p.key === 'bim' ? 'BIM and digital' : p.name.toLowerCase()} <span class="arrow" aria-hidden="true">→</span>
             </span>
           </a>
         ))}
@@ -140,7 +140,7 @@ const journeySteps = [
   <section class="promise-band">
     <div class="container">
       <div class="promise-band__inner">
-        <h2>Simplifying AEC with <span class="green-word">integrated</span> digital solutions.</h2>
+        <h2>Simplifying AEC with integrated digital solutions.</h2>
         <p>
           Architecture, engineering and construction (AEC) runs on information: drawings, models, programmes, costs and handover records. Too much of it sits in separate files, with separate teams, or in someone’s inbox. iBIM exists to join it up so you enter information once.
         </p>
@@ -182,10 +182,10 @@ const journeySteps = [
           <a href={`/${w.slug}`} class="ledger-row">
             <span class="ledger-row__meta">{w.tag}</span>
             <div>
-              <h3 class="ledger-row__title">{w.title}</h3>
+              <h3 class="ledger-row__title">{w.title}.</h3>
               <p class="ledger-row__body" style="margin-top: 4px;">{w.body}</p>
             </div>
-            <span class="button button--tertiary">View service</span>
+            <span class="button button--tertiary">View service <span class="arrow" aria-hidden="true">→</span></span>
           </a>
         ))}
       </div>
@@ -206,7 +206,7 @@ const journeySteps = [
           <div class="ledger-row ledger-row--2col">
             <div>
               <span class="ledger-row__meta">{a.group}</span>
-              <h3 class="ledger-row__title" style="margin-top: 4px;">{a.name}</h3>
+              <h3 class="ledger-row__title" style="margin-top: 4px;">{a.name}.</h3>
             </div>
             <div>
               <p class="ledger-row__body">{a.need}</p>
@@ -232,7 +232,7 @@ const journeySteps = [
             A UK practice covering architectural drawings, BIM and software, run by a building surveyor with a postgraduate diploma in BIM and project management.
           </p>
           <p>
-            iBIM Limited was incorporated in December 2024 and is based in Preston, Lancashire. We do the work ourselves: the person who scopes the job understands the drawing, the model and the code. At home on site in boots, precise in the model, and straight with you about what is worth automating.
+            iBIM was incorporated in December 2024 and is based in Preston, Lancashire. We do the work ourselves: the person who scopes the job understands the drawing, the model and the code. At home on site in boots, precise in the model, and straight with you about what is worth automating.
           </p>
         </div>
 
@@ -247,7 +247,7 @@ const journeySteps = [
             {contact.email}
           </a>
           <div style="margin-top: 12px;">
-            <a class="button button--small button--primary" href="/contact">
+            <a class="button button--primary" href="/contact">
               Talk to Jack
             </a>
           </div>
@@ -268,5 +268,5 @@ const journeySteps = [
     </div>
   </section>
 
-  <script is:inline src="/js/model.js?v=15" defer></script>
+  <script is:inline src="/js/model.js?v=16" defer></script>
 </Base>

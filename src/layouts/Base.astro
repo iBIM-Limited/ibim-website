@@ -125,7 +125,7 @@ const organisation = {
     </header>
 
     <!-- Mobile Full-Screen Ink Sheet (5.5) -->
-    <div id="mobile-sheet" class="mobile-sheet" data-mobile-sheet aria-hidden="true">
+    <div id="mobile-sheet" class="mobile-sheet" data-mobile-sheet aria-hidden="true" inert>
       <div class="mobile-sheet__head">
         <span class="eyebrow eyebrow--on-ink">Menu</span>
         <button type="button" class="mobile-sheet__close" data-mobile-close aria-label="Close menu">
@@ -136,8 +136,8 @@ const organisation = {
       <nav class="mobile-sheet__nav" aria-label="Mobile menu">
         <a href="/" class="mobile-sheet__link" aria-current={path === '/' ? 'page' : undefined}>Home</a>
 
-        <div>
-          <span class="mobile-sheet__link">Architectural</span>
+        <details class="mobile-sheet__group">
+          <summary class="mobile-sheet__link">Architectural</summary>
           <div class="mobile-sheet__sublinks">
             {architecturalServices.map((s) => (
               <a href={`/${s.slug}`} class="mobile-sheet__sublink" aria-current={`/${s.slug}` === path ? 'page' : undefined}>
@@ -145,10 +145,10 @@ const organisation = {
               </a>
             ))}
           </div>
-        </div>
+        </details>
 
-        <div>
-          <span class="mobile-sheet__link">BIM and digital</span>
+        <details class="mobile-sheet__group">
+          <summary class="mobile-sheet__link">BIM and digital</summary>
           <div class="mobile-sheet__sublinks">
             {services.map((s) => (
               <a href={`/${s.slug}`} class="mobile-sheet__sublink" aria-current={`/${s.slug}` === path ? 'page' : undefined}>
@@ -156,7 +156,7 @@ const organisation = {
               </a>
             ))}
           </div>
-        </div>
+        </details>
 
         <a href="/software-development" class="mobile-sheet__link" aria-current={path === '/software-development' ? 'page' : undefined}>
           Software and automation
@@ -199,7 +199,7 @@ const organisation = {
 
           <!-- Col 2: Architectural Services -->
           <div class="footer-col">
-            <h4>Architectural</h4>
+            <h2 class="footer-col__heading">Architectural</h2>
             <ul>
               {architecturalServices.map((s) => (
                 <li><a href={`/${s.slug}`}>{s.name}</a></li>
@@ -209,7 +209,7 @@ const organisation = {
 
           <!-- Col 3: BIM & Digital -->
           <div class="footer-col">
-            <h4>BIM and digital</h4>
+            <h2 class="footer-col__heading">BIM and digital</h2>
             <ul>
               {services.map((s) => (
                 <li><a href={`/${s.slug}`}>{s.name}</a></li>
@@ -220,7 +220,7 @@ const organisation = {
 
           <!-- Col 4: Contact & Location -->
           <div class="footer-col">
-            <h4>Contact</h4>
+            <h2 class="footer-col__heading">Contact</h2>
             <div class="footer-contact">
               <strong>{contact.person}</strong>
               <span>{contact.role}</span>

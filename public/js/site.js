@@ -9,6 +9,7 @@
     if (!mobileSheet) return;
     mobileSheet.classList.add('is-open');
     mobileSheet.setAttribute('aria-hidden', 'false');
+    mobileSheet.inert = false;
     mobileToggle?.setAttribute('aria-expanded', 'true');
     document.body.style.overflow = 'hidden';
     mobileClose?.focus();
@@ -18,6 +19,7 @@
     if (!mobileSheet) return;
     mobileSheet.classList.remove('is-open');
     mobileSheet.setAttribute('aria-hidden', 'true');
+    mobileSheet.inert = true;
     mobileToggle?.setAttribute('aria-expanded', 'false');
     document.body.style.overflow = '';
     mobileToggle?.focus();

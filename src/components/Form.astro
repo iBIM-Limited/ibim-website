@@ -60,13 +60,14 @@ const needOptions = ['Drawings', 'Scan / model', 'BIM support', 'Software', 'Not
         </label>
         <input
           id="contact-reply"
+          aria-describedby="contact-reply-help"
           name="reply"
           type="text"
           required
           autocomplete="email tel"
           placeholder="07123 456789 or name@example.co.uk"
         />
-        <span class="field-help">Enter a full UK number or an email so we can reply.</span>
+        <span class="field-help" id="contact-reply-help">Enter a full UK number or an email so we can reply.</span>
       </div>
 
       <div class="field">

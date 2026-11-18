@@ -194,10 +194,10 @@ const jsonLd = {
             <div class="pillar-col__icon">
               <Icon name={p.icon} size={24} />
             </div>
-            <h3 class="pillar-col__title">{p.name}</h3>
+            <h3 class="pillar-col__title">{p.name}.</h3>
             <p class="pillar-col__body">{p.card}</p>
             <span class="button button--tertiary">
-              View service
+              View service <span class="arrow" aria-hidden="true">→</span>
             </span>
           </a>
         ))}
@@ -205,5 +205,5 @@ const jsonLd = {
     </nav>
   </div>
 
-  <script is:inline src="/js/model.js?v=15" defer></script>
+  <script is:inline src="/js/model.js?v=16" defer></script>
 </Base>
