@@ -3,11 +3,19 @@
   const css = getComputedStyle(document.documentElement);
   const token = (name) => css.getPropertyValue(name).trim();
   const C = {
-    ink: token('--ink'), muted: token('--muted'), green: token('--green'), greenDark: token('--green-dark'),
-    tint: token('--tint'), line: token('--line'), paper: token('--paper'), clash: token('--clash'),
+    ink: token('--color-ink') || '#0B0D0B',
+    muted: token('--color-ink-60') || '#586056',
+    green: token('--color-signal') || '#43903C',
+    greenDark: token('--color-signal-text') || '#2E6B29',
+    tint: token('--color-tint') || '#EDF5EC',
+    surface: token('--color-surface') || '#F4F6F3',
+    line: token('--color-line') || '#DDE2DB',
+    paper: token('--color-white') || '#FFFFFF',
+    inkGreen: token('--color-ink-green') || '#7BC474',
+    clash: token('--color-error') || '#B3261E',
   };
   const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
-  const MONO = '"Space Mono", ui-monospace, Menlo, monospace';
+  const MONO = '"JetBrains Mono Variable", "JetBrains Mono", Consolas, monospace';
 
   // Geometry in metres.
   const W = 30, D = 18, BAY = 6, FLOORS = 5, FH = 3.6;
@@ -66,16 +74,27 @@
   // Sorted by angle, so a share of the array is the same share of the visible scan.
   points.sort((a, b) => a.a - b.a);
 
-  // Scan intensity ramp: the colours a scanner viewer uses, and only ever used here.
+  // Intensity greyscale: neutral greys on ink / white, no rainbow height ramps (4.8)
   const ramp = (t) => {
-    const stops = [[34, 83, 180], [31, 158, 137], [120, 190, 60], [240, 190, 40], [224, 70, 45]];
-    const s = Math.min(stops.length - 1.001, t * (stops.length - 1)), k = Math.floor(s), f = s - k;
-    const a = stops[k], b = stops[k + 1];
-    return `rgb(${a.map((v, n) => Math.round(v + (b[n] - v) * f)).join(',')})`;
+    const v = Math.round(110 + t * 125);
+    return `rgb(${v},${v},${v})`;
   };
   const rampCache = Array.from({ length: 32 }, (_, i) => ramp(i / 31));
 
-  const DURATION = { journey: 13.5, visual: 6, advise: 4, capture: 5, information: 6.5, sequence: 12.5, delivery: 7.8, twin: 6, drawings: 2, planning: 2, regs: 2 };
+  const DURATION = {
+    journey: 13.5, visual: 6, advise: 4, capture: 5, information: 6.5, sequence: 12.5, delivery: 7.8, twin: 6, drawings: 2, planning: 2, regs: 2,
+    plan: 2, elevation: 2, section: 2, wire: 4, cloud: 5, cde: 6.5, programme: 7.8,
+  };
+  const STATE_MAP = {
+    plan: 'drawings',
+    elevation: 'planning',
+    section: 'regs',
+    wire: 'advise',
+    cloud: 'capture',
+    cde: 'information',
+    programme: 'delivery',
+  };
+  const resolveState = (s) => STATE_MAP[s] || s;
   const PHASES = ['Substructure', 'Level 1', 'Level 2', 'Level 3', 'Level 4', 'Level 5', 'Envelope', 'Services'];
   const CLASHES = [{ x: 12.2, y: 9, z: FH * 3 - 0.9 }, { x: 24.1, y: 9, z: FH * 2 - 0.9 }, { x: 6.1, y: 9, z: FH * 4 - 0.9 }];
   const SENSORS = [
@@ -498,7 +517,8 @@
       scale = planned ? fit * 0.72 : fit;
       ox = width / 2;
       oy = planned ? height * 0.5 : height * 0.7;
-      (render[state] || render.advise)(t);
+      const renderFn = render[resolveState(state)] || render.advise;
+      renderFn(t);
       if (!reduced && elapsed < length) frame = requestAnimationFrame(draw);
     }
     const request = () => { if (!frame && visible) frame = requestAnimationFrame(draw); };
@@ -540,7 +560,19 @@
   }
 
   const clamp = (v) => Math.max(0, Math.min(1, v));
-  const ease = (v) => v * v * (3 - 2 * v);
+
+  // Brand easing curve: cubic-bezier(0.2, 0.8, 0.2, 1)
+  function ease(t) {
+    let u = Math.max(0, Math.min(1, t));
+    for (let i = 0; i < 6; i++) {
+      const x = 3 * (1 - u) * (1 - u) * u * 0.2 + 3 * (1 - u) * u * u * 0.2 + u * u * u;
+      const dx = 3 * (1 - u) * (1 - u) * 0.2 + 3 * u * u * 0.8;
+      if (Math.abs(x - t) < 1e-4) break;
+      u -= (x - t) / (dx || 1);
+      u = Math.max(0, Math.min(1, u));
+    }
+    return 3 * (1 - u) * (1 - u) * u * 0.8 + 3 * (1 - u) * u * u * 1.0 + u * u * u;
+  }
 
   function start() {
     document.querySelectorAll('[data-model]').forEach((root) => {
@@ -550,7 +582,7 @@
       const showRender = () => {
         const photo = new Image();
         photo.src = '/img/ibim-visual.webp?v=2';
-        photo.alt = 'Realistic illustrative render of a glazed office building with a brick base, trees and people.';
+        photo.alt = 'Visualisation · illustrative, not a client project';
         photo.width = 1600; photo.height = 1280;
         photo.className = 'model__photo model__photo--static';
         root.querySelector('canvas').after(photo);
@@ -582,6 +614,6 @@
   }
 
   // Canvas labels need the brand font loaded before the first draw.
-  const load = document.fonts && document.fonts.load ? document.fonts.load(`11px "Space Mono"`) : Promise.resolve();
+  const load = document.fonts && document.fonts.load ? document.fonts.load(`11px "JetBrains Mono Variable", "JetBrains Mono"`) : Promise.resolve();
   load.catch(() => {}).then(start);
 })();

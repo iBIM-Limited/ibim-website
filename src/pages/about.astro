@@ -1,35 +1,188 @@
 ---
 import Base from '../layouts/Base.astro';
-const values = ['Trust', 'Partner', 'Innovate'];
+import { contact } from '../data/services';
+
+const commitments = [
+  {
+    num: '01',
+    title: 'Simple before clever.',
+    body: 'The best solution is the one your team will still use in a year. We choose that over the impressive one.',
+  },
+  {
+    num: '02',
+    title: 'Integrated before bolted on.',
+    body: 'Drawings, models and software are planned together from day one, so information is entered once.',
+  },
+  {
+    num: '03',
+    title: 'Evidence before adjectives.',
+    body: 'Hours saved, clashes caught, dates met. We show the number and how we measured it.',
+  },
+  {
+    num: '04',
+    title: 'Standards without the lecture.',
+    body: 'We work to ISO 19650 and the UK BIM Framework, and explain them in plain English when asked.',
+  },
+  {
+    num: '05',
+    title: 'Built to hand over.',
+    body: 'Your models, data and code are yours, documented well enough to run without us.',
+  },
+];
+
+const values = [
+  {
+    name: 'Trust',
+    behaviour: 'We say what a job needs, what it costs and how long it takes. We say so when we are not the right fit.',
+  },
+  {
+    name: 'Partner',
+    behaviour: 'We work inside your team, your common data environment and your standards, and share responsibility for the outcome.',
+  },
+  {
+    name: 'Innovate',
+    behaviour: 'We automate a task only after we understand it by hand. New technology has to earn its place on a live project.',
+  },
+];
 ---
-<Base title="About iBIM" description="iBIM helps organisations in the built environment use BIM processes to improve collaboration and efficiency and achieve sustainable outcomes.">
-  <section class="wrap page-head">
-    <h1>Giving back to construction with advanced BIM solutions</h1>
-  </section>
-  <section class="wrap statements">
-    <div>
-      <h2>Our mission</h2>
-      <p>To enable organisations in the built environment with cutting-edge digital solutions, integrating BIM processes to drive collaboration, optimise efficiency and enable sustainable outcomes across every project lifecycle.</p>
+<Base
+  title="About iBIM"
+  description="iBIM helps organisations in the built environment use BIM processes to improve collaboration and efficiency and achieve sustainable outcomes."
+>
+  <div class="container section">
+    <!-- Page Header (1.1 Purpose) -->
+    <header style="max-width: 800px; margin-bottom: 64px;">
+      <span class="eyebrow eyebrow--green">About iBIM</span>
+      <h1 style="margin-top: 8px; margin-bottom: 20px;">
+        To simplify how buildings are designed, delivered and run.
+      </h1>
+      <p class="standfirst">
+        Every project runs on information: drawings, models, programmes, costs and handover records. Too much of it sits in separate files, with separate teams, or in someone’s inbox.
+      </p>
+      <p style="margin-top: 16px; font-size: 17px; line-height: 1.55; color: var(--color-ink-60);">
+        iBIM exists to join it up. One UK practice that draws the building, manages its information and writes the software that removes the admin in between.
+      </p>
+    </header>
+
+    <!-- Video Box (Moved from home) -->
+    <div style="margin-bottom: 80px; max-width: 900px;">
+      <div class="video-box">
+        <button
+          type="button"
+          class="video-btn"
+          data-video="ly6469N83WA"
+          aria-label="Play the iBIM video about BIM. Loads from YouTube."
+        >
+          <img src="/img/video-bim.jpg" alt="Video thumbnail about BIM" width="900" height="506" loading="lazy" />
+          <span class="video-btn__badge">Play video (YouTube)</span>
+        </button>
+      </div>
+      <p class="small" style="margin-top: 8px;">An introduction to building information modelling (BIM) and why joined-up delivery matters.</p>
     </div>
-    <div>
-      <h2>Our vision</h2>
-      <p>To be the leading force in transforming the construction industry through innovative digital methodologies, fostering seamless collaboration and setting the benchmark for sustainable and intelligent project delivery and operation.</p>
-    </div>
-  </section>
-  <section class="wrap statements">
-    <div>
-      <h2>Who runs iBIM</h2>
-      <p>iBIM Limited was incorporated in December 2024 and is based in Preston, Lancashire. Its director is Jack Ward, who holds a BSc (Hons) in Building Surveying and a Postgraduate Diploma in BIM and Project Management. We are software and automation specialists working across BIM and architectural projects.</p>
-    </div>
-  </section>
-  <section class="wrap values">
-    <h2>Our values</h2>
-    <ul>{values.map((v) => <li>{v}</li>)}</ul>
-  </section>
-  <section class="cta">
-    <div class="wrap cta__grid">
-      <div><h2>Work with us</h2><p>Tell us what you’re planning and we’ll help you work out where to start.</p></div>
-      <a class="button button--ink" href="/contact">Contact iBIM</a>
+
+    <!-- Vision & Mission (1.3) -->
+    <section style="margin-bottom: 80px;">
+      <span class="eyebrow eyebrow--green">Where we’re going</span>
+      <h2 style="margin-top: 8px; margin-bottom: 32px;">Vision and mission.</h2>
+
+      <div class="pillars-grid">
+        <div class="process-card" style="background: var(--color-white);">
+          <span class="eyebrow eyebrow--green">Vision — The destination</span>
+          <h3 style="font-size: 19px; line-height: 1.3;">Joined-up digital delivery as the normal way UK buildings are designed, built and run.</h3>
+          <p class="small" style="font-size: 14.5px;">Not a specialist extra bought on the biggest jobs. The default on every job.</p>
+        </div>
+
+        <div class="process-card" style="background: var(--color-white);">
+          <span class="eyebrow eyebrow--green">Mission — The method</span>
+          <h3 style="font-size: 19px; line-height: 1.3;">Digital tools and BIM processes that cut wasted effort.</h3>
+          <p class="small" style="font-size: 14.5px;">Give every team in the built environment digital tools and BIM processes that improve collaboration, cut wasted effort and support sustainable outcomes. Across the whole project lifecycle, from first sketch to operation.</p>
+        </div>
+
+        <div class="process-card" style="background: var(--color-tint); border-color: var(--color-signal-text);">
+          <span class="eyebrow eyebrow--green">The test — Every decision</span>
+          <h3 style="font-size: 19px; line-height: 1.3;">Does it simplify? Does it integrate? Does it stand up on site?</h3>
+          <p class="small" style="font-size: 14.5px;">If any answer is no, we change the decision and keep the standard.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Values & Behaviours (1.6) -->
+    <section style="margin-bottom: 80px;">
+      <span class="eyebrow eyebrow--green">How we act</span>
+      <h2 style="margin-top: 8px; margin-bottom: 32px;">Values are verbs at iBIM.</h2>
+
+      <div class="pillars-grid">
+        {values.map((v) => (
+          <div class="process-card" style="background: var(--color-surface);">
+            <span class="mono" style="font-size: 13px; font-weight: 600; color: var(--color-signal-text); text-transform: uppercase;">
+              {v.name}
+            </span>
+            <p style="font-size: 15.5px; line-height: 1.5; color: var(--color-ink);">
+              {v.behaviour}
+            </p>
+          </div>
+        ))}
+      </div>
+    </section>
+
+    <!-- Five Commitments (1.5) -->
+    <section style="margin-bottom: 80px;">
+      <span class="eyebrow eyebrow--green">What makes us different</span>
+      <h2 style="margin-top: 8px; margin-bottom: 12px;">Five commitments.</h2>
+      <p class="small" style="margin-bottom: 32px; font-size: 15px;">Held every day across every instruction.</p>
+
+      <div class="process-grid" style="grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));">
+        {commitments.map((c) => (
+          <div class="process-card">
+            <span class="process-card__step">{c.num}</span>
+            <h3 class="process-card__title">{c.title}</h3>
+            <p class="process-card__body">{c.body}</p>
+          </div>
+        ))}
+      </div>
+    </section>
+
+    <!-- Who Runs iBIM (4.2 Rewrite) -->
+    <section style="margin-bottom: 48px;">
+      <div class="leadership-box">
+        <div class="leadership-box__content">
+          <span class="eyebrow eyebrow--green">Practice leadership</span>
+          <h2>Who runs iBIM.</h2>
+          <p class="standfirst" style="font-size: 18px;">
+            A UK practice covering architectural drawings, BIM and software, run by a building surveyor with a postgraduate diploma in BIM and project management.
+          </p>
+          <p>
+            iBIM Limited was incorporated in December 2024 and is based in Preston, Lancashire. We do the work ourselves: the person who scopes the job understands the drawing, the model and the code. At home on site in boots, precise in the model, and straight with you about what is worth automating.
+          </p>
+        </div>
+
+        <div class="leadership-box__contact">
+          <span class="mono small" style="text-transform: uppercase;">Direct contact</span>
+          <strong style="font-size: 18px;">{contact.person}</strong>
+          <span class="small">{contact.role} · BSc (Hons), PgDip</span>
+          <a href={contact.phoneHref} class="mono" style="color: var(--color-signal-text); font-weight: 600; text-decoration: none;">
+            {contact.phone}
+          </a>
+          <a href={`mailto:${contact.email}`} style="color: var(--color-ink); font-size: 14.5px;">
+            {contact.email}
+          </a>
+          <a class="button button--small button--primary" href="/contact" style="margin-top: 8px;">
+            Start a project
+          </a>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- Contact CTA Band -->
+  <section class="cta-band">
+    <div class="container">
+      <h2>Work with us.</h2>
+      <p>Tell us what you’re planning and we’ll help you work out where to start.</p>
+      <div class="cta-band__actions">
+        <a class="button button--large button--action" href="/contact">Start a project</a>
+        <a class="button button--large button--secondary-ink" href={contact.phoneHref}>Call {contact.phone}</a>
+      </div>
     </div>
   </section>
 </Base>

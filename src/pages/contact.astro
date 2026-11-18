@@ -3,20 +3,74 @@ import Base from '../layouts/Base.astro';
 import Form from '../components/Form.astro';
 import { contact } from '../data/services';
 ---
-<Base title="Contact iBIM" description="Contact iBIM for BIM solutions tailored to your planning, design, construction and operations needs.">
-  <section class="wrap contact">
-    <div class="contact__intro">
-      <h1>Contact us</h1>
-      <p class="lead">Speak to us about BIM, architectural drawings, planning submissions or building regulations.</p>
-      <dl class="details">
-        <div><dt>Telephone or WhatsApp</dt><dd><a href={contact.phoneHref}>{contact.phone}</a></dd></div>
-        <div><dt>Email</dt><dd><a href={`mailto:${contact.email}`}>{contact.email}</a></dd></div>
-        <div><dt>Hours</dt><dd>{contact.hours}</dd></div>
-      </dl>
+<Base
+  title="Contact iBIM"
+  description="Contact iBIM for BIM solutions tailored to your planning, design, construction and operations needs."
+>
+  <div class="container section">
+    <div style="display: grid; grid-template-columns: 1fr; gap: 48px;">
+      <header style="max-width: 680px;">
+        <span class="eyebrow eyebrow--green">Contact us</span>
+        <h1 style="margin-top: 8px; margin-bottom: 16px;">Tell us about the job.</h1>
+        <p class="standfirst">About one minute. We reply within one working day.</p>
+      </header>
+
+      <div style="display: grid; grid-template-columns: 1fr; gap: 48px;" class="contact-grid">
+        <!-- Form Column -->
+        <div>
+          <Form kind="contact" />
+        </div>
+
+        <!-- Direct Contact Info Column -->
+        <aside style="background: var(--color-surface); border: 1px solid var(--color-line); border-radius: var(--radius-card); padding: clamp(24px, 4vw, 36px); display: flex; flex-direction: column; gap: 24px; height: fit-content;">
+          <div>
+            <span class="mono eyebrow eyebrow--green">Direct contact</span>
+            <strong style="display: block; font-size: 20px; margin-top: 6px; margin-bottom: 4px;">{contact.person}</strong>
+            <p class="small">{contact.role} · iBIM Limited</p>
+          </div>
+
+          <div style="display: grid; gap: 16px; font-size: 15px;">
+            <div>
+              <span class="mono small" style="text-transform: uppercase; display: block; margin-bottom: 2px;">Telephone / WhatsApp</span>
+              <a href={contact.phoneHref} class="mono" style="font-weight: 600; color: var(--color-signal-text); text-decoration: none;">
+                {contact.phone}
+              </a>
+            </div>
+
+            <div>
+              <span class="mono small" style="text-transform: uppercase; display: block; margin-bottom: 2px;">Email</span>
+              <a href={`mailto:${contact.email}`} style="color: var(--color-ink); text-decoration: none;">
+                {contact.email}
+              </a>
+            </div>
+
+            <div>
+              <span class="mono small" style="text-transform: uppercase; display: block; margin-bottom: 2px;">Working hours</span>
+              <span>{contact.hours}</span>
+            </div>
+
+            <div>
+              <span class="mono small" style="text-transform: uppercase; display: block; margin-bottom: 2px;">Office</span>
+              <span class="small">{contact.registeredOffice}</span>
+            </div>
+          </div>
+
+          <div style="padding-top: 16px; border-top: 1px solid var(--color-line);">
+            <p class="small">
+              Based in Wesham, Preston, working on building projects across Lancashire and the wider UK.
+            </p>
+          </div>
+        </aside>
+      </div>
     </div>
-    <div class="contact__form">
-      <h2>Send us a message</h2>
-      <Form kind="contact" />
-    </div>
-  </section>
+  </div>
+
+  <style>
+    @media (min-width: 900px) {
+      .contact-grid {
+        grid-template-columns: 1.3fr 0.8fr !important;
+        gap: 64px !important;
+      }
+    }
+  </style>
 </Base>

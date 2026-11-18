@@ -1,23 +1,92 @@
 ---
 import Base from '../layouts/Base.astro';
 import Form from '../components/Form.astro';
+import Icon from '../components/Icon.astro';
 ---
-<Base title="Software and automation" description="iBIM uses software and automation in its BIM and architectural work, builds custom dashboards and reporting, and is investing in a digital twin platform.">
-  <section class="wrap contact">
-    <div class="contact__intro">
-      <h1>Software and automation for the built environment</h1>
-      <p class="lead">We’re software and automation specialists working across BIM and architectural projects, so routine work takes less time and your project information is easier to use.</p>
-      <ul class="plain-list">
-        <li>Automation in 3D modelling, turning captured data into reliable models</li>
-        <li>Custom dashboards and reporting for project information</li>
-        <li>A digital twin platform we’re investing in, connecting BIM workflows to facilities management using AI</li>
-      </ul>
-      <p>Tell us about a process that takes too long, or join the waiting list to hear about the platform first.</p>
-      <a class="textlink" href="/contact">Talk to us about automation</a>
+<Base
+  title="Software and automation"
+  description="iBIM uses software and automation in its BIM and architectural work, builds custom dashboards and reporting, and is investing in a digital twin platform."
+>
+  <div class="container section">
+    <div style="display: grid; grid-template-columns: 1fr; gap: 56px;">
+      <header style="max-width: 800px;">
+        <span class="eyebrow eyebrow--green">The third pillar</span>
+        <h1 style="margin-top: 8px; margin-bottom: 20px;">Software and automation.</h1>
+        <p class="standfirst">
+          We’re software and automation specialists working across BIM and architectural projects, so routine work takes less time and your project information is easier to use.
+        </p>
+      </header>
+
+      <!-- What we build -->
+      <section>
+        <span class="eyebrow eyebrow--green">What we build</span>
+        <h2 style="margin-top: 8px; margin-bottom: 28px;">Tools that remove repeated admin.</h2>
+
+        <div class="pillars-grid">
+          <div class="process-card" style="background: var(--color-white);">
+            <div style="color: var(--color-signal-text); margin-bottom: 8px;">
+              <Icon name="scan-line" size={24} />
+            </div>
+            <h3 style="font-size: 18px; margin-bottom: 8px;">3D modelling automation.</h3>
+            <p style="font-size: 14.5px; line-height: 1.5; color: var(--color-ink-60);">
+              Automating repeated steps in reality capture, turning laser scan point clouds and survey data into clean, reliable models faster.
+            </p>
+          </div>
+
+          <div class="process-card" style="background: var(--color-white);">
+            <div style="color: var(--color-signal-text); margin-bottom: 8px;">
+              <Icon name="folder-tree" size={24} />
+            </div>
+            <h3 style="font-size: 18px; margin-bottom: 8px;">Dashboards and reporting.</h3>
+            <p style="font-size: 14.5px; line-height: 1.5; color: var(--color-ink-60);">
+              Custom scripts and dashboards that audit models, track clashes by owner and date, and extract schedules directly into spreadsheet formats.
+            </p>
+          </div>
+
+          <div class="process-card" style="background: var(--color-white);">
+            <div style="color: var(--color-signal-text); margin-bottom: 8px;">
+              <Icon name="building-2" size={24} />
+            </div>
+            <h3 style="font-size: 18px; margin-bottom: 8px;">Digital twin platform.</h3>
+            <p style="font-size: 14.5px; line-height: 1.5; color: var(--color-ink-60);">
+              A platform we are investing in that links BIM handover files and open IFC models to live facilities management data and maintenance history.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Talk to us & Waiting list -->
+      <div style="display: grid; grid-template-columns: 1fr; gap: 48px;" class="software-grid">
+        <div>
+          <span class="eyebrow eyebrow--green">Custom software</span>
+          <h2 style="margin-top: 8px; margin-bottom: 16px;">Have a process that takes too long?</h2>
+          <p style="font-size: 16px; line-height: 1.55; color: var(--color-ink-60); margin-bottom: 24px;">
+            If your team spends hours each week reformatting drawing schedules, renaming files or manually checking clash reports, we can write a script or build a tool to handle it.
+          </p>
+          <a class="button button--primary" href="/contact">
+            Talk to us about automation
+          </a>
+        </div>
+
+        <div style="background: var(--color-surface); border: 1px solid var(--color-line); border-radius: var(--radius-card); padding: clamp(24px, 4vw, 36px);">
+          <span class="eyebrow eyebrow--green">Digital twin platform</span>
+          <h2 style="font-size: 22px; margin-top: 6px; margin-bottom: 12px;">Join the platform waiting list.</h2>
+          <p class="small" style="margin-bottom: 24px;">
+            Be the first to hear about our digital twin platform as it develops. We will email you only when there is news.
+          </p>
+          <Form kind="waitlist" />
+        </div>
+      </div>
     </div>
-    <div class="contact__form">
-      <h2>Join the platform waiting list</h2>
-      <Form kind="waitlist" />
-    </div>
-  </section>
+  </div>
+
+  <style>
+    @media (min-width: 900px) {
+      .software-grid {
+        grid-template-columns: 1fr 1.2fr !important;
+        gap: 64px !important;
+        align-items: start;
+      }
+    }
+  </style>
 </Base>

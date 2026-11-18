@@ -10,7 +10,19 @@ import {
 
 const W = 30, D = 18, FLOORS = 5, FH = 3.6, H = FLOORS * FH, BAY = 3;
 const clamp = (v) => Math.max(0, Math.min(1, v));
-const ease = (v) => v * v * (3 - 2 * v);
+
+// Brand easing curve: cubic-bezier(0.2, 0.8, 0.2, 1)
+function ease(t) {
+  let u = t;
+  for (let i = 0; i < 6; i++) {
+    const x = 3 * (1 - u) * (1 - u) * u * 0.2 + 3 * (1 - u) * u * u * 0.2 + u * u * u;
+    const dx = 3 * (1 - u) * (1 - u) * 0.2 + 3 * u * u * 0.8;
+    if (Math.abs(x - t) < 1e-4) break;
+    u -= (x - t) / (dx || 1);
+    u = Math.max(0, Math.min(1, u));
+  }
+  return 3 * (1 - u) * (1 - u) * u * 0.8 + 3 * (1 - u) * u * u * 1.0 + u * u * u;
+}
 
 let seed = 7;
 const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
@@ -101,10 +113,10 @@ export function mount(root, { mode = 'journey', onReady }) {
   renderer.shadowMap.enabled = true;
   renderer.shadowMap.type = PCFSoftShadowMap;
   renderer.localClippingEnabled = true;
-  renderer.setClearColor(0xffffff, 1);
+  renderer.setClearColor(0x0b0d0b, 1);
 
   const scene = new Scene();
-  scene.background = new Color(0xffffff);
+  scene.background = new Color(0x0b0d0b);
   const sky = skyTexture();
   const pmrem = new PMREMGenerator(renderer);
   scene.environment = pmrem.fromEquirectangular(sky).texture;
@@ -303,11 +315,10 @@ export function mount(root, { mode = 'journey', onReady }) {
   pushEdges(11, 1.8, 7, -2, top + 0.9, 0);
   const wireGeo = new BufferGeometry();
   wireGeo.setAttribute('position', new BufferAttribute(new Float32Array(wirePositions), 3));
-  const wire = new LineSegments(wireGeo, new LineBasicMaterial({ color: 0x16201a, transparent: true, opacity: 0 }));
+  const wire = new LineSegments(wireGeo, new LineBasicMaterial({ color: 0x7bc474, transparent: true, opacity: 0 }));
   scene.add(wire);
 
-  // Point cloud stage, coloured by height as a scanner viewer would.
-  const stops = [[34, 83, 180], [31, 158, 137], [120, 190, 60], [240, 190, 40], [224, 70, 45]].map((c) => new Color(c[0] / 255, c[1] / 255, c[2] / 255).convertSRGBToLinear());
+  // Point cloud stage: intensity greyscale on ink, no rainbow ramps (4.8)
   const scanPoints = [];
   const pt = (x, y, z) => {
     const n = (y / H) * 0.72 + 0.12 + (rnd() - 0.5) * 0.14;
@@ -325,12 +336,10 @@ export function mount(root, { mode = 'journey', onReady }) {
   for (let i = 0; i < N(13000); i++) { const x = (rnd() - 0.5) * 90, z = (rnd() - 0.5) * 72; if (Math.abs(x) > W / 2 || Math.abs(z) > D / 2) pt(x, 0.02, z); }
   scanPoints.sort((a, b) => a.a - b.a);
   const pos = new Float32Array(scanPoints.length * 3), col = new Float32Array(scanPoints.length * 3);
-  const mixed = new Color();
   scanPoints.forEach((p, i) => {
     pos.set([p.x, p.y, p.z], i * 3);
-    const s = Math.min(stops.length - 1.001, p.n * (stops.length - 1)), k = Math.floor(s);
-    mixed.copy(stops[k]).lerp(stops[k + 1], s - k);
-    col.set([mixed.r, mixed.g, mixed.b], i * 3);
+    const v = 0.4 + p.n * 0.55;
+    col.set([v, v, v], i * 3);
   });
   const cloudGeo = new BufferGeometry();
   cloudGeo.setAttribute('position', new BufferAttribute(pos, 3));
@@ -350,14 +359,14 @@ export function mount(root, { mode = 'journey', onReady }) {
   const labels = document.createElement('ol');
   labels.className = 'journey-steps';
   labels.setAttribute('aria-hidden', 'true');
-  ['Point cloud', '3D model', 'Realistic visual'].forEach((t) => { const li = document.createElement('li'); li.textContent = t; labels.append(li); });
+  ['Point cloud', '3D model', 'Visualisation'].forEach((t) => { const li = document.createElement('li'); li.textContent = t; labels.append(li); });
   if (mode === 'journey') root.append(labels);
   root.classList.add('model--has-3d');
   base.after(canvas);
   const photo = document.createElement('img');
   photo.className = 'model__photo';
   photo.src = '/img/ibim-visual.webp?v=2';
-  photo.alt = 'Realistic illustrative render of a five-storey glazed office building with a brick base, trees and a road.';
+  photo.alt = 'Visualisation · illustrative, not a client project';
   photo.width = 1600; photo.height = 1280;
   canvas.after(photo);
 

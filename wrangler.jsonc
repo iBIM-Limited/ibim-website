@@ -26,6 +26,14 @@
       "d1_databases": [
         { "binding": "DB", "database_name": "ibim-enquiries-local", "database_id": "local", "migrations_dir": "migrations" }
       ]
+    },
+    "preview": {
+      "name": "ibim-website-preview",
+      "routes": [],
+      "workers_dev": true,
+      "d1_databases": [
+        { "binding": "DB", "database_name": "ibim-enquiries-preview", "database_id": "23d3859c-2c9e-474f-962a-f1098e8ba30a", "migrations_dir": "migrations" }
+      ]
     }
   }
 }

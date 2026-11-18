@@ -1,16 +1,19 @@
 ---
 import Base from '../layouts/Base.astro';
+import Icon from '../components/Icon.astro';
 import { allServices, architecturalServices, services, contact } from '../data/services';
 
 export function getStaticPaths() {
   return allServices.map((service) => ({ params: { slug: service.slug }, props: { service } }));
 }
+
 const { service } = Astro.props;
-const isArchitectural = service.group === 'architectural';
+const isArchitectural = service.pillar === 'architectural';
 const peers = isArchitectural ? architecturalServices : services;
-const i = peers.findIndex((s) => s.slug === service.slug);
-const next = peers[(i + 1) % peers.length];
-const prev = peers[(i - 1 + peers.length) % peers.length];
+
+const pillarName = isArchitectural ? 'ARCHITECTURAL' : 'BIM AND DIGITAL';
+const breadcrumb = `${pillarName} → ${service.short.toUpperCase()}`;
+
 const jsonLd = {
   '@context': 'https://schema.org',
   '@type': 'Service',
@@ -18,60 +21,189 @@ const jsonLd = {
   serviceType: service.serviceType ?? service.title,
   description: service.description,
   url: `https://www.i-bim.co.uk/${service.slug}`,
-  areaServed: [{ '@type': 'AdministrativeArea', name: 'Lancashire' }, { '@type': 'Country', name: 'United Kingdom' }],
-  provider: { '@type': 'ProfessionalService', name: 'iBIM', url: 'https://www.i-bim.co.uk/', telephone: contact.phone },
+  areaServed: [
+    { '@type': 'AdministrativeArea', name: 'Lancashire' },
+    { '@type': 'Country', name: 'United Kingdom' },
+  ],
+  provider: {
+    '@type': 'ProfessionalService',
+    name: 'iBIM',
+    url: 'https://www.i-bim.co.uk/',
+    telephone: contact.phone,
+  },
 };
 ---
 <Base title={service.title} description={service.description} jsonLd={jsonLd}>
-  <section class="wrap svc-hero">
-    <div class="svc-hero__copy">
-      <p class="crumb"><a href={isArchitectural ? '/#who' : '/#lifecycle'}>{isArchitectural ? 'Architectural services' : 'Project lifecycle'}</a> <span aria-hidden="true">/</span> {service.stage}</p>
-      <h1>{service.title}</h1>
-      <p class="lead">{service.lead}</p>
-      <a class="button" href="/contact">Talk to us about this</a>
-      <p class="small">We work across Lancashire and the wider UK. <a href="/preston-lancashire">Preston and Lancashire</a></p>
-    </div>
-    <figure class="model model--page" data-model data-state={service.state}>
-      <canvas role="img" aria-label={`Illustration for ${service.stage.toLowerCase()}.`}></canvas>
-      <figcaption class="small">{service.state === 'visual' || service.state === 'journey' ? 'Illustrative render, not a real project.' : isArchitectural ? 'Illustrative drawing, not a real project.' : 'Illustrative model. Drag to orbit.'}</figcaption>
-    </figure>
-  </section>
+  <div class="container">
+    <!-- Breadcrumb (5.9) -->
+    <header class="service-header">
+      <span class="mono eyebrow eyebrow--green">{breadcrumb}</span>
+      <h1>{service.name}.</h1>
+    </header>
 
-  <section class="wrap steps-section">
-    <h2>How we work</h2>
-    <ol class="steps">
-      {service.steps.map((step) => (
-        <li><h3>{step.title}</h3><p>{step.body}</p></li>
-      ))}
-    </ol>
-    {service.includes && (
-      <div class="includes">
-        <h3>What this covers</h3>
-        <ul>{service.includes.map((x) => <li>{x}</li>)}</ul>
-      </div>
+    <!-- Above-the-fold Figure (5.9) -->
+    {service.figure === 'visual' ? (
+      <figure class="service-figure">
+        <img
+          src="/img/ibim-visual.webp"
+          alt="Visualisation · illustrative, not a client project"
+          width="1600"
+          height="1280"
+          loading="eager"
+        />
+        <figcaption class="mono small">{service.figureCaption}</figcaption>
+      </figure>
+    ) : (
+      <figure class="service-figure model model--page" data-model data-state={service.figure}>
+        <canvas role="img" aria-label={`Technical drawing for ${service.name}.`}></canvas>
+        <figcaption class="mono small">{service.figureCaption}</figcaption>
+      </figure>
     )}
-    {service.explainer && (
-      <div class="split">
-        <h2>{service.explainer.title}</h2>
-        <div class="split__body">
-          {service.explainer.body.map((x) => <p>{x}</p>)}
-          {service.explainer.list && <ul>{service.explainer.list.map((x) => <li>{x}</li>)}</ul>}
+
+    <!-- Two-column Service Layout with Sticky Panel (5.9) -->
+    <div class="service-layout">
+      <!-- Main Content: The Four Core Blocks -->
+      <div class="service-main">
+        <!-- 1. What it is -->
+        <section class="service-block">
+          <h2>What it is.</h2>
+          <p class="standfirst">{service.what}</p>
+        </section>
+
+        <!-- 2. What you receive (by file format) -->
+        <section class="service-block">
+          <h2>What you receive.</h2>
+          <ul class="receive-list">
+            {service.receive.map((item) => (
+              <li>{item}</li>
+            ))}
+          </ul>
+        </section>
+
+        <!-- 3. How it runs -->
+        <section class="service-block">
+          <h2>How it runs.</h2>
+          <div class="service-steps">
+            {service.steps.map((step, idx) => (
+              <div class="service-step">
+                <span class="service-step__num">0{idx + 1}</span>
+                <div class="service-step__content">
+                  <h3>{step.title}.</h3>
+                  <p>{step.body}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        <!-- 4. Honestly? -->
+        <section class="honestly-box">
+          <h2>Honestly?</h2>
+          <p>{service.honestly}</p>
+        </section>
+
+        <!-- Additional Includes (if present) -->
+        {service.includes && (
+          <section class="service-block">
+            <h2>{service.includes.title}</h2>
+            <ul class="receive-list">
+              {service.includes.items.map((item) => (
+                <li>{item}</li>
+              ))}
+            </ul>
+          </section>
+        )}
+
+        <!-- Additional Explainer (if present) -->
+        {service.explainer && (
+          <section class="service-block">
+            <h2>{service.explainer.title}</h2>
+            {service.explainer.body.map((p) => (
+              <p>{p}</p>
+            ))}
+            {service.explainer.list && (
+              <ul class="receive-list" style="margin-top: 12px;">
+                {service.explainer.list.map((item) => (
+                  <li>{item}</li>
+                ))}
+              </ul>
+            )}
+          </section>
+        )}
+
+        <!-- Common Questions / FAQs (if present) -->
+        {service.questions && (
+          <section class="service-block">
+            <h2>Common questions.</h2>
+            <dl class="faq-list">
+              {service.questions.map((q) => (
+                <div class="faq-item">
+                  <dt>{q.q}</dt>
+                  <dd>{q.a}</dd>
+                </div>
+              ))}
+            </dl>
+          </section>
+        )}
+      </div>
+
+      <!-- Sticky Side Panel (5.9) -->
+      <aside class="service-panel" aria-label="Typical job overview and contact">
+        <div>
+          <span class="service-panel__title">Typical job</span>
+          <dl class="typical-list">
+            <div>
+              <dt>Inputs</dt>
+              <dd>{service.typical.inputs}</dd>
+            </div>
+            <div>
+              <dt>Standards</dt>
+              <dd>{service.typical.standards}</dd>
+            </div>
+            <div>
+              <dt>Timescale</dt>
+              <dd>{service.typical.timescale}</dd>
+            </div>
+          </dl>
         </div>
-      </div>
-    )}
-    {service.questions && (
-      <div class="split">
-        <h2>Common questions</h2>
-        <dl class="questions">
-          {service.questions.map((x) => <div><dt>{x.q}</dt><dd>{x.a}</dd></div>)}
-        </dl>
-      </div>
-    )}
-  </section>
 
-  <nav class="wrap pager" aria-label={isArchitectural ? 'Other architectural services' : 'Other lifecycle stages'}>
-    <a href={`/${prev.slug}`}><span class="small">{isArchitectural ? 'Related service' : 'Previous stage'}</span>{prev.short}</a>
-    <a href={`/${next.slug}`} class="pager__next"><span class="small">{isArchitectural ? 'Related service' : 'Next stage'}</span>{next.short}</a>
-  </nav>
-  <script is:inline src="/js/model.js?v=12" defer></script>
+        <div class="service-panel__actions">
+          <a class="button button--action" href="/contact">Request a quote</a>
+          <a
+            class="button button--secondary"
+            href={`mailto:${contact.email}?subject=${encodeURIComponent('Question about ' + service.name)}`}
+          >
+            Ask a question
+          </a>
+        </div>
+
+        <div class="service-panel__person">
+          <strong>{contact.person}</strong>
+          <span class="small">{contact.role}</span>
+          <a href={contact.phoneHref}>{contact.phone}</a>
+        </div>
+      </aside>
+    </div>
+
+    <!-- Related Services in Pillar -->
+    <nav class="section section--sm" style="margin-top: 48px; border-top: 1px solid var(--color-line);" aria-label="Other services in this pillar">
+      <h2>Other {isArchitectural ? 'architectural' : 'BIM and digital'} services.</h2>
+      <div class="pillars-grid" style="margin-top: 24px;">
+        {peers.filter((p) => p.slug !== service.slug).slice(0, 3).map((p) => (
+          <a href={`/${p.slug}`} class="service-card">
+            <div class="service-card__icon">
+              <Icon name={p.icon} size={24} />
+            </div>
+            <h3 class="service-card__title">{p.name}</h3>
+            <p class="service-card__body">{p.card}</p>
+            <span class="button button--tertiary">
+              View service <span class="arrow">→</span>
+            </span>
+          </a>
+        ))}
+      </div>
+    </nav>
+  </div>
+
+  <script is:inline src="/js/model.js?v=13" defer></script>
 </Base>

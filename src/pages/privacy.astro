@@ -3,21 +3,62 @@ import Base from '../layouts/Base.astro';
 import { contact } from '../data/services';
 ---
 <Base title="Privacy notice" description="How iBIM handles the personal information you send through this website.">
-  <section class="wrap page-head"><h1>Privacy notice</h1></section>
-  <section class="wrap prose">
-    <h2>Who we are</h2>
-    <p>This website is run by iBIM Limited, a company registered in England and Wales, number {contact.companyNumber}. Our registered office is {contact.registeredOffice}.</p>
-    <h2>What we collect</h2>
-    <p>When you send a form on this website, we collect the details you enter, such as your name, email address, company, job title and message. We also record which page you sent the form from, the website that referred you if there was one, and how you heard about us if you tell us. We store a one-way scrambled version of your internet address to limit spam.</p>
-    <h2>How we use it</h2>
-    <p>We use your details to respond to your enquiry or to contact you about the digital twin platform waiting list. We rely on our legitimate interest in responding to people who contact us, or on your consent when you join the waiting list.</p>
-    <h2>Who handles it</h2>
-    <p>This website and its form data are hosted by Cloudflare. Email is handled by Google. We don’t sell your details.</p>
-    <h2>Cookies and tracking</h2>
-    <p>We use Cloudflare Web Analytics to count visits, see which pages are viewed and measure how quickly they load. It doesn’t set cookies or build a profile of you. This website doesn’t set advertising or analytics cookies. If you choose to play the video, it loads from YouTube, which may then set its own cookies.</p>
-    <h2>How long we keep it</h2>
-    <p>We keep enquiries for up to two years unless we start working together, or until you ask us to delete them.</p>
-    <h2>Your rights</h2>
-    <p>You can ask to see, correct or delete your information, or object to how we use it, by emailing <a href={`mailto:${contact.email}`}>{contact.email}</a>. You can also complain to the <a href="https://ico.org.uk/make-a-complaint/" rel="noopener">Information Commissioner’s Office</a>.</p>
-  </section>
+  <div class="container section">
+    <header style="max-width: 720px; margin-bottom: 48px;">
+      <span class="eyebrow eyebrow--green">Legal & Privacy</span>
+      <h1 style="margin-top: 8px; margin-bottom: 16px;">Privacy notice.</h1>
+      <p class="small">Last updated 18 November 2026.</p>
+    </header>
+
+    <div style="max-width: 68ch; display: flex; flex-direction: column; gap: 32px; font-size: 16px; line-height: 1.6;">
+      <section>
+        <h2 style="font-size: 20px; margin-bottom: 8px;">Who we are.</h2>
+        <p>
+          This website is operated by iBIM Limited, a company registered in England and Wales, company number {contact.companyNumber}. Our registered office is {contact.registeredOffice}.
+        </p>
+      </section>
+
+      <section>
+        <h2 style="font-size: 20px; margin-bottom: 8px;">What we collect.</h2>
+        <p>
+          When you submit a form on this website, we collect the details you enter, such as your name, email address, phone number, company, job title and project description. We also record which page you sent the form from, the referring website if there was one, and how you heard about us. We store a one-way hashed version of your internet address to limit spam and prevent abuse.
+        </p>
+      </section>
+
+      <section>
+        <h2 style="font-size: 20px; margin-bottom: 8px;">How we use your information.</h2>
+        <p>
+          We use your details to respond to your project enquiry or to send occasional updates about the digital twin platform waiting list. We rely on our legitimate interest in responding to people who contact us, or on your consent when you join our waiting list.
+        </p>
+      </section>
+
+      <section>
+        <h2 style="font-size: 20px; margin-bottom: 8px;">Who handles your data.</h2>
+        <p>
+          This website and its database are hosted on Cloudflare infrastructure in the United Kingdom and Europe. Business email is handled by Google Workspace. We never sell, rent or share your details with third parties for marketing purposes.
+        </p>
+      </section>
+
+      <section>
+        <h2 style="font-size: 20px; margin-bottom: 8px;">Cookies and analytics.</h2>
+        <p>
+          We use privacy-friendly Cloudflare Web Analytics to count visits and measure page loading performance. It does not set cookies, use local storage or track you across the web. This website sets no advertising or tracking cookies. If you choose to play an embedded video, it loads from YouTube’s privacy-enhanced mode (youtube-nocookie.com), which may set its own cookies.
+        </p>
+      </section>
+
+      <section>
+        <h2 style="font-size: 20px; margin-bottom: 8px;">Retention.</h2>
+        <p>
+          We keep enquiries for up to two years unless we enter into an ongoing contract, or until you ask us to remove your information.
+        </p>
+      </section>
+
+      <section>
+        <h2 style="font-size: 20px; margin-bottom: 8px;">Your rights.</h2>
+        <p>
+          Under UK data protection laws, you can ask to inspect, correct or delete your personal information, or object to how we use it, by contacting Jack Ward directly at <a href={`mailto:${contact.email}`} style="color: var(--color-signal-text); font-weight: 600;">{contact.email}</a>. You also have the right to lodge a complaint with the <a href="https://ico.org.uk/make-a-complaint/" rel="noopener noreferrer" target="_blank" style="color: var(--color-signal-text); font-weight: 600;">Information Commissioner’s Office (ICO)</a>.
+        </p>
+      </section>
+    </div>
+  </div>
 </Base>

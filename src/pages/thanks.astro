@@ -2,9 +2,16 @@
 import Base from '../layouts/Base.astro';
 ---
 <Base title="Message sent" description="Your message has been sent to iBIM." noindex>
-  <section class="wrap page-head">
-    <h1>Message sent</h1>
-    <p class="lead">We’ll reply as soon as we can.</p>
-    <a class="button" href="/">Back to home</a>
-  </section>
+  <div class="container section" style="min-height: 60vh; display: flex; flex-direction: column; justify-content: center;">
+    <header style="max-width: 600px;">
+      <span class="mono eyebrow eyebrow--green">Confirmation</span>
+      <h1 style="margin-top: 8px; margin-bottom: 16px;">Message sent.</h1>
+      <p class="standfirst" style="font-size: 18px; margin-bottom: 28px;">
+        Jack replies personally, usually within one working day.
+      </p>
+      <div>
+        <a class="button button--primary" href="/">Back to home</a>
+      </div>
+    </header>
+  </div>
 </Base>
