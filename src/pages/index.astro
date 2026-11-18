@@ -129,7 +129,7 @@ const journeySteps = [
             <span class="service-card__summary">{p.summary}</span>
             <p class="service-card__body">{p.body}</p>
             <span class="button button--tertiary">
-              Explore {p.name.toLowerCase()} <span class="arrow">→</span>
+              Explore {p.key === 'bim' ? 'BIM and digital' : p.name.toLowerCase()} <span class="arrow">→</span>
             </span>
           </a>
         ))}
@@ -142,7 +142,7 @@ const journeySteps = [
     <div class="container">
       <div class="promise-band__inner">
         <span class="eyebrow eyebrow--green">The organising idea</span>
-        <h2>{promise}</h2>
+        <h2>Simplifying AEC with <span class="green-word">integrated</span> digital solutions.</h2>
         <p>
           Architecture, engineering and construction (AEC) runs on information: drawings, models, programmes, costs and handover records. Too much of it sits in separate files, with separate teams, or in someone’s inbox. iBIM exists to join it up so you enter information once.
         </p>

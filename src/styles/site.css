@@ -432,7 +432,6 @@ a:hover {
   border: 1px solid var(--color-line);
   border-radius: var(--radius-control);
   padding: 8px 0;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
   display: grid;
   z-index: 200;
 }
@@ -696,6 +695,14 @@ a:hover {
   position: static;
 }
 
+/* Layering: the 2D canvas sets the size; the 3D canvas and render sit on top of it. */
+.model > .model__3d { display: none; }
+.model--has-3d > canvas:first-child { visibility: hidden; }
+.model--has-3d > .model__3d { display: block; position: absolute; top: 0; left: 0; width: 100%; }
+.model--has-3d > .model__photo:not(.model__photo--static) { inset: auto; top: 0; left: 0; height: auto; aspect-ratio: 4 / 3; }
+.journey-steps { position: absolute; top: 0; left: 0; right: 0; z-index: 2; display: none; margin: 0; list-style: none; }
+.model--has-3d > .journey-steps { display: flex; }
+
 /* Cards (5.7) */
 .pillars-grid {
   display: grid;
@@ -849,8 +856,10 @@ a:hover {
 }
 .promise-band h2 {
   font-size: clamp(24px, 3.5vw, 32px);
-  color: var(--color-signal-text);
+  color: var(--color-ink);
 }
+/* One green word per headline (2.3, 3.11): "integrated" echoes the logo strapline. */
+.green-word { color: var(--color-signal-text); }
 
 /* Who We Work With (1.8) */
 .audiences-grid {
