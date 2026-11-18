@@ -8,52 +8,56 @@ import { contact } from '../data/services';
   description="Contact iBIM for BIM solutions tailored to your planning, design, construction and operations needs."
 >
   <div class="container section">
-    <div style="display: grid; grid-template-columns: 1fr; gap: 48px;">
+    <div style="display: grid; grid-template-columns: 1fr; gap: 56px;">
       <header style="max-width: 680px;">
         <span class="eyebrow eyebrow--green">Contact us</span>
         <h1 style="margin-top: 8px; margin-bottom: 16px;">Tell us about the job.</h1>
         <p class="standfirst">About one minute. We reply within one working day.</p>
       </header>
 
-      <div style="display: grid; grid-template-columns: 1fr; gap: 48px;" class="contact-grid">
+      <div style="display: grid; grid-template-columns: 1fr; gap: 56px;" class="contact-grid">
         <!-- Form Column -->
         <div>
           <Form kind="contact" />
         </div>
 
-        <!-- Direct Contact Info Column -->
-        <aside style="background: var(--color-surface); border: 1px solid var(--color-line); border-radius: var(--radius-card); padding: clamp(24px, 4vw, 36px); display: flex; flex-direction: column; gap: 24px; height: fit-content;">
+        <!-- Direct Contact Info Column — Structured like a Drawing Titleblock -->
+        <aside class="service-panel" style="position: static; height: fit-content;">
           <div>
-            <span class="mono eyebrow eyebrow--green">Direct contact</span>
+            <span class="service-panel__title">Direct contact</span>
             <strong style="display: block; font-size: 20px; margin-top: 6px; margin-bottom: 4px;">{contact.person}</strong>
             <p class="small">{contact.role} · iBIM Limited</p>
           </div>
 
-          <div style="display: grid; gap: 16px; font-size: 15px;">
+          <dl class="typical-list">
             <div>
-              <span class="mono small" style="text-transform: uppercase; display: block; margin-bottom: 2px;">Telephone / WhatsApp</span>
-              <a href={contact.phoneHref} class="mono" style="font-weight: 600; color: var(--color-signal-text); text-decoration: none;">
-                {contact.phone}
-              </a>
+              <dt>Telephone / WhatsApp</dt>
+              <dd>
+                <a href={contact.phoneHref} class="mono" style="font-weight: 600; color: var(--color-signal-text); text-decoration: none;">
+                  {contact.phone}
+                </a>
+              </dd>
             </div>
 
             <div>
-              <span class="mono small" style="text-transform: uppercase; display: block; margin-bottom: 2px;">Email</span>
-              <a href={`mailto:${contact.email}`} style="color: var(--color-ink); text-decoration: none;">
-                {contact.email}
-              </a>
+              <dt>Email</dt>
+              <dd>
+                <a href={`mailto:${contact.email}`} style="color: var(--color-ink); text-decoration: none;">
+                  {contact.email}
+                </a>
+              </dd>
             </div>
 
             <div>
-              <span class="mono small" style="text-transform: uppercase; display: block; margin-bottom: 2px;">Working hours</span>
-              <span>{contact.hours}</span>
+              <dt>Working hours</dt>
+              <dd>{contact.hours}</dd>
             </div>
 
             <div>
-              <span class="mono small" style="text-transform: uppercase; display: block; margin-bottom: 2px;">Office</span>
-              <span class="small">{contact.registeredOffice}</span>
+              <dt>Registered office</dt>
+              <dd class="small">{contact.registeredOffice}</dd>
             </div>
-          </div>
+          </dl>
 
           <div style="padding-top: 16px; border-top: 1px solid var(--color-line);">
             <p class="small">
@@ -69,7 +73,7 @@ import { contact } from '../data/services';
     @media (min-width: 900px) {
       .contact-grid {
         grid-template-columns: 1.3fr 0.8fr !important;
-        gap: 64px !important;
+        gap: 72px !important;
       }
     }
   </style>

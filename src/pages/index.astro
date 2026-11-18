@@ -1,7 +1,7 @@
 ---
 import Base from '../layouts/Base.astro';
 import Icon from '../components/Icon.astro';
-import { pillars, recentWork, contact, promise } from '../data/services';
+import { pillars, recentWork, contact } from '../data/services';
 
 const audiences = [
   {
@@ -111,25 +111,24 @@ const journeySteps = [
     </div>
   </section>
 
-  <!-- 2. The Three Pillars at Equal Width (5.4) -->
+  <!-- 2. The Three Pillars at Equal Width — Architectural Drawing Sheet Columns (5.4) -->
   <section class="section">
     <div class="container">
       <div style="margin-bottom: 32px;">
-        <span class="eyebrow eyebrow--green">Our three pillars</span>
-        <h2 style="margin-top: 8px;">Three disciplines. Equal weight.</h2>
+        <h2>Three disciplines. Equal weight.</h2>
       </div>
 
-      <div class="pillars-grid">
+      <div class="pillars-sheet">
         {pillars.map((p) => (
-          <a href={p.href} class="service-card">
-            <div class="service-card__icon">
+          <a href={p.href} class="pillar-col">
+            <div class="pillar-col__icon">
               <Icon name={p.icon} size={28} />
             </div>
-            <h3 class="service-card__title">{p.name}</h3>
-            <span class="service-card__summary">{p.summary}</span>
-            <p class="service-card__body">{p.body}</p>
+            <h3 class="pillar-col__title">{p.name}</h3>
+            <span class="pillar-col__summary">{p.summary}</span>
+            <p class="pillar-col__body">{p.body}</p>
             <span class="button button--tertiary">
-              Explore {p.key === 'bim' ? 'BIM and digital' : p.name.toLowerCase()} <span class="arrow">→</span>
+              Explore {p.key === 'bim' ? 'BIM and digital' : p.name.toLowerCase()}
             </span>
           </a>
         ))}
@@ -141,7 +140,6 @@ const journeySteps = [
   <section class="promise-band">
     <div class="container">
       <div class="promise-band__inner">
-        <span class="eyebrow eyebrow--green">The organising idea</span>
         <h2>Simplifying AEC with <span class="green-word">integrated</span> digital solutions.</h2>
         <p>
           Architecture, engineering and construction (AEC) runs on information: drawings, models, programmes, costs and handover records. Too much of it sits in separate files, with separate teams, or in someone’s inbox. iBIM exists to join it up so you enter information once.
@@ -150,69 +148,73 @@ const journeySteps = [
     </div>
   </section>
 
-  <!-- 4. How We Work / Client Journey (5.10) -->
+  <!-- 4. How We Work / Client Journey — Datum Strip (5.10) -->
   <section class="section" id="how-we-work">
     <div class="container">
       <div style="margin-bottom: 32px;">
-        <span class="eyebrow eyebrow--green">The client journey</span>
+        <span class="eyebrow eyebrow--green">How we work</span>
         <h2 style="margin-top: 8px;">From enquiry to a model you can run.</h2>
       </div>
 
-      <div class="process-grid">
+      <div class="journey-strip">
         {journeySteps.map((s) => (
-          <div class="process-card">
-            <span class="process-card__step">STEP {s.num}</span>
-            <h3 class="process-card__title">{s.title}</h3>
-            <p class="process-card__body">{s.body}</p>
+          <div class="journey-step">
+            <span class="journey-step__num">0{s.num.replace(/^0/, '')} — {s.name.toUpperCase()}</span>
+            <h3 class="journey-step__title">{s.title}</h3>
+            <p class="journey-step__body">{s.body}</p>
           </div>
         ))}
       </div>
     </div>
   </section>
 
-  <!-- 5. Recent Work (5.7 - Text Cards, No Invented Results) -->
-  <section class="section section--sm" style="background: var(--color-surface); border-top: 1px solid var(--color-line); border-bottom: 1px solid var(--color-line);">
-    <div class="container">
-      <div style="margin-bottom: 32px;">
-        <span class="eyebrow eyebrow--green">Recent work</span>
-        <h2 style="margin-top: 8px;">Work completed.</h2>
+  <!-- 5. Recent Work — Editorial Schedule / Ledger (No Invented Results) -->
+  <section class="section section--bordered">
+    <div class="container editorial-split">
+      <div class="editorial-split__head editorial-split__head--sticky">
+        <span class="eyebrow eyebrow--green">Selected work</span>
+        <h2>Work completed.</h2>
+        <p class="small">Real instructions across capture, planning and visualisation.</p>
       </div>
 
-      <div class="work-grid">
+      <div class="ledger">
         {recentWork.map((w) => (
-          <a href={`/${w.slug}`} class="work-card">
-            <span class="work-card__tag">{w.tag}</span>
-            <h3 class="work-card__title">{w.title}</h3>
-            <p class="work-card__body">{w.body}</p>
-            <span class="button button--tertiary">
-              View service <span class="arrow">→</span>
-            </span>
+          <a href={`/${w.slug}`} class="ledger-row">
+            <span class="ledger-row__meta">{w.tag}</span>
+            <div>
+              <h3 class="ledger-row__title">{w.title}</h3>
+              <p class="ledger-row__body" style="margin-top: 4px;">{w.body}</p>
+            </div>
+            <span class="button button--tertiary">View service</span>
           </a>
         ))}
       </div>
     </div>
   </section>
 
-  <!-- 6. Who We Work With (1.8 - Homeowners, Developers, Landowners, Construction, M&E) -->
-  <section class="section" id="who-we-work-with">
-    <div class="container">
-      <div style="margin-bottom: 32px;">
+  <!-- 6. Who We Work With — Editorial Ledger (1.8) -->
+  <section class="section section--bordered" id="who-we-work-with">
+    <div class="container editorial-split">
+      <div class="editorial-split__head editorial-split__head--sticky">
         <span class="eyebrow eyebrow--green">Who we work with</span>
-        <h2 style="margin-top: 8px;">One supply chain. Built for every stage.</h2>
+        <h2>One supply chain.</h2>
+        <p class="small">Design, build, own and operate.</p>
       </div>
 
-      <div class="audiences-grid">
+      <div class="ledger">
         {audiences.map((a) => (
-          <div class="audience-card">
+          <div class="ledger-row ledger-row--2col">
             <div>
-              <span class="mono small" style="color: var(--color-signal-text); text-transform: uppercase;">{a.group}</span>
-              <h3 style="margin-top: 4px;">{a.name}</h3>
+              <span class="ledger-row__meta">{a.group}</span>
+              <h3 class="ledger-row__title" style="margin-top: 4px;">{a.name}</h3>
             </div>
-            <p>{a.need}</p>
-            <div class="audience-card__links">
-              {a.links.map((link) => (
-                <a href={link.href}>{link.name}</a>
-              ))}
+            <div>
+              <p class="ledger-row__body">{a.need}</p>
+              <div class="ledger-row__links">
+                {a.links.map((link) => (
+                  <a href={link.href}>{link.name}</a>
+                ))}
+              </div>
             </div>
           </div>
         ))}
@@ -220,12 +222,11 @@ const journeySteps = [
     </div>
   </section>
 
-  <!-- 7. Who Runs iBIM (4.2 Rewrite, 1.7 Personality) -->
+  <!-- 7. Who Runs iBIM — Drawing Titleblock Layout (4.2 Rewrite, 1.7 Personality) -->
   <section class="section section--sm">
     <div class="container">
-      <div class="leadership-box">
-        <div class="leadership-box__content">
-          <span class="eyebrow eyebrow--green">Practice leadership</span>
+      <div class="leadership-sheet">
+        <div class="leadership-sheet__copy">
           <h2>Who runs iBIM.</h2>
           <p class="standfirst" style="font-size: 18px;">
             A UK practice covering architectural drawings, BIM and software, run by a building surveyor with a postgraduate diploma in BIM and project management.
@@ -235,19 +236,21 @@ const journeySteps = [
           </p>
         </div>
 
-        <div class="leadership-box__contact">
-          <span class="mono small" style="text-transform: uppercase;">Direct contact</span>
-          <strong style="font-size: 18px;">{contact.person}</strong>
-          <span class="small">{contact.role} · BSc (Hons), PgDip</span>
-          <a href={contact.phoneHref} class="mono" style="color: var(--color-signal-text); font-weight: 600; text-decoration: none;">
+        <div class="leadership-sheet__meta">
+          <span class="mono small" style="text-transform: uppercase;">Practice director</span>
+          <strong style="font-size: 20px;">{contact.person}</strong>
+          <span class="small">BSc (Hons) Building Surveying · PgDip BIM &amp; Project Management</span>
+          <a href={contact.phoneHref} class="mono" style="color: var(--color-signal-text); font-weight: 600; text-decoration: none; margin-top: 4px;">
             {contact.phone}
           </a>
-          <a href={`mailto:${contact.email}`} style="color: var(--color-ink); font-size: 14.5px;">
+          <a href={`mailto:${contact.email}`} style="color: var(--color-ink); font-size: 15px;">
             {contact.email}
           </a>
-          <a class="button button--small button--primary" href="/contact" style="margin-top: 8px;">
-            Talk to Jack
-          </a>
+          <div style="margin-top: 12px;">
+            <a class="button button--small button--primary" href="/contact">
+              Talk to Jack
+            </a>
+          </div>
         </div>
       </div>
     </div>

@@ -185,19 +185,19 @@ const jsonLd = {
       </aside>
     </div>
 
-    <!-- Related Services in Pillar -->
-    <nav class="section section--sm" style="margin-top: 48px; border-top: 1px solid var(--color-line);" aria-label="Other services in this pillar">
-      <h2>Other {isArchitectural ? 'architectural' : 'BIM and digital'} services.</h2>
-      <div class="pillars-grid" style="margin-top: 24px;">
+    <!-- Related Services in Pillar — Architectural Sheet Columns -->
+    <nav class="section section--sm" style="margin-top: 56px;" aria-label="Other services in this pillar">
+      <h2 style="margin-bottom: 24px;">Other {isArchitectural ? 'architectural' : 'BIM and digital'} services.</h2>
+      <div class="pillars-sheet">
         {peers.filter((p) => p.slug !== service.slug).slice(0, 3).map((p) => (
-          <a href={`/${p.slug}`} class="service-card">
-            <div class="service-card__icon">
+          <a href={`/${p.slug}`} class="pillar-col">
+            <div class="pillar-col__icon">
               <Icon name={p.icon} size={24} />
             </div>
-            <h3 class="service-card__title">{p.name}</h3>
-            <p class="service-card__body">{p.card}</p>
+            <h3 class="pillar-col__title">{p.name}</h3>
+            <p class="pillar-col__body">{p.card}</p>
             <span class="button button--tertiary">
-              View service <span class="arrow">→</span>
+              View service
             </span>
           </a>
         ))}

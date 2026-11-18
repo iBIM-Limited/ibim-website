@@ -1,6 +1,7 @@
 /* ==========================================================================
    iBIM Design System Styles
    Based on iBIM Brand Book Edition 1.0 Draft (18 November 2026)
+   and Studio Editorial / Architectural Sheet Principles
    ========================================================================== */
 
 :root {
@@ -150,6 +151,11 @@ p {
   color: var(--color-ink-green);
 }
 
+/* One green word per headline (2.3, 3.11) */
+.green-word {
+  color: var(--color-signal-text);
+}
+
 a {
   color: inherit;
   text-underline-offset: 0.18em;
@@ -198,6 +204,35 @@ a:hover {
 .section--sm {
   padding-block: clamp(48px, 6vw, 64px);
 }
+.section--bordered {
+  border-top: 1px solid var(--color-line);
+}
+
+/* Editorial Section Header: Asymmetric 2-column layout (Title Left, Content Right) */
+.editorial-split {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 32px;
+}
+@media (min-width: 900px) {
+  .editorial-split {
+    grid-template-columns: 320px 1fr;
+    gap: 64px;
+    align-items: start;
+  }
+}
+
+.editorial-split__head {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+@media (min-width: 900px) {
+  .editorial-split__head--sticky {
+    position: sticky;
+    top: 96px;
+  }
+}
 
 /* Graphic Devices (3.6) */
 .drawing-grid {
@@ -240,8 +275,7 @@ a:hover {
   border: 1.5px solid transparent;
   transition: background-color var(--dur-hover) var(--ease-brand),
               border-color var(--dur-hover) var(--ease-brand),
-              color var(--dur-hover) var(--ease-brand),
-              transform var(--dur-hover) var(--ease-brand);
+              color var(--dur-hover) var(--ease-brand);
 }
 
 .button--large {
@@ -346,7 +380,6 @@ a:hover {
   height: 64px;
   background: var(--color-white);
   border-bottom: 1px solid var(--color-line);
-  transition: border-color var(--dur-hover) var(--ease-brand);
 }
 
 .site-header__inner {
@@ -399,7 +432,7 @@ a:hover {
   text-underline-offset: 6px;
 }
 
-/* Dropdown Menus */
+/* Dropdown Menus (No drop shadows per 3.6) */
 .nav-dropdown {
   position: relative;
 }
@@ -718,145 +751,212 @@ a:hover {
 .journey-steps { position: absolute; top: 0; left: 0; right: 0; z-index: 2; display: none; margin: 0; list-style: none; }
 .model--has-3d > .journey-steps { display: flex; }
 
-/* Cards (5.7) */
-.pillars-grid {
+/* ==========================================================================
+   Three Pillars — Architectural Drawing Sheet Columns (No SaaS Cards)
+   ========================================================================== */
+.pillars-sheet {
   display: grid;
   grid-template-columns: 1fr;
-  gap: 24px;
+  border-top: 2px solid var(--color-ink);
+  border-bottom: 1px solid var(--color-line);
 }
 @media (min-width: 840px) {
-  .pillars-grid {
+  .pillars-sheet {
     grid-template-columns: repeat(3, 1fr);
   }
 }
 
-.service-card {
+.pillar-col {
   display: flex;
   flex-direction: column;
-  padding: 32px 28px;
-  background: var(--color-white);
-  border: 1px solid var(--color-line);
-  border-radius: var(--radius-card);
+  padding: 36px 0;
   text-decoration: none;
   color: var(--color-ink);
-  transition: border-color var(--dur-hover) var(--ease-brand);
+  border-bottom: 1px solid var(--color-line);
+  transition: background-color var(--dur-hover) var(--ease-brand);
 }
-.service-card:hover {
-  border-color: var(--color-signal-text);
+.pillar-col:last-child {
+  border-bottom: 0;
 }
-.service-card__icon {
-  margin-bottom: 20px;
+@media (min-width: 840px) {
+  .pillar-col {
+    padding: 40px 32px;
+    border-bottom: 0;
+    border-right: 1px solid var(--color-line);
+  }
+  .pillar-col:first-child {
+    padding-left: 0;
+  }
+  .pillar-col:last-child {
+    padding-right: 0;
+    border-right: 0;
+  }
+}
+
+.pillar-col__icon {
   color: var(--color-ink);
+  margin-bottom: 20px;
+  transition: color var(--dur-hover) var(--ease-brand);
 }
-.service-card:hover .service-card__icon {
+.pillar-col:hover .pillar-col__icon {
   color: var(--color-signal-text);
 }
-.service-card__title {
-  font-size: 20px;
+.pillar-col__title {
+  font-size: 22px;
   font-weight: 700;
-  margin-bottom: 8px;
+  margin-bottom: 6px;
 }
-.service-card__summary {
+.pillar-col__summary {
   font-family: var(--font-mono);
-  font-size: 13px;
+  font-size: 12.5px;
   color: var(--color-ink-60);
-  margin-bottom: 12px;
+  margin-bottom: 16px;
 }
-.service-card__body {
-  font-size: 15px;
+.pillar-col__body {
+  font-size: 15.5px;
   line-height: var(--lh-body);
   color: var(--color-ink-60);
   margin-bottom: 24px;
   flex-grow: 1;
 }
 
-.process-grid {
+/* ==========================================================================
+   Client Journey / Stepped Process — Architectural Datum Strip (5.10)
+   ========================================================================== */
+.journey-strip {
   display: grid;
   grid-template-columns: 1fr;
-  gap: 20px;
+  border-top: 1px solid var(--color-line);
 }
-@media (min-width: 600px) {
-  .process-grid { grid-template-columns: repeat(2, 1fr); }
+@media (min-width: 640px) {
+  .journey-strip {
+    grid-template-columns: repeat(2, 1fr);
+  }
 }
 @media (min-width: 1024px) {
-  .process-grid { grid-template-columns: repeat(4, 1fr); }
+  .journey-strip {
+    grid-template-columns: repeat(4, 1fr);
+  }
 }
 
-.process-card {
-  background: var(--color-tint);
-  border: 1px solid var(--color-line);
-  border-radius: var(--radius-card);
-  padding: 24px 20px;
+.journey-step {
+  padding: 28px 0;
+  border-bottom: 1px solid var(--color-line);
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 10px;
 }
-.process-card__step {
+@media (min-width: 640px) {
+  .journey-step {
+    padding: 32px 24px;
+    border-right: 1px solid var(--color-line);
+  }
+  .journey-step:nth-child(2n) {
+    border-right: 0;
+  }
+}
+@media (min-width: 1024px) {
+  .journey-step:nth-child(2n) {
+    border-right: 1px solid var(--color-line);
+  }
+  .journey-step:first-child {
+    padding-left: 0;
+  }
+  .journey-step:last-child {
+    padding-right: 0;
+    border-right: 0;
+  }
+}
+
+.journey-step__num {
   font-family: var(--font-mono);
   font-size: 12px;
   font-weight: 500;
   color: var(--color-signal-text);
-  letter-spacing: 0.1em;
+  letter-spacing: 0.08em;
 }
-.process-card__title {
+.journey-step__title {
   font-size: 18px;
   font-weight: 700;
   line-height: 1.25;
 }
-.process-card__body {
+.journey-step__body {
   font-size: 14.5px;
-  line-height: 1.5;
+  line-height: 1.55;
   color: var(--color-ink-60);
 }
 
-/* Work Cards */
-.work-grid {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 20px;
-}
-@media (min-width: 768px) {
-  .work-grid { grid-template-columns: repeat(3, 1fr); }
+/* ==========================================================================
+   Ledger / Schedule Rows — Used for Work, Audiences, Services, Commitments
+   ========================================================================== */
+.ledger {
+  border-top: 1px solid var(--color-line);
 }
 
-.work-card {
-  display: flex;
-  flex-direction: column;
-  padding: 28px 24px;
-  background: var(--color-surface);
-  border: 1px solid var(--color-line);
-  border-radius: var(--radius-card);
+.ledger-row {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+  padding: 28px 0;
+  border-bottom: 1px solid var(--color-line);
   text-decoration: none;
   color: var(--color-ink);
-  transition: border-color var(--dur-hover) var(--ease-brand);
+  transition: background-color var(--dur-hover) var(--ease-brand);
 }
-.work-card:hover {
-  border-color: var(--color-signal-text);
+@media (min-width: 768px) {
+  .ledger-row {
+    grid-template-columns: 240px 1fr auto;
+    gap: 32px;
+    align-items: baseline;
+  }
+  .ledger-row--2col {
+    grid-template-columns: 260px 1fr;
+  }
 }
-.work-card__tag {
+
+a.ledger-row:hover .ledger-row__title {
+  color: var(--color-signal-text);
+  text-decoration: underline;
+}
+
+.ledger-row__meta {
   font-family: var(--font-mono);
-  font-size: 11.5px;
-  font-weight: 500;
+  font-size: 12px;
   color: var(--color-signal-text);
   text-transform: uppercase;
   letter-spacing: 0.08em;
-  margin-bottom: 12px;
-}
-.work-card__title {
-  font-size: 18px;
-  font-weight: 700;
-  margin-bottom: 8px;
-  line-height: 1.3;
-}
-.work-card__body {
-  font-size: 14.5px;
-  line-height: 1.5;
-  color: var(--color-ink-60);
-  margin-bottom: 20px;
-  flex-grow: 1;
 }
 
-/* Callout / Promise Banner */
+.ledger-row__title {
+  font-size: 19px;
+  font-weight: 700;
+  line-height: 1.3;
+  color: var(--color-ink);
+}
+
+.ledger-row__body {
+  font-size: 15.5px;
+  line-height: var(--lh-body);
+  color: var(--color-ink-60);
+}
+
+.ledger-row__links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 18px;
+  margin-top: 10px;
+}
+.ledger-row__links a {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-signal-text);
+  text-decoration: none;
+}
+.ledger-row__links a:hover {
+  text-decoration: underline;
+}
+
+/* Callout / Promise Band */
 .promise-band {
   background: var(--color-tint);
   border-top: 1px solid var(--color-line);
@@ -873,84 +973,34 @@ a:hover {
   font-size: clamp(24px, 3.5vw, 32px);
   color: var(--color-ink);
 }
-/* One green word per headline (2.3, 3.11): "integrated" echoes the logo strapline. */
-.green-word { color: var(--color-signal-text); }
 
-/* Who We Work With (1.8) */
-.audiences-grid {
+/* Leadership / Who runs iBIM — Editorial Split with Titleblock Data */
+.leadership-sheet {
+  border-top: 2px solid var(--color-ink);
+  border-bottom: 1px solid var(--color-line);
+  padding-block: clamp(40px, 6vw, 64px);
   display: grid;
   grid-template-columns: 1fr;
-  gap: 24px;
-}
-@media (min-width: 768px) {
-  .audiences-grid { grid-template-columns: repeat(2, 1fr); }
-}
-
-.audience-card {
-  border: 1px solid var(--color-line);
-  border-radius: var(--radius-card);
-  padding: 28px 24px;
-  background: var(--color-white);
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-.audience-card h3 {
-  font-size: 19px;
-  font-weight: 700;
-}
-.audience-card p {
-  font-size: 15px;
-  color: var(--color-ink-60);
-  line-height: 1.5;
-}
-.audience-card__links {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px 16px;
-  margin-top: 8px;
-  padding-top: 12px;
-  border-top: 1px solid var(--color-line);
-}
-.audience-card__links a {
-  font-size: 13.5px;
-  font-weight: 600;
-  color: var(--color-signal-text);
-  text-decoration: none;
-}
-.audience-card__links a:hover {
-  text-decoration: underline;
-}
-
-/* Leadership / Who runs iBIM */
-.leadership-box {
-  background: var(--color-surface);
-  border: 1px solid var(--color-line);
-  border-radius: var(--radius-card);
-  padding: clamp(32px, 5vw, 48px);
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 28px;
+  gap: 40px;
 }
 @media (min-width: 840px) {
-  .leadership-box {
+  .leadership-sheet {
     grid-template-columns: 1.4fr 0.8fr;
-    align-items: center;
+    gap: 64px;
+    align-items: start;
   }
 }
-.leadership-box__content {
+.leadership-sheet__copy {
   display: flex;
   flex-direction: column;
   gap: 16px;
 }
-.leadership-box__contact {
+.leadership-sheet__meta {
+  border-left: 2px solid var(--color-ink);
+  padding-left: 24px;
   display: flex;
   flex-direction: column;
-  gap: 12px;
-  padding: 24px;
-  background: var(--color-white);
-  border: 1px solid var(--color-line);
-  border-radius: var(--radius-control);
+  gap: 10px;
 }
 
 /* CTA / Contact Band */
@@ -984,11 +1034,11 @@ a:hover {
   padding-bottom: 24px;
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 12px;
 }
 
 .service-figure {
-  margin-block: 24px 48px;
+  margin-block: 16px 56px;
 }
 .service-figure img {
   border-radius: var(--radius-img);
@@ -1004,7 +1054,7 @@ a:hover {
 @media (min-width: 960px) {
   .service-layout {
     grid-template-columns: 1fr 340px;
-    gap: 64px;
+    gap: 72px;
     align-items: start;
   }
 }
@@ -1019,6 +1069,12 @@ a:hover {
   display: flex;
   flex-direction: column;
   gap: 16px;
+  padding-top: 24px;
+  border-top: 1px solid var(--color-line);
+}
+.service-block:first-child {
+  padding-top: 0;
+  border-top: 0;
 }
 .service-block h2 {
   font-size: 22px;
@@ -1030,7 +1086,7 @@ a:hover {
   gap: 10px;
 }
 .receive-list li {
-  padding-left: 24px;
+  padding-left: 20px;
   position: relative;
   font-size: 15.5px;
   color: var(--color-ink);
@@ -1038,35 +1094,33 @@ a:hover {
 .receive-list li::before {
   content: '';
   position: absolute;
-  left: 4px;
-  top: 9px;
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
+  left: 0;
+  top: 10px;
+  width: 6px;
+  height: 6px;
   background: var(--color-signal);
 }
 
 .service-steps {
   display: grid;
-  gap: 20px;
+  gap: 24px;
 }
 .service-step {
   display: grid;
   grid-template-columns: 36px 1fr;
   gap: 16px;
-  align-items: start;
+  align-items: baseline;
 }
 .service-step__num {
   font-family: var(--font-mono);
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 500;
   color: var(--color-signal-text);
-  padding-top: 2px;
 }
 .service-step__content h3 {
   font-size: 17px;
   font-weight: 700;
-  margin-bottom: 6px;
+  margin-bottom: 4px;
 }
 .service-step__content p {
   font-size: 15px;
@@ -1076,11 +1130,10 @@ a:hover {
 .honestly-box {
   background: var(--color-tint);
   border-left: 4px solid var(--color-signal-text);
-  border-radius: 0 var(--radius-control) var(--radius-control) 0;
   padding: 24px 28px;
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 8px;
 }
 .honestly-box h2 {
   font-size: 19px;
@@ -1093,17 +1146,17 @@ a:hover {
   line-height: var(--lh-body);
 }
 
-/* Service Sticky Panel (5.9) */
+/* Service Sticky Panel (5.9) — Structured like a Drawing Titleblock */
 .service-panel {
   position: sticky;
-  top: 84px;
+  top: 88px;
   background: var(--color-surface);
-  border: 1px solid var(--color-line);
-  border-radius: var(--radius-card);
+  border-top: 3px solid var(--color-ink);
+  border-bottom: 1px solid var(--color-line);
   padding: 28px 24px;
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 24px;
 }
 .service-panel__title {
   font-family: var(--font-mono);
@@ -1112,17 +1165,27 @@ a:hover {
   text-transform: uppercase;
   letter-spacing: 0.12em;
   color: var(--color-ink-60);
-  margin-bottom: 4px;
+  margin-bottom: 8px;
+  display: block;
 }
 .typical-list {
   display: grid;
   gap: 14px;
   font-size: 14px;
 }
+.typical-list > div {
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--color-line);
+}
+.typical-list > div:last-child {
+  padding-bottom: 0;
+  border-bottom: 0;
+}
 .typical-list dt {
   font-family: var(--font-mono);
-  font-size: 11.5px;
+  font-size: 11px;
   text-transform: uppercase;
+  letter-spacing: 0.06em;
   color: var(--color-ink-60);
   margin-bottom: 2px;
 }
@@ -1134,7 +1197,6 @@ a:hover {
   display: flex;
   flex-direction: column;
   gap: 10px;
-  padding-top: 8px;
 }
 .service-panel__actions .button {
   width: 100%;
@@ -1143,7 +1205,7 @@ a:hover {
   display: flex;
   flex-direction: column;
   gap: 4px;
-  padding-top: 14px;
+  padding-top: 16px;
   border-top: 1px solid var(--color-line);
   font-size: 13.5px;
 }
@@ -1159,17 +1221,21 @@ a:hover {
   text-decoration: underline;
 }
 
-/* FAQ & Explainer Sections */
+/* FAQ List */
 .faq-list {
   display: grid;
-  gap: 20px;
+  gap: 24px;
 }
 .faq-item {
   border-bottom: 1px solid var(--color-line);
-  padding-bottom: 20px;
+  padding-bottom: 24px;
   display: flex;
   flex-direction: column;
   gap: 8px;
+}
+.faq-item:last-child {
+  border-bottom: 0;
+  padding-bottom: 0;
 }
 .faq-item dt {
   font-size: 17px;
@@ -1279,9 +1345,8 @@ a:hover {
 }
 
 .form__person-note {
-  font-size: 14px;
+  font-size: 14.5px;
   color: var(--color-ink-60);
-  font-style: italic;
 }
 
 .form-status {

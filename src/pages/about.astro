@@ -4,27 +4,22 @@ import { contact } from '../data/services';
 
 const commitments = [
   {
-    num: '01',
     title: 'Simple before clever.',
     body: 'The best solution is the one your team will still use in a year. We choose that over the impressive one.',
   },
   {
-    num: '02',
     title: 'Integrated before bolted on.',
     body: 'Drawings, models and software are planned together from day one, so information is entered once.',
   },
   {
-    num: '03',
     title: 'Evidence before adjectives.',
     body: 'Hours saved, clashes caught, dates met. We show the number and how we measured it.',
   },
   {
-    num: '04',
     title: 'Standards without the lecture.',
     body: 'We work to ISO 19650 and the UK BIM Framework, and explain them in plain English when asked.',
   },
   {
-    num: '05',
     title: 'Built to hand over.',
     body: 'Your models, data and code are yours, documented well enough to run without us.',
   },
@@ -80,73 +75,81 @@ const values = [
       <p class="small" style="margin-top: 8px;">An introduction to building information modelling (BIM) and why joined-up delivery matters.</p>
     </div>
 
-    <!-- Vision & Mission (1.3) -->
+    <!-- Vision & Mission — Architectural Sheet Columns (1.3) -->
     <section style="margin-bottom: 80px;">
-      <span class="eyebrow eyebrow--green">Where we’re going</span>
-      <h2 style="margin-top: 8px; margin-bottom: 32px;">Vision and mission.</h2>
+      <h2 style="margin-bottom: 24px;">Vision and mission.</h2>
 
-      <div class="pillars-grid">
-        <div class="process-card" style="background: var(--color-white);">
-          <span class="eyebrow eyebrow--green">Vision — The destination</span>
-          <h3 style="font-size: 19px; line-height: 1.3;">Joined-up digital delivery as the normal way UK buildings are designed, built and run.</h3>
-          <p class="small" style="font-size: 14.5px;">Not a specialist extra bought on the biggest jobs. The default on every job.</p>
+      <div class="pillars-sheet">
+        <div class="pillar-col">
+          <span class="eyebrow eyebrow--green" style="margin-bottom: 12px;">Vision</span>
+          <h3 class="pillar-col__title" style="font-size: 19px; line-height: 1.3; margin-bottom: 12px;">
+            Joined-up digital delivery as the normal way UK buildings are designed, built and run.
+          </h3>
+          <p class="pillar-col__body" style="margin-bottom: 0;">
+            Not a specialist extra bought on the biggest jobs. The default on every job.
+          </p>
         </div>
 
-        <div class="process-card" style="background: var(--color-white);">
-          <span class="eyebrow eyebrow--green">Mission — The method</span>
-          <h3 style="font-size: 19px; line-height: 1.3;">Digital tools and BIM processes that cut wasted effort.</h3>
-          <p class="small" style="font-size: 14.5px;">Give every team in the built environment digital tools and BIM processes that improve collaboration, cut wasted effort and support sustainable outcomes. Across the whole project lifecycle, from first sketch to operation.</p>
+        <div class="pillar-col">
+          <span class="eyebrow eyebrow--green" style="margin-bottom: 12px;">Mission</span>
+          <h3 class="pillar-col__title" style="font-size: 19px; line-height: 1.3; margin-bottom: 12px;">
+            Digital tools and BIM processes that cut wasted effort.
+          </h3>
+          <p class="pillar-col__body" style="margin-bottom: 0;">
+            Give every team in the built environment digital tools and BIM processes that improve collaboration, cut wasted effort and support sustainable outcomes. Across the whole project lifecycle, from first sketch to operation.
+          </p>
         </div>
 
-        <div class="process-card" style="background: var(--color-tint); border-color: var(--color-signal-text);">
-          <span class="eyebrow eyebrow--green">The test — Every decision</span>
-          <h3 style="font-size: 19px; line-height: 1.3;">Does it simplify? Does it integrate? Does it stand up on site?</h3>
-          <p class="small" style="font-size: 14.5px;">If any answer is no, we change the decision and keep the standard.</p>
+        <div class="pillar-col">
+          <span class="eyebrow eyebrow--green" style="margin-bottom: 12px;">The test</span>
+          <h3 class="pillar-col__title" style="font-size: 19px; line-height: 1.3; margin-bottom: 12px;">
+            Does it simplify? Does it integrate? Does it stand up on site?
+          </h3>
+          <p class="pillar-col__body" style="margin-bottom: 0;">
+            If any answer is no, we change the decision and keep the standard.
+          </p>
         </div>
       </div>
     </section>
 
-    <!-- Values & Behaviours (1.6) -->
-    <section style="margin-bottom: 80px;">
-      <span class="eyebrow eyebrow--green">How we act</span>
-      <h2 style="margin-top: 8px; margin-bottom: 32px;">Values are verbs at iBIM.</h2>
+    <!-- Values & Behaviours — Editorial Split Ledger (1.6) -->
+    <section class="editorial-split" style="margin-bottom: 80px;">
+      <div class="editorial-split__head">
+        <h2>Values are verbs at iBIM.</h2>
+        <p class="small">Each value appears with the behaviour it demands.</p>
+      </div>
 
-      <div class="pillars-grid">
+      <div class="ledger">
         {values.map((v) => (
-          <div class="process-card" style="background: var(--color-surface);">
-            <span class="mono" style="font-size: 13px; font-weight: 600; color: var(--color-signal-text); text-transform: uppercase;">
-              {v.name}
-            </span>
-            <p style="font-size: 15.5px; line-height: 1.5; color: var(--color-ink);">
-              {v.behaviour}
-            </p>
+          <div class="ledger-row ledger-row--2col">
+            <h3 class="ledger-row__title">{v.name}</h3>
+            <p class="ledger-row__body">{v.behaviour}</p>
           </div>
         ))}
       </div>
     </section>
 
-    <!-- Five Commitments (1.5) -->
-    <section style="margin-bottom: 80px;">
-      <span class="eyebrow eyebrow--green">What makes us different</span>
-      <h2 style="margin-top: 8px; margin-bottom: 12px;">Five commitments.</h2>
-      <p class="small" style="margin-bottom: 32px; font-size: 15px;">Held every day across every instruction.</p>
+    <!-- Five Commitments — Editorial Split Ledger (1.5) -->
+    <section class="editorial-split" style="margin-bottom: 80px;">
+      <div class="editorial-split__head">
+        <h2>Five commitments.</h2>
+        <p class="small">Held every day across every instruction.</p>
+      </div>
 
-      <div class="process-grid" style="grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));">
+      <div class="ledger">
         {commitments.map((c) => (
-          <div class="process-card">
-            <span class="process-card__step">{c.num}</span>
-            <h3 class="process-card__title">{c.title}</h3>
-            <p class="process-card__body">{c.body}</p>
+          <div class="ledger-row ledger-row--2col">
+            <h3 class="ledger-row__title">{c.title}</h3>
+            <p class="ledger-row__body">{c.body}</p>
           </div>
         ))}
       </div>
     </section>
 
     <!-- Who Runs iBIM (4.2 Rewrite) -->
-    <section style="margin-bottom: 48px;">
-      <div class="leadership-box">
-        <div class="leadership-box__content">
-          <span class="eyebrow eyebrow--green">Practice leadership</span>
+    <section>
+      <div class="leadership-sheet">
+        <div class="leadership-sheet__copy">
           <h2>Who runs iBIM.</h2>
           <p class="standfirst" style="font-size: 18px;">
             A UK practice covering architectural drawings, BIM and software, run by a building surveyor with a postgraduate diploma in BIM and project management.
@@ -156,19 +159,21 @@ const values = [
           </p>
         </div>
 
-        <div class="leadership-box__contact">
-          <span class="mono small" style="text-transform: uppercase;">Direct contact</span>
-          <strong style="font-size: 18px;">{contact.person}</strong>
-          <span class="small">{contact.role} · BSc (Hons), PgDip</span>
-          <a href={contact.phoneHref} class="mono" style="color: var(--color-signal-text); font-weight: 600; text-decoration: none;">
+        <div class="leadership-sheet__meta">
+          <span class="mono small" style="text-transform: uppercase;">Practice director</span>
+          <strong style="font-size: 20px;">{contact.person}</strong>
+          <span class="small">BSc (Hons) Building Surveying · PgDip BIM &amp; Project Management</span>
+          <a href={contact.phoneHref} class="mono" style="color: var(--color-signal-text); font-weight: 600; text-decoration: none; margin-top: 4px;">
             {contact.phone}
           </a>
-          <a href={`mailto:${contact.email}`} style="color: var(--color-ink); font-size: 14.5px;">
+          <a href={`mailto:${contact.email}`} style="color: var(--color-ink); font-size: 15px;">
             {contact.email}
           </a>
-          <a class="button button--small button--primary" href="/contact" style="margin-top: 8px;">
-            Start a project
-          </a>
+          <div style="margin-top: 12px;">
+            <a class="button button--small button--primary" href="/contact">
+              Start a project
+            </a>
+          </div>
         </div>
       </div>
     </section>

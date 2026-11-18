@@ -1,6 +1,5 @@
 ---
 import Base from '../layouts/Base.astro';
-import Icon from '../components/Icon.astro';
 import { architecturalServices, services } from '../data/services';
 
 const checklist = 'https://www.preston.gov.uk/article/5129/Validation-Checklist-for-Planning-and-Other-Applications';
@@ -10,7 +9,7 @@ const checklist = 'https://www.preston.gov.uk/article/5129/Validation-Checklist-
   description="BIM consultancy, architectural drawings, planning submissions and building regulations drawings for projects in Preston and across Lancashire."
 >
   <div class="container section">
-    <header style="max-width: 800px; margin-bottom: 56px;">
+    <header style="max-width: 800px; margin-bottom: 64px;">
       <span class="eyebrow eyebrow--green">Lancashire coverage</span>
       <h1 style="margin-top: 8px; margin-bottom: 20px;">BIM and architectural services in Preston and Lancashire.</h1>
       <p class="standfirst">
@@ -21,77 +20,90 @@ const checklist = 'https://www.preston.gov.uk/article/5129/Validation-Checklist-
       </div>
     </header>
 
-    <!-- Services Grids -->
-    <div style="display: grid; gap: 64px;">
-      <section>
-        <span class="eyebrow eyebrow--green">Architectural</span>
-        <h2 style="margin-top: 8px; margin-bottom: 24px;">Architectural and planning work.</h2>
-        <div class="pillars-grid">
+    <div style="display: grid; gap: 72px;">
+      <!-- Architectural Services Ledger -->
+      <section class="editorial-split">
+        <div class="editorial-split__head">
+          <h2>Architectural and planning work.</h2>
+          <p class="small">Measured surveys, planning applications and building regulations packages.</p>
+        </div>
+
+        <div class="ledger">
           {architecturalServices.map((s) => (
-            <a href={`/${s.slug}`} class="service-card">
-              <div class="service-card__icon"><Icon name={s.icon} size={24} /></div>
-              <h3 class="service-card__title">{s.name}</h3>
-              <p class="service-card__body">{s.card}</p>
-              <span class="button button--tertiary">View service <span class="arrow">→</span></span>
+            <a href={`/${s.slug}`} class="ledger-row">
+              <h3 class="ledger-row__title">{s.name}</h3>
+              <p class="ledger-row__body">{s.card}</p>
+              <span class="button button--tertiary">View service</span>
             </a>
           ))}
         </div>
       </section>
 
-      <section>
-        <span class="eyebrow eyebrow--green">BIM & Digital</span>
-        <h2 style="margin-top: 8px; margin-bottom: 24px;">BIM and digital services.</h2>
-        <div class="pillars-grid">
+      <!-- BIM Services Ledger -->
+      <section class="editorial-split">
+        <div class="editorial-split__head">
+          <h2>BIM and digital services.</h2>
+          <p class="small">Reality capture, information management, 4D/5D and digital twins.</p>
+        </div>
+
+        <div class="ledger">
           {services.map((s) => (
-            <a href={`/${s.slug}`} class="service-card">
-              <div class="service-card__icon"><Icon name={s.icon} size={24} /></div>
-              <h3 class="service-card__title">{s.name}</h3>
-              <p class="service-card__body">{s.card}</p>
-              <span class="button button--tertiary">View service <span class="arrow">→</span></span>
+            <a href={`/${s.slug}`} class="ledger-row">
+              <h3 class="ledger-row__title">{s.name}</h3>
+              <p class="ledger-row__body">{s.card}</p>
+              <span class="button button--tertiary">View service</span>
             </a>
           ))}
         </div>
       </section>
 
       <!-- Local Planning Applications & Recent Work -->
-      <div style="display: grid; grid-template-columns: 1fr; gap: 48px;" class="local-info-grid">
-        <section style="background: var(--color-surface); border: 1px solid var(--color-line); border-radius: var(--radius-card); padding: clamp(24px, 4vw, 36px);">
-          <span class="eyebrow eyebrow--green">Local guidance</span>
-          <h2 style="font-size: 22px; margin-top: 6px; margin-bottom: 16px;">Planning applications in Preston.</h2>
-          <div style="display: flex; flex-direction: column; gap: 14px; font-size: 15px; color: var(--color-ink-60); line-height: 1.55;">
-            <p>
-              Applications for sites within Preston go to Preston City Council. Its validation checklist, adopted in October 2024, sets out mandatory national requirements and local requirements based on the type of proposal.
-            </p>
-            <p>
-              <a href={checklist} rel="noopener noreferrer" target="_blank" style="color: var(--color-signal-text); font-weight: 600;">
-                Read Preston City Council’s validation checklist ↗
-              </a>
-            </p>
-            <p>
-              Elsewhere in Lancashire (Fylde, Wyre, Ribble Valley, South Ribble, Lancaster), each local planning authority publishes its own validation requirements. We check what your council requires before submitting.
-            </p>
-          </div>
-        </section>
+      <section class="editorial-split">
+        <div class="editorial-split__head">
+          <h2>Local planning and recent work.</h2>
+        </div>
 
-        <section style="background: var(--color-surface); border: 1px solid var(--color-line); border-radius: var(--radius-card); padding: clamp(24px, 4vw, 36px);">
-          <span class="eyebrow eyebrow--green">Case study</span>
-          <h2 style="font-size: 22px; margin-top: 6px; margin-bottom: 16px;">Recent local work.</h2>
-          <div style="display: flex; flex-direction: column; gap: 14px; font-size: 15px; color: var(--color-ink-60); line-height: 1.55;">
-            <p>
-              <strong style="color: var(--color-ink);">Planning drawings for a house in Lytham:</strong> Architectural drawings prepared and submitted for a residential planning application.
-            </p>
-            <a class="button button--tertiary" href="/planning-submissions">
-              See planning submissions service <span class="arrow">→</span>
-            </a>
+        <div class="ledger">
+          <div class="ledger-row ledger-row--2col">
+            <h3 class="ledger-row__title">Planning applications in Preston.</h3>
+            <div style="display: flex; flex-direction: column; gap: 12px;" class="ledger-row__body">
+              <p>
+                Applications for sites within Preston go to Preston City Council. Its validation checklist, adopted in October 2024, sets out mandatory national requirements and local requirements based on the type of proposal.
+              </p>
+              <p>
+                <a href={checklist} rel="noopener noreferrer" target="_blank" style="color: var(--color-signal-text); font-weight: 600;">
+                  Read Preston City Council’s validation checklist
+                </a>
+              </p>
+              <p>
+                Elsewhere in Lancashire (Fylde, Wyre, Ribble Valley, South Ribble, Lancaster), each local planning authority publishes its own validation requirements. We check what your council requires before submitting.
+              </p>
+            </div>
           </div>
-        </section>
-      </div>
+
+          <div class="ledger-row ledger-row--2col">
+            <h3 class="ledger-row__title">Recent local work.</h3>
+            <div style="display: flex; flex-direction: column; gap: 12px;" class="ledger-row__body">
+              <p>
+                <strong style="color: var(--color-ink);">Planning drawings for a house in Lytham:</strong> Architectural drawings prepared and submitted for a residential planning application.
+              </p>
+              <div>
+                <a class="button button--tertiary" href="/planning-submissions">
+                  See planning submissions service
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
 
       <!-- FAQs -->
-      <section>
-        <span class="eyebrow eyebrow--green">Questions</span>
-        <h2 style="margin-top: 8px; margin-bottom: 24px;">Common questions.</h2>
-        <dl class="faq-list">
+      <section class="editorial-split">
+        <div class="editorial-split__head">
+          <h2>Common questions.</h2>
+        </div>
+
+        <dl class="faq-list" style="border-top: 1px solid var(--color-line); padding-top: 24px;">
           <div class="faq-item">
             <dt>Do you only work in Preston?</dt>
             <dd>No. We work across Lancashire and the wider UK. This page is for anyone looking for technical drawing or BIM support locally.</dd>
@@ -104,13 +116,4 @@ const checklist = 'https://www.preston.gov.uk/article/5129/Validation-Checklist-
       </section>
     </div>
   </div>
-
-  <style>
-    @media (min-width: 900px) {
-      .local-info-grid {
-        grid-template-columns: 1fr 1fr !important;
-        gap: 32px !important;
-      }
-    }
-  </style>
 </Base>
