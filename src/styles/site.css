@@ -1727,3 +1727,20 @@ a.ledger-row:hover .ledger-row__title {
 .scene__status { position: relative; color: rgba(255, 255, 255, 0.8); }
 .scene figcaption { padding: 8px 12px; text-align: right; color: var(--color-ink-60); border-top: 1px solid var(--color-line); }
 @media (max-width: 640px) { .scene__stage { aspect-ratio: 4 / 3; } }
+
+/* ---- Green Tint page background (Jack, 20 November 2026) ----
+   Everything that was white becomes Green Tint. The header and footer stay white because the
+   logo files have a white background. Panels that were tint or mist become white so they still read. */
+body { background: var(--color-tint); }
+.promise-band,
+.honestly-box,
+.service-panel,
+.radio-chip__label,
+.form__about,
+.form-status[data-kind="ok"],
+.form-status[data-kind="pending"],
+.button--secondary:hover {
+  background: var(--color-white);
+}
+.radio-chip input:checked + .radio-chip__label { background: var(--color-white); border-width: 2px; }
+.promise-band, .honestly-box { border-color: #cfdccd; }
