@@ -175,6 +175,19 @@ export function mount(root, { mode = 'journey', onReady }) {
   };
   lines(edgePositions, 0x1b1d1b, 0.6);
 
+  // Wireframe stage: the model's own edges, drawn in light lines that rise through the scan
+  // before the surfaces fill in. A green ring marks the level being drawn (the one green element).
+  const wirePlane = new Plane(new Vector3(0, -1, 0), 0);
+  const wireGeo = new BufferGeometry();
+  wireGeo.setAttribute('position', new BufferAttribute(new Float32Array(edgePositions), 3));
+  const wire = new LineSegments(wireGeo, new LineBasicMaterial({ color: 0xe6ebe4, transparent: true, opacity: 0, clippingPlanes: [wirePlane] }));
+  scene.add(wire);
+  const rx = W / 2 + 0.6, rz = D / 2 + 0.6;
+  const ringGeo = new BufferGeometry();
+  ringGeo.setAttribute('position', new BufferAttribute(new Float32Array([-rx, 0, -rz, rx, 0, -rz, rx, 0, -rz, rx, 0, rz, rx, 0, rz, -rx, 0, rz, -rx, 0, rz, -rx, 0, -rz]), 3));
+  const ring = new LineSegments(ringGeo, new LineBasicMaterial({ color: 0x7bc474, transparent: true, opacity: 0 }));
+  scene.add(ring);
+
   // Setting-out grid on the ground.
   const gridPos = [];
   for (let x = -W / 2 - 5; x <= W / 2 + 5.01; x += 5) gridPos.push(x, 0.02, -D / 2 - 8, x, 0.02, D / 2 + 8);
@@ -231,7 +244,7 @@ export function mount(root, { mode = 'journey', onReady }) {
     li.textContent = labelText;
     li.dataset.stage = String(index);
     li.addEventListener('click', () => {
-      const stageTimes = [1.8, 6.4, 10.8];
+      const stageTimes = [1.8, 5.8, 10.8];
       t = stageTimes[index];
       offset = t;
       running = index < 2 && !reduced;
@@ -262,7 +275,7 @@ export function mount(root, { mode = 'journey', onReady }) {
 
   function apply(time) {
     const seg = (a, b) => ease(clamp((time - a) / (b - a)));
-    const cloudAlpha = 1 - seg(4.6, 7.4);
+    const cloudAlpha = 1 - seg(4.4, 6.6);
     cloud.visible = cloudAlpha > 0;
     cloud.material.opacity = cloudAlpha;
 
@@ -294,9 +307,18 @@ export function mount(root, { mode = 'journey', onReady }) {
       colAttr.needsUpdate = true;
     }
 
-    // The model rises floor by floor through the scan it was built from.
-    const build = seg(3.8, 7.8);
-    M.paving.opacity = seg(3.8, 5.4);
+    // The wireframe rises through the scan, then the surfaces follow it up floor by floor.
+    const wireRise = seg(2.8, 5.6);
+    const wireAlpha = seg(2.8, 3.4) * (1 - seg(6.6, 8.2));
+    wirePlane.constant = wireRise * (TOP + 1.5);
+    wire.material.opacity = wireAlpha * 0.8;
+    wire.visible = wireAlpha > 0;
+    ring.position.y = wirePlane.constant;
+    ring.material.opacity = seg(2.8, 3.2) * (1 - seg(5.2, 5.8));
+    ring.visible = ring.material.opacity > 0;
+
+    const build = seg(5.0, 8.2);
+    M.paving.opacity = seg(5.0, 6.4);
     reveal.constant = build * (TOP + 2.5);
     building.visible = build > 0;
 
