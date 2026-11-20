@@ -1728,19 +1728,49 @@ a.ledger-row:hover .ledger-row__title {
 .scene figcaption { padding: 8px 12px; text-align: right; color: var(--color-ink-60); border-top: 1px solid var(--color-line); }
 @media (max-width: 640px) { .scene__stage { aspect-ratio: 4 / 3; } }
 
-/* ---- Green Tint page background (Jack, 20 November 2026) ----
-   Everything that was white becomes Green Tint. The header and footer stay white because the
-   logo files have a white background. Panels that were tint or mist become white so they still read. */
-body { background: var(--color-tint); }
-.promise-band,
-.honestly-box,
-.service-panel,
-.radio-chip__label,
-.form__about,
-.form-status[data-kind="ok"],
-.form-status[data-kind="pending"],
-.button--secondary:hover {
-  background: var(--color-white);
+/* ==========================================================================
+   Theme: four brand colours, mixed by rule (brand book 3.1 to 3.5)
+   1. White       #FFFFFF  the reading surface: most sections, cards on tint
+   2. Green Tint  #EDF5EC  every other band, page heads, panels on white
+   3. Ink         #0B0D0B  the bookends: hero at the top, call to action at the bottom, and all text
+   4. Deep Green  #2E6B29  the action colour: buttons, links, and one statement band per page
+   Rules: bands alternate white and tint so sections separate without lines; a panel always takes the
+   other light colour from its band; ink and green stay within the book's 70/20/10 split.
+   ========================================================================== */
+:root { --color-surface: var(--color-tint); } /* Mist is retired from the site so only four colours carry it. */
+
+.section--tint,
+.band--tint { background: var(--color-tint); }
+.band--tint { padding-bottom: clamp(40px, 5vw, 64px); margin-bottom: clamp(40px, 5vw, 64px); }
+.band--tint .service-figure { margin-bottom: 0; }
+
+/* Page heads on the simpler pages run edge to edge in tint. */
+.page-head {
+  background: var(--color-tint);
+  box-shadow: 0 0 0 100vmax var(--color-tint);
+  clip-path: inset(0 -100vmax);
+  max-width: none !important;
+  margin-top: calc(-1 * clamp(64px, 8vw, 112px));
+  margin-bottom: clamp(24px, 3vw, 40px) !important;
+  padding-block: clamp(48px, 6vw, 80px) clamp(32px, 4vw, 48px);
 }
-.radio-chip input:checked + .radio-chip__label { background: var(--color-white); border-width: 2px; }
-.promise-band, .honestly-box { border-color: #cfdccd; }
+.page-head > * { max-width: 800px; }
+
+/* A panel takes the other light colour from the band it sits in. */
+.section--tint .honestly-box, .section--tint .service-panel,
+.band--tint .honestly-box, .band--tint .service-panel { background: var(--color-white); }
+.radio-chip__label { background: var(--color-white); }
+.model--page figcaption { background: var(--color-white); }
+.model--page.model--ink figcaption { background: #0f120f; }
+
+/* The one Deep Green band: the promise, word for word, in white. */
+.promise-band { background: var(--color-signal-text); border: 0; }
+.promise-band h2 { color: var(--color-white); }
+.promise-band p { color: rgba(255, 255, 255, 0.9); }
+.promise-band ::selection { background: var(--color-white); color: var(--color-signal-text); }
+
+/* Audit fixes: form field edges need 3:1 against their background; hairlines need to show on tint. */
+.field input[type="text"], .field input[type="email"], .field input[type="tel"], .field textarea, .field select,
+.radio-chip__label { border-color: var(--color-ink-60); }
+.radio-chip input:checked + .radio-chip__label { border-color: var(--color-signal-text); background: var(--color-tint); box-shadow: inset 0 0 0 1px var(--color-signal-text); }
+.section--tint, .band--tint, .page-head, .service-panel, .honestly-box { --color-line: #C9D8C7; } /* A deeper tint of the same green (3.4). */
