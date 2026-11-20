@@ -1,6 +1,7 @@
 ---
 import Base from '../layouts/Base.astro';
 import Icon from '../components/Icon.astro';
+import { existsSync, readdirSync, statSync } from 'node:fs';
 import { allServices, architecturalServices, services, contact } from '../data/services';
 
 export function getStaticPaths() {
@@ -13,6 +14,13 @@ const peers = isArchitectural ? architecturalServices : services;
 
 const pillarName = isArchitectural ? 'ARCHITECTURAL' : 'BIM AND DIGITAL';
 const breadcrumb = `${pillarName} → ${service.short.toUpperCase()}`;
+
+// A walk-around 3D scene exported from Marble. It appears on the 3D visuals page only once the
+// export has been saved into public/scenes/ (.spz, .ply, .splat or .sog), with an optional scene.jpg still.
+const sceneFile = existsSync('public/scenes') ? readdirSync('public/scenes').find((f) => /\.(spz|ply|splat|sog)$/i.test(f)) : undefined;
+const showScene = service.figure === 'visual' && sceneFile;
+const sceneSize = showScene ? Math.max(1, Math.round(statSync(`public/scenes/${sceneFile}`).size / 1048576)) : 0;
+const scenePoster = existsSync('public/scenes/scene.jpg');
 
 const jsonLd = {
   '@context': 'https://schema.org',
@@ -106,6 +114,24 @@ const jsonLd = {
           <h2>Honestly?</h2>
           <p>{service.honestly}</p>
         </section>
+
+        {showScene && (
+          <section class="service-block">
+            <h2>Look around a scene.</h2>
+            <p>A 3D scene you can turn and zoom in the browser, with no app or headset. We can host one like this for your project.</p>
+            <figure class="scene" data-scene={`/scenes/${sceneFile}`} data-label="Interactive 3D scene. Drag to look around.">
+              <div class:list={["scene__stage", { "drawing-grid": !scenePoster }]}>
+                {scenePoster && <img class="scene__poster" src="/scenes/scene.jpg" alt="" loading="lazy" />}
+                <div class="scene__prompt">
+                  <button class="button button--action" type="button" data-scene-load>Load the 3D scene</button>
+                  <span class="mono small">About {sceneSize} MB · drag to look around</span>
+                </div>
+                <p class="scene__status mono small" role="status" hidden></p>
+              </div>
+              <figcaption class="mono small">Visualisation · illustrative, not a client project</figcaption>
+            </figure>
+          </section>
+        )}
 
         <!-- Additional Includes (if present) -->
         {service.includes && (
@@ -210,5 +236,5 @@ const jsonLd = {
     </nav>
   </div>
 
-  <script is:inline src="/js/model.js?v=22" defer></script>
+  <script is:inline src="/js/model.js?v=23" defer></script>
 </Base>

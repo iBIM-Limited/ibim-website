@@ -754,7 +754,7 @@
       if (mode === 'visual') {
         showRender();
       } else if (mode === 'journey') {
-        const load = () => import('/js/visual3d.js?v=12')
+        const load = () => import('/js/visual3d.js?v=13')
           .then((m) => model.attach(m.mount(root, { mode })))
           .catch((err) => {
             console.warn('3D animation unavailable', err);

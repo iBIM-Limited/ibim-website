@@ -8,6 +8,8 @@ const GONE = new Set([
   '/set-of-plates-cxlzwx', '/sunglasses-iubjnq', '/wooden-chair-mopukh', '/wool-sweater-lortoo',
 ]);
 
+const SCENE_PAGE = '/3d-visuals-and-real-time-visualisation';
+
 const SECURITY_HEADERS = {
   'Strict-Transport-Security': 'max-age=63072000; includeSubDomains; preload',
   'X-Content-Type-Options': 'nosniff',
@@ -86,6 +88,11 @@ export default {
 function secure(response, url) {
   const res = new Response(response.body, response);
   for (const [k, v] of Object.entries(SECURITY_HEADERS)) res.headers.set(k, v);
+  // The walk-around 3D scene needs WebAssembly and a background worker. Only its page is allowed them.
+  if (url.pathname === SCENE_PAGE) {
+    res.headers.set('Content-Security-Policy', SECURITY_HEADERS['Content-Security-Policy']
+      .replace("script-src 'self'", "script-src 'self' 'wasm-unsafe-eval'") + "; worker-src 'self' blob:");
+  }
   if (url.hostname !== CANONICAL_HOST) res.headers.set('X-Robots-Tag', 'noindex, nofollow');
   // Cache only successful responses, so a brief 404 during a deploy is never cached for a year.
   if (res.ok && /\.(js|css|png|jpg|webp|woff2?)$/.test(url.pathname)) {

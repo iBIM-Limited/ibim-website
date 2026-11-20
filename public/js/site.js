@@ -70,6 +70,29 @@
     });
   });
 
+  // Click-to-load 3D scene (large file, so it never downloads unasked)
+  document.querySelectorAll('[data-scene]').forEach((fig) => {
+    const btn = fig.querySelector('[data-scene-load]');
+    const status = fig.querySelector('.scene__status');
+    btn?.addEventListener('click', async () => {
+      fig.querySelector('.scene__prompt').hidden = true;
+      status.hidden = false;
+      status.textContent = 'Loading the scene…';
+      try {
+        const viewer = await import('/js/scene-viewer.js?v=1');
+        await Promise.race([
+          viewer.mount(fig, fig.dataset.scene),
+          new Promise((_, reject) => setTimeout(() => reject(new Error('Scene took too long to load')), 90000)),
+        ]);
+        status.hidden = true;
+        fig.classList.add('scene--live');
+      } catch (err) {
+        console.warn('3D scene unavailable', err);
+        status.textContent = 'This browser could not load the 3D scene.';
+      }
+    });
+  });
+
   // Validation helpers
   const isValidEmail = (val) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val);
   const isValidUKPhone = (val) => val.replace(/\D/g, '').length >= 10;
