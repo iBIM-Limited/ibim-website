@@ -1,9 +1,9 @@
-// Animated 3D scene: laser scan point cloud, then a BIM model in a shaded-with-edges view, ending on the render.
+// Animated 3D scene: laser scan point cloud, then a BIM model in a realistic model view, ending on the render.
 // Bundled to public/js/visual3d.js and loaded after the page, so it never delays the first paint.
 import {
-  BoxGeometry, BufferAttribute, BufferGeometry, Clock, DirectionalLight, DoubleSide, EdgesGeometry, Group, HemisphereLight,
-  LineBasicMaterial, LineSegments, Mesh, MeshLambertMaterial, PerspectiveCamera, Plane, Points, PointsMaterial, Scene, SRGBColorSpace,
-  Vector3, WebGLRenderer,
+  BoxGeometry, BufferAttribute, BufferGeometry, CanvasTexture, Clock, DirectionalLight, DoubleSide, EdgesGeometry, Group,
+  HemisphereLight, InstancedMesh, LineBasicMaterial, LineSegments, Mesh, MeshBasicMaterial, MeshLambertMaterial, Object3D,
+  PCFSoftShadowMap, PerspectiveCamera, Plane, Points, PointsMaterial, RepeatWrapping, Scene, SRGBColorSpace, Vector3, WebGLRenderer,
 } from 'three';
 
 // The building in the render: 30 m by 20 m, a brick ground floor and four glazed floors under a deep parapet.
@@ -42,28 +42,49 @@ export function mount(root, { mode = 'journey', onReady }) {
   renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
   renderer.outputColorSpace = SRGBColorSpace;
   renderer.localClippingEnabled = true;
+  renderer.shadowMap.enabled = true;
+  renderer.shadowMap.type = PCFSoftShadowMap;
   renderer.setClearColor(0x000000, 0);
 
   const scene = new Scene();
-  // Flat, even light: the look of a shaded model view, not a render.
-  const key = new DirectionalLight(0xffffff, 1.5);
-  key.position.set(-30, 60, 70);
-  scene.add(key);
-  scene.add(new HemisphereLight(0xffffff, 0xaab0aa, 1.5));
+  // Sun from the front left, as in the render: the entrance front is lit and the side return is in shade.
+  const sun = new DirectionalLight(0xfff4e2, 1.9);
+  sun.position.set(-42, 58, 52);
+  sun.castShadow = true;
+  sun.shadow.mapSize.set(small ? 1024 : 2048, small ? 1024 : 2048);
+  Object.assign(sun.shadow.camera, { left: -42, right: 42, top: 42, bottom: -42, near: 10, far: 190 });
+  sun.shadow.bias = -0.0005; sun.shadow.normalBias = 0.04; sun.shadow.radius = 4;
+  scene.add(sun);
+  scene.add(new HemisphereLight(0xeaf1f6, 0x8f8a80, 1.35));
 
   const reveal = new Plane(new Vector3(0, -1, 0), 0);
-  const clip = { clippingPlanes: [reveal] };
+  const clip = { clippingPlanes: [reveal], clipShadows: true };
   // Surfaces sit a hair behind their edge lines, so the lines stay crisp.
   const flat = (color, extra = {}) => new MeshLambertMaterial({ color, polygonOffset: true, polygonOffsetFactor: 1, polygonOffsetUnits: 1, ...clip, ...extra });
+  // Facing brick in stretcher bond, one tile of 8 bricks by 16 courses (1.8 m by 1.2 m).
+  const brickMap = (() => {
+    const c = document.createElement('canvas'); c.width = c.height = 512;
+    const x = c.getContext('2d');
+    x.fillStyle = '#b9b0a2'; x.fillRect(0, 0, 512, 512);
+    const bw = 64, bh = 32;
+    for (let r = 0; r < 16; r++) for (let i = -1; i < 8; i++) {
+      x.fillStyle = `hsl(${11 + rnd() * 7}, ${44 + rnd() * 12}%, ${37 + rnd() * 9}%)`;
+      x.fillRect(i * bw + (r % 2 ? bw / 2 : 0) + 1.5, r * bh + 1.5, bw - 3, bh - 3);
+    }
+    const t = new CanvasTexture(c);
+    t.wrapS = t.wrapT = RepeatWrapping; t.colorSpace = SRGBColorSpace; t.anisotropy = 8;
+    return t;
+  })();
+  const brick = (len, h) => { const t = brickMap.clone(); t.repeat.set(len / 1.8, h / 1.2); t.needsUpdate = true; return flat(0xffffff, { map: t }); };
+  // Materials taken from the render: off-white bands, dark anodised frames, grey-blue glass, pale paving.
   const M = {
-    white: flat(0xeceee9), wall: flat(0xb4b8b1), frame: flat(0x30342f), inside: flat(0xcfd3cd), roof: flat(0x9a9f98),
-    glass: flat(0x9fb9c4, { transparent: true, opacity: 0.3, depthWrite: false, side: DoubleSide }),
-    green: flat(0x43903c),
+    white: flat(0xece8de), frame: flat(0x2b2c2a), inside: flat(0xd9d6ce), roof: flat(0x8e918c), paving: flat(0xbcbab2, { transparent: true, opacity: 0 }),
+    glass: flat(0x7f9aa6, { transparent: true, opacity: 0.42, depthWrite: false, side: DoubleSide }),
   };
 
   const building = new Group();
   scene.add(building);
-  const edgePositions = [], coursePositions = [];
+  const edgePositions = [];
   const pushEdges = (w, h, d, x, y, z, target) => {
     const e = new EdgesGeometry(new BoxGeometry(w, h, d));
     const p = e.attributes.position;
@@ -75,6 +96,7 @@ export function mount(root, { mode = 'journey', onReady }) {
     const m = new Mesh(new BoxGeometry(w, h, d), mat);
     m.position.set(x, y, z);
     if (mat === M.glass) m.renderOrder = 2;
+    else { m.castShadow = true; m.receiveShadow = true; }
     building.add(m);
     if (edges) pushEdges(w, h, d, x, y, z, edgePositions);
     return m;
@@ -91,22 +113,23 @@ export function mount(root, { mode = 'journey', onReady }) {
 
   // Ground slab, floor plates with their white spandrel bands, and the parapet around a roof deck.
   solid(M.white, W + 0.6, 0.3, D + 0.6, 0, 0.15, 0);
+  // Paved apron around the building, to carry its shadow as the paving does in the render.
+  const apron = solid(M.paving, W + 16, 0.1, D + 18, 0, -0.05, 2, false);
+  apron.castShadow = false;
   for (let f = 1; f < FLOORS; f++) solid(M.white, W + 0.5, 0.6, D + 0.5, 0, f * FH, 0);
   FACADES.forEach((f) => onFacade(f, M.white, -f.len / 2 - 0.25, f.len / 2 + 0.25, H - 0.3, TOP, 0.5, 0));
   solid(M.roof, W, 0.2, D, 0, H + 0.3, 0, false);
-  solid(M.inside, 10, 1, 6, -3, H + 0.9, -1);
+  solid(M.roof, 10, 1, 6, -3, H + 0.9, -1);
+  // A dark shadow gap under the parapet and under each band, as the frames read in the render.
+  for (let f = 1; f <= FLOORS; f++) solid(M.frame, W + 0.3, 0.08, D + 0.3, 0, f * FH - 0.34, 0, false);
 
-  // Ground floor: brick walls between the entrance and window openings, drawn with their coursing.
+  // Ground floor: brick walls between the entrance and window openings, in facing brick.
   const OPENINGS = [[[-12.3, -10.2], [-4.6, 0.8], [4.3, 7.6]], [[-9, -6], [5, 8]], [[-6.5, -4.5], [0.5, 3]], [[-2, 1]]];
   FACADES.forEach((f, i) => {
     let from = -f.len / 2;
     [...OPENINGS[i], [f.len / 2, f.len / 2]].forEach(([a, b]) => {
       if (a > from) {
-        onFacade(f, M.wall, from, a, 0.3, FH - 0.3, 0.3);
-        for (let y = 0.6; y < FH - 0.3; y += 0.3) {
-          const [x0, z0] = f.at(from, 0.152), [x1, z1] = f.at(a, 0.152);
-          coursePositions.push(x0, y, z0, x1, y, z1);
-        }
+        onFacade(f, brick(a - from, FH - 0.6), from, a, 0.3, FH - 0.3, 0.3);
       }
       if (b > a) {
         // Glazed opening: glass, a frame around it, and a mullion every metre or so.
@@ -134,8 +157,14 @@ export function mount(root, { mode = 'journey', onReady }) {
     });
     for (const x of [-10, -10 / 3, 10 / 3, 10]) for (const z of [-5.5, 5.5]) solid(M.inside, 0.45, FH - 0.6, 0.45, x, f * FH + FH / 2, z);
     solid(M.inside, 6, FH - 0.6, 5, 7, f * FH + FH / 2, -2);
-    solid(M.green, W - 8, 0.4, 1, -1, (f + 1) * FH - 0.75, 1.5);
   }
+  // Ceiling light panels on the office floors, seen through the glazing as in the render.
+  const lightSpots = [];
+  for (let f = 1; f < FLOORS; f++) for (let i = 0; i < 9; i++) for (const z of [7, 3.5, 0, -3.5, -7]) lightSpots.push([-W / 2 + BAY * (i + 0.5), (f + 1) * FH - 0.4, z]);
+  const lights = new InstancedMesh(new BoxGeometry(1.5, 0.05, 0.3), new MeshBasicMaterial({ color: 0xfff7e6, ...clip }), lightSpots.length);
+  const dummy = new Object3D();
+  lightSpots.forEach(([x, y, z], i) => { dummy.position.set(x, y, z); dummy.updateMatrix(); lights.setMatrixAt(i, dummy.matrix); });
+  building.add(lights);
 
   const lines = (positions, color, opacity) => {
     const g = new BufferGeometry();
@@ -144,8 +173,7 @@ export function mount(root, { mode = 'journey', onReady }) {
     building.add(l);
     return l;
   };
-  lines(edgePositions, 0x0b0d0b, 0.9);
-  lines(coursePositions, 0x6f746d, 0.55);
+  lines(edgePositions, 0x1b1d1b, 0.6);
 
   // Setting-out grid on the ground.
   const gridPos = [];
@@ -155,23 +183,6 @@ export function mount(root, { mode = 'journey', onReady }) {
   gridGeo.setAttribute('position', new BufferAttribute(new Float32Array(gridPos), 3));
   const groundGrid = new LineSegments(gridGeo, new LineBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.15 }));
   scene.add(groundGrid);
-
-  // Structural frame, drawn on in light lines before the model fills in. Services are the one green element.
-  const wirePositions = [], wireGreenPositions = [];
-  for (let f = 0; f < FLOORS; f++) {
-    pushEdges(W, 0.3, D, 0, (f + 1) * FH - 0.15, 0, wirePositions);
-    for (const x of [-15, -10, -10 / 3, 10 / 3, 10, 15]) for (const z of [-10, -5.5, 5.5, 10]) pushEdges(0.42, FH - 0.3, 0.42, x, f * FH + FH / 2 - 0.15, z, wirePositions);
-    for (const z of [-10, -5.5, 5.5, 10]) pushEdges(W, 0.45, 0.28, 0, (f + 1) * FH - 0.52, z, wirePositions);
-    if (f) pushEdges(W - 8, 0.4, 1, -1, (f + 1) * FH - 0.75, 1.5, wireGreenPositions);
-  }
-  const wireGeo = new BufferGeometry();
-  wireGeo.setAttribute('position', new BufferAttribute(new Float32Array(wirePositions), 3));
-  const wire = new LineSegments(wireGeo, new LineBasicMaterial({ color: 0xdde2db, transparent: true, opacity: 0 }));
-  scene.add(wire);
-  const wireGreenGeo = new BufferGeometry();
-  wireGreenGeo.setAttribute('position', new BufferAttribute(new Float32Array(wireGreenPositions), 3));
-  const wireGreen = new LineSegments(wireGreenGeo, new LineBasicMaterial({ color: 0x7bc474, transparent: true, opacity: 0 }));
-  scene.add(wireGreen);
 
   // Point cloud stage: intensity greyscale on ink, with a green sweep at the front of the scan.
   const scanPoints = [];
@@ -220,7 +231,7 @@ export function mount(root, { mode = 'journey', onReady }) {
     li.textContent = labelText;
     li.dataset.stage = String(index);
     li.addEventListener('click', () => {
-      const stageTimes = [1.8, 5.6, 10.8];
+      const stageTimes = [1.8, 6.4, 10.8];
       t = stageTimes[index];
       offset = t;
       running = index < 2 && !reduced;
@@ -251,7 +262,7 @@ export function mount(root, { mode = 'journey', onReady }) {
 
   function apply(time) {
     const seg = (a, b) => ease(clamp((time - a) / (b - a)));
-    const cloudAlpha = 1 - seg(4.2, 6.8);
+    const cloudAlpha = 1 - seg(4.6, 7.4);
     cloud.visible = cloudAlpha > 0;
     cloud.material.opacity = cloudAlpha;
 
@@ -283,18 +294,9 @@ export function mount(root, { mode = 'journey', onReady }) {
       colAttr.needsUpdate = true;
     }
 
-    const wireAlpha = seg(3.2, 5.2) * (1 - seg(6.4, 8.2));
-    wire.material.opacity = wireAlpha * 0.65;
-    wireGreen.material.opacity = wireAlpha;
-    wire.visible = wireGreen.visible = wireAlpha > 0;
-
-    // Progressive wireframe draw-on
-    const wireDraw = ease(clamp((time - 3.0) / 2.4));
-    wireGeo.setDrawRange(0, Math.floor((wirePositions.length / 3) * wireDraw));
-    wireGreenGeo.setDrawRange(0, Math.floor((wireGreenPositions.length / 3) * wireDraw));
-
-    // The model rises floor by floor through the frame.
-    const build = seg(5.4, 8.4);
+    // The model rises floor by floor through the scan it was built from.
+    const build = seg(3.8, 7.8);
+    M.paving.opacity = seg(3.8, 5.4);
     reveal.constant = build * (TOP + 2.5);
     building.visible = build > 0;
 
