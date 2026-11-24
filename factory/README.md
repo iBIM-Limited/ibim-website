@@ -11,7 +11,7 @@ the code owner merges it. The rules agents follow are in [`AGENTS.md`](../AGENTS
 | Spec approved by the owner | Ticket status, before any code |
 | Dependency audit, typecheck and build green | `ci` check |
 | Every test runs and passes; none skipped; no fewer passing than on `main` | `ci` check, which runs the tests with a fixed command and reads the runner's own totals |
-| No deleted or renamed test files, no skip/only/todo markers, no test files outside `tests/`, test and assertion counts not lower | `guard` check |
+| No deleted or renamed test files, no skip/only/todo markers, no test files the runner would miss, assertion count not lower | `guard` check |
 | PR targets `main`; checks re-run if the title or target changes | `guard`, `ci` and `codeql` triggers |
 | Rules changes are announced: title must start with `Rules: ` | `guard` check |
 | Changed existing tests or build/test scripts flagged | `guard` warnings, repeated in the handover |

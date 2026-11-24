@@ -9,6 +9,11 @@ on:
   schedule:
     - cron: '23 6 * * 1'
 
+# A newer run for the same PR replaces an older one.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
 permissions:
   contents: read
 

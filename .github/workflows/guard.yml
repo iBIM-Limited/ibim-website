@@ -8,6 +8,11 @@ on:
     # "edited" re-runs the check when a PR's title or target branch is changed.
     types: [opened, synchronize, reopened, edited]
 
+# A newer run for the same PR replaces an older one.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
 permissions:
   contents: read
 
@@ -36,6 +41,8 @@ jobs:
             echo "::error::Pull requests must target main, not $BASE_REF"; exit 1
           fi
           git rev-parse --verify --quiet "$BASE^{commit}" > /dev/null
+          # List file names as they are, so unusual characters cannot hide a file from the steps below.
+          git config --global core.quotePath false
 
       - name: No deleted or renamed test files
         run: |
@@ -45,12 +52,13 @@ jobs:
             echo "::error::Test files deleted or renamed:"; echo "$gone"; exit 1
           fi
 
-      - name: Every test file is where the test runner looks
+      - name: Every test file is one the test runner runs
         run: |
           all=$(git ls-files)
-          stray=$(grep -E '\.(test|spec)\.[cm]?[jt]sx?$' <<< "$all" | grep -v '^tests/' || true)
+          named=$(grep -E '(\.(test|spec)\.[A-Za-z]+$|_test\.[A-Za-z]+$|(^|/)__tests__/)' <<< "$all" || true)
+          stray=$(grep -vE '^tests/(.*/)?[^/]+\.test\.ts$' <<< "$named" || true)
           if [ -n "$stray" ]; then
-            echo "::error::Test files outside tests/ are never run:"; echo "$stray"; exit 1
+            echo "::error::These test files are never run (tests must be tests/**/*.test.ts):"; echo "$stray"; exit 1
           fi
 
       - name: No skipped, focused or environment-dependent tests
@@ -58,35 +66,39 @@ jobs:
           changed=$(git diff --no-renames --name-only "$BASE"...HEAD)
           tests=$(grep -E "$TEST_FILES" <<< "$changed" || true)
           [ -z "$tests" ] && exit 0
-          files=(); while read -r f; do files+=("$f"); done <<< "$tests"
+          files=(); while IFS= read -r f; do files+=("$f"); done <<< "$tests"
           diff=$(git diff --no-renames "$BASE"...HEAD -- "${files[@]}")
           added=$(grep -E '^\+[^+]' <<< "$diff" || true)
-          hits=$(grep -E '(\.(skip|only|todo)\b|\b(skip|only|todo)\s*:|\b(xit|xdescribe|xtest)\b|process\.env)' <<< "$added" || true)
+          q="['\"\`]"
+          m="(skip|only|todo)"
+          markers="\.$m\b|\[\s*$q$m$q|[{,]\s*$m\s*[:,}]|^\+\s*$m\s*[:,]|\b(xit|xdescribe|xtest)\b"
+          environment="\bprocess\s*[.[]|$q(node:)?process$q"
+          hits=$(grep -E "($markers|$environment)" <<< "$added" || true)
           if [ -n "$hits" ]; then
-            echo "::error::Tests must not be skipped, focused, marked todo or depend on the environment:"
+            echo "::error::Tests must not be skipped, focused, marked todo or read the environment:"
             echo "$hits"; exit 1
           fi
 
-      - name: Test and assertion counts do not go down
+      - name: Assertion count does not go down
         run: |
-          count() { # <ref> <pattern>
+          count() { # <ref> <pattern>: matching lines in that ref's test files, ignoring comment lines
             local files f total=0 n
             files=$(git ls-tree -r --name-only "$1")
             files=$(grep -E "$TEST_FILES" <<< "$files" | grep -E '\.[cm]?[jt]sx?$' || true)
             [ -z "$files" ] && { echo 0; return; }
-            while read -r f; do
-              n=$(git show "$1:$f" | grep -cE "$2" || true)
+            while IFS= read -r f; do
+              n=$(git show "$1:$f" | grep -vE '^\s*(//|/\*|\*)' | grep -cE "$2" || true)
               total=$((total + n))
             done <<< "$files"
             echo "$total"
           }
-          tests='^\s*(test|it)\s*\('
+          tests='(^|[^.[:alnum:]_])(test|it)\s*\('
           asserts='\b(assert(\.[a-zA-Z]+)?|expect)\s*\('
           tb=$(count "$BASE" "$tests"); ta=$(count HEAD "$tests")
           ab=$(count "$BASE" "$asserts"); aa=$(count HEAD "$asserts")
-          echo "Tests: $tb on base, $ta on this PR. Assertions: $ab on base, $aa on this PR."
-          echo "Tests: $tb on base, $ta on this PR. Assertions: $ab on base, $aa on this PR." >> "$GITHUB_STEP_SUMMARY"
-          if [ "$ta" -lt "$tb" ]; then echo "::error::Test count went down from $tb to $ta"; exit 1; fi
+          echo "Assertions: $ab on main, $aa on this PR. Test declarations: $tb on main, $ta on this PR." | tee -a "$GITHUB_STEP_SUMMARY"
+          # ci counts the tests that really run; this text count is only a hint.
+          if [ "$ta" -lt "$tb" ]; then echo "::warning::Fewer test declarations than on main ($tb to $ta)"; fi
           if [ "$aa" -lt "$ab" ]; then echo "::error::Assertion count went down from $ab to $aa"; exit 1; fi
 
       - name: Rules changes must be announced in the PR title

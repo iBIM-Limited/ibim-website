@@ -33,8 +33,9 @@ the site or touches the live database. Deploys are done by the owner by hand.
 5. **CI decides.** "Tests pass" from an agent does not count. Only green `ci`, `guard` and `codeql`
    runs on the PR count.
 6. **Never delete, skip or weaken a test to get green.** That is a failure, not a fix. Stop and report.
-   The checks fail on deleted or renamed test files, skip/only/todo markers, tests that read
-   `process.env`, test files outside `tests/`, and a drop in the number of tests or assertions.
+   The checks fail on deleted or renamed test files, skipped, focused or todo tests, tests that
+   read the environment (`process`), test files the runner would not run (anything but
+   `tests/**/*.test.ts`), fewer passing tests than on `main`, and a drop in the number of assertions.
 7. **Two CI attempts per ticket.** If the second push is still red, stop, report on the ticket, and
    move it to Blocked. Never push a third time.
 8. **No acceptance criteria that code can check, no build.** Send the ticket back instead.

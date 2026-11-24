@@ -5,6 +5,9 @@ updates:
     directory: /
     schedule:
       interval: monthly
+    # These PRs change workflow files, so their titles must start with "Rules: ".
+    commit-message:
+      prefix: 'Rules'
     groups:
       actions:
         patterns: ['*']
