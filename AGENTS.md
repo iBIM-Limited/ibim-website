@@ -98,3 +98,5 @@ Link: <PR url>
 ```
 
 If `guard` warns that existing tests changed, say so at the top of the handover.
+
+<!-- Break-it test: unreviewed rules change. Never merge. -->
