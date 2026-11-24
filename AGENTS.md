@@ -10,10 +10,10 @@ and the enquiry forms. See `README.md` for the layout.
 
 | Task | Command |
 |---|---|
-| Install | `npm ci` |
+| Install | `npm ci` (packages' install scripts are switched off in `.npmrc`) |
 | Build | `npm run build` (also rebuilds `public/js/*` from `src/3d/`) |
 | Typecheck | `npm run typecheck` (`astro check`) |
-| Test | `npm test` (Node's built-in test runner, tests in `tests/*.test.ts`) |
+| Test | `npm test` (Node's built-in test runner; every test lives in `tests/**/*.test.ts`) |
 | Dependency audit | `npm audit --audit-level=high` |
 | Lint | none set up yet |
 
@@ -30,9 +30,11 @@ the site or touches the live database. Deploys are done by the owner by hand.
    never change rulesets, branch protection, repo settings or visibility.
 4. **Agents cannot change their own rules.** `AGENTS.md`, `CLAUDE.md`, `.claude/`, `.github/`,
    `factory/` and `CODEOWNERS` change only through a PR the code owner reviews.
-5. **CI decides.** "Tests pass" from an agent does not count. Only a green `ci` and `guard` run on
-   the PR counts.
+5. **CI decides.** "Tests pass" from an agent does not count. Only green `ci`, `guard` and `codeql`
+   runs on the PR count.
 6. **Never delete, skip or weaken a test to get green.** That is a failure, not a fix. Stop and report.
+   The checks fail on deleted or renamed test files, skip/only/todo markers, tests that read
+   `process.env`, test files outside `tests/`, and a drop in the number of tests or assertions.
 7. **Two CI attempts per ticket.** If the second push is still red, stop, report on the ticket, and
    move it to Blocked. Never push a third time.
 8. **No acceptance criteria that code can check, no build.** Send the ticket back instead.
@@ -60,6 +62,12 @@ the site or touches the live database. Deploys are done by the owner by hand.
   Plain `gh` is the owner's account: never use it for anything that writes.
 - Never use a harness's built-in "create pull request" or merge tool or button. They act as the owner.
 - Never read the `gh` config directory, run `gh auth token`, or print any credential.
+- Pull requests target `main` only.
+- A PR that changes rules files (`AGENTS.md`, `CLAUDE.md`, `CODEOWNERS`, `.npmrc`, `.claude/`,
+  `.github/`, `factory/`) must have a title starting with `Rules: `, so the owner can see it at a
+  glance. Never mix a rules change into a ticket's PR.
+- The agent account is not meant to be able to push workflow files. If a ticket needs a change
+  under `.github/workflows/`, stop and ask the owner.
 
 ## The loop, per ticket
 
@@ -89,7 +97,7 @@ FAC-<n> is ready to merge (about <x> min to check)
 What it does: <two plain-English sentences>
 Try it: <numbered steps> → you should see <result>
 Evidence: <screenshot or recording link>
-Checks: ci <green/red>, guard <green/red>, attempts used <n>/2
+Checks: ci <green/red>, guard <green/red>, codeql <green/red>, attempts used <n>/2
 Files touched: <list>. Anything outside what the ticket is about: none / <which and why>
 Existing tests changed: no / YES: <which and why>
 Reviewer verdict: <one line>

@@ -13,6 +13,10 @@ updates:
     schedule:
       interval: monthly
     open-pull-requests-limit: 2
+    # Major versions can break the build; they are done as a ticket instead.
+    ignore:
+      - dependency-name: '*'
+        update-types: ['version-update:semver-major']
     groups:
       npm-minor-and-patch:
         update-types: [minor, patch]

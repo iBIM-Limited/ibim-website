@@ -1,7 +1,11 @@
 name: ci
 
+# The test command and the pass rules are inline on purpose, so a PR cannot change
+# how tests are run by editing package.json or a script file.
 on:
   pull_request:
+    branches: [main]
+    types: [opened, synchronize, reopened, edited]
   push:
     branches: [main]
 
@@ -12,6 +16,9 @@ jobs:
   ci:
     runs-on: ubuntu-latest
     timeout-minutes: 15
+    defaults:
+      run:
+        shell: bash -euo pipefail {0}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -29,14 +36,49 @@ jobs:
         run: npm audit --audit-level=high
 
       - name: Typecheck
-        run: npm run typecheck
+        run: npx --no-install astro check
 
       - name: Build
         run: npm run build
 
       - name: Build leaves no uncommitted changes
         # build:3d rewrites public/js; the committed bundles must match the sources.
-        run: git diff --exit-code
+        run: |
+          dirty=$(git status --porcelain)
+          if [ -n "$dirty" ]; then echo "::error::The build changed or created files:"; echo "$dirty"; exit 1; fi
 
       - name: Tests
-        run: npm test
+        env:
+          IS_PR: ${{ github.event_name == 'pull_request' }}
+        run: |
+          run_tests() { # <dir> <output file>; the summary is checked below, not the exit code
+            (cd "$1" && node --test --test-reporter=tap 'tests/**/*.test.ts') > "$2" 2>&1 || true
+          }
+          field() { # <output file> <name>: read one number from the runner's closing summary
+            tail -n 12 "$1" | sed -n "s/^# $2 \([0-9][0-9]*\)$/\1/p" | tail -n 1
+          }
+          out="$RUNNER_TEMP/head.tap"
+          run_tests . "$out"; cat "$out"
+          total=$(field "$out" tests); pass=$(field "$out" pass); fail=$(field "$out" fail)
+          skipped=$(field "$out" skipped); todo=$(field "$out" todo); cancelled=$(field "$out" cancelled)
+          for v in "$total" "$pass" "$fail" "$skipped" "$todo" "$cancelled"; do
+            [ -n "$v" ] || { echo "::error::Could not read the test summary"; exit 1; }
+          done
+          echo "Tests run: $total. Passed: $pass. Failed: $fail. Skipped: $skipped. Todo: $todo. Cancelled: $cancelled." | tee -a "$GITHUB_STEP_SUMMARY"
+          [ "$total" -gt 0 ] || { echo "::error::No tests ran"; exit 1; }
+          [ "$fail" -eq 0 ] && [ "$cancelled" -eq 0 ] || { echo "::error::Tests failed"; exit 1; }
+          [ "$skipped" -eq 0 ] && [ "$todo" -eq 0 ] || { echo "::error::Skipped or todo tests are not allowed"; exit 1; }
+          [ "$pass" -eq "$total" ] || { echo "::error::Not every test passed"; exit 1; }
+
+          if [ "$IS_PR" = "true" ]; then
+            # Run main's own tests the same way and require at least as many passing here.
+            git fetch --quiet --depth=1 origin main
+            base="$RUNNER_TEMP/base"
+            git worktree add --quiet --detach "$base" FETCH_HEAD
+            ln -s "$PWD/node_modules" "$base/node_modules"
+            run_tests "$base" "$RUNNER_TEMP/base.tap"
+            base_total=$(field "$RUNNER_TEMP/base.tap" tests)
+            [ -n "$base_total" ] || { echo "::error::Could not read main's test summary"; exit 1; }
+            echo "Tests on main: $base_total. Passing on this PR: $pass." | tee -a "$GITHUB_STEP_SUMMARY"
+            [ "$pass" -ge "$base_total" ] || { echo "::error::Fewer tests pass here ($pass) than exist on main ($base_total)"; exit 1; }
+          fi

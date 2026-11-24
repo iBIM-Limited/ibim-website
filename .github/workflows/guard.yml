@@ -1,6 +1,12 @@
 name: guard
 
-on: pull_request
+# All logic is inline on purpose: a script file in the repo could be edited by a PR,
+# while workflow files can only be changed by an account allowed to push workflows.
+on:
+  pull_request:
+    branches: [main]
+    # "edited" re-runs the check when a PR's title or target branch is changed.
+    types: [opened, synchronize, reopened, edited]
 
 permissions:
   contents: read
@@ -9,8 +15,13 @@ jobs:
   guard:
     runs-on: ubuntu-latest
     timeout-minutes: 5
+    defaults:
+      run:
+        shell: bash -euo pipefail {0}
     env:
       BASE: origin/${{ github.base_ref }}
+      BASE_REF: ${{ github.base_ref }}
+      PR_TITLE: ${{ github.event.pull_request.title }}
       # Files that count as tests.
       TEST_FILES: '(\.test\.|\.spec\.|_test\.|(^|/)tests?/|__tests__/)'
     steps:
@@ -19,49 +30,87 @@ jobs:
           fetch-depth: 0
           persist-credentials: false
 
+      - name: PR targets main and the base is readable
+        run: |
+          if [ "$BASE_REF" != "main" ]; then
+            echo "::error::Pull requests must target main, not $BASE_REF"; exit 1
+          fi
+          git rev-parse --verify --quiet "$BASE^{commit}" > /dev/null
+
       - name: No deleted or renamed test files
         run: |
-          gone=$(git diff --no-renames --diff-filter=D --name-only "$BASE"...HEAD | grep -E "$TEST_FILES" || true)
+          removed=$(git diff --no-renames --diff-filter=D --name-only "$BASE"...HEAD)
+          gone=$(grep -E "$TEST_FILES" <<< "$removed" || true)
           if [ -n "$gone" ]; then
             echo "::error::Test files deleted or renamed:"; echo "$gone"; exit 1
           fi
 
-      - name: No newly skipped or focused tests
+      - name: Every test file is where the test runner looks
         run: |
-          # Code files only, so docs that mention these markers do not trip it.
-          added=$(git diff --no-renames "$BASE"...HEAD -- '*.ts' '*.tsx' '*.js' '*.jsx' '*.mjs' '*.cjs' '*.astro' | grep -E '^\+[^+]' || true)
-          hits=$(printf '%s\n' "$added" | grep -E '(\.(skip|only|todo)\s*\(|\b(xit|xdescribe|xtest)\s*\(|\b(skip|only|todo)\s*:\s*(true|['"'"'"`]))' || true)
+          all=$(git ls-files)
+          stray=$(grep -E '\.(test|spec)\.[cm]?[jt]sx?$' <<< "$all" | grep -v '^tests/' || true)
+          if [ -n "$stray" ]; then
+            echo "::error::Test files outside tests/ are never run:"; echo "$stray"; exit 1
+          fi
+
+      - name: No skipped, focused or environment-dependent tests
+        run: |
+          changed=$(git diff --no-renames --name-only "$BASE"...HEAD)
+          tests=$(grep -E "$TEST_FILES" <<< "$changed" || true)
+          [ -z "$tests" ] && exit 0
+          files=(); while read -r f; do files+=("$f"); done <<< "$tests"
+          diff=$(git diff --no-renames "$BASE"...HEAD -- "${files[@]}")
+          added=$(grep -E '^\+[^+]' <<< "$diff" || true)
+          hits=$(grep -E '(\.(skip|only|todo)\b|\b(skip|only|todo)\s*:|\b(xit|xdescribe|xtest)\b|process\.env)' <<< "$added" || true)
           if [ -n "$hits" ]; then
-            echo "::error::New skip/only/todo markers found:"; echo "$hits"; exit 1
+            echo "::error::Tests must not be skipped, focused, marked todo or depend on the environment:"
+            echo "$hits"; exit 1
           fi
 
-      - name: Test count does not go down
+      - name: Test and assertion counts do not go down
         run: |
-          count() {
-            git ls-tree -r --name-only "$1" | grep -E "$TEST_FILES" | grep -E '\.(ts|js|mjs|cjs|tsx|jsx)$' \
-              | while read -r f; do git show "$1:$f"; done \
-              | grep -cE '(^|[^.[:alnum:]_])(test|it)\s*\(' || true
+          count() { # <ref> <pattern>
+            local files f total=0 n
+            files=$(git ls-tree -r --name-only "$1")
+            files=$(grep -E "$TEST_FILES" <<< "$files" | grep -E '\.[cm]?[jt]sx?$' || true)
+            [ -z "$files" ] && { echo 0; return; }
+            while read -r f; do
+              n=$(git show "$1:$f" | grep -cE "$2" || true)
+              total=$((total + n))
+            done <<< "$files"
+            echo "$total"
           }
-          before=$(count "$BASE"); after=$(count HEAD)
-          echo "Tests on base: $before. Tests on this PR: $after."
-          echo "Test count: $before on base, $after on this PR." >> "$GITHUB_STEP_SUMMARY"
-          if [ "$after" -lt "$before" ]; then
-            echo "::error::Test count went down from $before to $after"; exit 1
+          tests='^\s*(test|it)\s*\('
+          asserts='\b(assert(\.[a-zA-Z]+)?|expect)\s*\('
+          tb=$(count "$BASE" "$tests"); ta=$(count HEAD "$tests")
+          ab=$(count "$BASE" "$asserts"); aa=$(count HEAD "$asserts")
+          echo "Tests: $tb on base, $ta on this PR. Assertions: $ab on base, $aa on this PR."
+          echo "Tests: $tb on base, $ta on this PR. Assertions: $ab on base, $aa on this PR." >> "$GITHUB_STEP_SUMMARY"
+          if [ "$ta" -lt "$tb" ]; then echo "::error::Test count went down from $tb to $ta"; exit 1; fi
+          if [ "$aa" -lt "$ab" ]; then echo "::error::Assertion count went down from $ab to $aa"; exit 1; fi
+
+      - name: Rules changes must be announced in the PR title
+        run: |
+          changed=$(git diff --no-renames --name-only "$BASE"...HEAD)
+          protected=$(grep -E '^(AGENTS\.md|CLAUDE\.md|CODEOWNERS|\.npmrc|\.claude/|\.github/|factory/)' <<< "$changed" || true)
+          [ -z "$protected" ] && exit 0
+          { echo "### Rules files changed"; echo "$protected"; } >> "$GITHUB_STEP_SUMMARY"
+          echo "::warning::Rules files changed: $(echo $protected)"
+          if [[ "$PR_TITLE" != "Rules: "* ]]; then
+            echo "::error::This PR changes rules files, so its title must start with 'Rules: '"; exit 1
           fi
 
-      - name: Flag changed existing tests
+      - name: Flag changed existing tests and scripts
         run: |
-          changed=$(git diff --no-renames --diff-filter=M --name-only "$BASE"...HEAD | grep -E "$TEST_FILES" || true)
-          if [ -n "$changed" ]; then
-            echo "::warning::Existing tests were changed: $(echo $changed)"
-            { echo "### Existing tests changed"; echo "$changed"; } >> "$GITHUB_STEP_SUMMARY"
+          modified=$(git diff --no-renames --diff-filter=M --name-only "$BASE"...HEAD)
+          tests=$(grep -E "$TEST_FILES" <<< "$modified" || true)
+          if [ -n "$tests" ]; then
+            echo "::warning::Existing tests were changed: $(echo $tests)"
+            { echo "### Existing tests changed"; echo "$tests"; } >> "$GITHUB_STEP_SUMMARY"
           fi
-
-      - name: Note changes to protected paths
-        run: |
-          protected=$(git diff --no-renames --name-only "$BASE"...HEAD \
-            | grep -E '^(AGENTS\.md|CLAUDE\.md|CODEOWNERS|\.claude/|\.github/|factory/)' || true)
-          if [ -n "$protected" ]; then
-            echo "::warning::Protected rules files changed (code-owner review required): $(echo $protected)"
-            { echo "### Protected paths changed"; echo "$protected"; } >> "$GITHUB_STEP_SUMMARY"
+          pkg=$(git diff --no-renames "$BASE"...HEAD -- package.json)
+          scripts=$(grep -E '^[+-]\s+"(test|typecheck|build[^"]*)"\s*:' <<< "$pkg" || true)
+          if [ -n "$scripts" ]; then
+            echo "::warning::package.json build or test scripts were changed"
+            { echo "### package.json scripts changed"; echo '```'; echo "$scripts"; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
           fi
