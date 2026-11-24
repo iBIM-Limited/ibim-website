@@ -25,6 +25,12 @@ jobs:
       - name: Install from lockfile
         run: npm ci --no-audit --no-fund
 
+      - name: Dependency audit (fails on high or critical)
+        run: npm audit --audit-level=high
+
+      - name: Typecheck
+        run: npm run typecheck
+
       - name: Build
         run: npm run build
 

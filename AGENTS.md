@@ -12,8 +12,10 @@ and the enquiry forms. See `README.md` for the layout.
 |---|---|
 | Install | `npm ci` |
 | Build | `npm run build` (also rebuilds `public/js/*` from `src/3d/`) |
+| Typecheck | `npm run typecheck` (`astro check`) |
 | Test | `npm test` (Node's built-in test runner, tests in `tests/*.test.ts`) |
-| Lint / typecheck | none set up yet |
+| Dependency audit | `npm audit --audit-level=high` |
+| Lint | none set up yet |
 
 Node 24 or newer. Never run `npm run deploy`, `wrangler deploy` or any other command that publishes
 the site or touches the live database. Deploys are done by the owner by hand.
@@ -70,8 +72,8 @@ for example `fac-12-date-filter`.
    then what will change, which files, which test proves each criterion, and open questions.
    No code yet. Aim for under about 300 changed lines; propose a split if it needs more.
 3. **Wait** until the owner moves the ticket to Approved.
-4. **Build.** Tests first for each criterion, then the code. Run `npm run build` and `npm test`
-   locally before pushing.
+4. **Build.** Tests first for each criterion, then the code. Run `npm run typecheck`,
+   `npm run build` and `npm test` locally before pushing.
 5. **CI attempt 1.** Open the PR as ibim-agent with the template filled in.
 6. **CI attempt 2** only if attempt 1 is red: read the failure, fix the cause, push once more.
    Still red: stop, report on the ticket (what failed, what was tried, best guess), move to Blocked.

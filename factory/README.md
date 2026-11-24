@@ -9,7 +9,8 @@ the code owner merges it. The rules agents follow are in [`AGENTS.md`](../AGENTS
 |---|---|
 | Ticket has acceptance criteria code can check | Intake, before any spec |
 | Spec approved by the owner | Ticket status, before any code |
-| Build and tests green | `ci` check (`.github/workflows/ci.yml`) |
+| Dependency audit, typecheck, build and tests green | `ci` check (`.github/workflows/ci.yml`) |
+| Static security scan | `codeql` check (`.github/workflows/codeql.yml`) |
 | No deleted, renamed or skipped tests; test count not lower | `guard` check (`.github/workflows/guard.yml`) |
 | Changed existing tests or rules files flagged | `guard` warnings, repeated in the handover |
 | Rules files reviewed by the owner | `CODEOWNERS` |
