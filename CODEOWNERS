@@ -1,0 +1,9 @@
+# Everything needs the owner's review. Rules files are listed explicitly so they stay owned
+# even if the line above is ever narrowed.
+*           @jackward11
+/AGENTS.md  @jackward11
+/CLAUDE.md  @jackward11
+/.claude/   @jackward11
+/.github/   @jackward11
+/factory/   @jackward11
+/CODEOWNERS @jackward11
