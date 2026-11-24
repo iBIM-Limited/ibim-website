@@ -1,9 +1,18 @@
 name: ci
 
+# The test command and the pass rules are inline on purpose, so a PR cannot change
+# how tests are run by editing package.json or a script file.
 on:
   pull_request:
+    branches: [main]
+    types: [opened, synchronize, reopened, edited]
   push:
     branches: [main]
+
+# A newer run for the same PR replaces an older one.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
 
 permissions:
   contents: read
@@ -12,6 +21,9 @@ jobs:
   ci:
     runs-on: ubuntu-latest
     timeout-minutes: 15
+    defaults:
+      run:
+        shell: bash -euo pipefail {0}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -23,20 +35,67 @@ jobs:
           cache: npm
 
       - name: Install from lockfile
-        run: npm ci --no-audit --no-fund
+        # Install scripts are off here as well as in .npmrc, so no code from the PR has run yet.
+        run: npm ci --ignore-scripts --no-audit --no-fund
+
+      - name: Tests
+        # Runs before the build, so nothing a PR's build could do can change how tests run.
+        env:
+          IS_PR: ${{ github.event_name == 'pull_request' }}
+        run: |
+          node_bin=$(command -v node)
+          run_tests() { # <dir>: prints the runner's output and returns its exit code
+            (cd "$1" && env -u NODE_OPTIONS "$node_bin" --test --test-reporter=tap 'tests/**/*.test.ts' 2>&1)
+          }
+          summary() { # <output>: sets s_tests, s_pass, ... from the runner's closing summary
+            local name
+            for name in tests pass fail cancelled skipped todo; do
+              # Exactly one such line may exist, so a test cannot print a second summary.
+              if [ "$(grep -cE "^# $name [0-9]+$" <<< "$1" || true)" != "1" ]; then
+                echo "::error::Test summary line '$name' is missing or repeated"; return 1
+              fi
+              printf -v "s_$name" %s "$(sed -n "s/^# $name \([0-9][0-9]*\)$/\1/p" <<< "$1")"
+            done
+          }
+
+          base_total=""
+          if [ "$IS_PR" = "true" ]; then
+            # main's own tests, with main's own packages, before any test from this PR runs.
+            git fetch --quiet --depth=1 origin main
+            base="$RUNNER_TEMP/base"
+            git -c core.hooksPath=/dev/null worktree add --quiet --detach "$base" FETCH_HEAD
+            (cd "$base" && npm ci --ignore-scripts --no-audit --no-fund > /dev/null)
+            out=$(run_tests "$base") || true
+            summary "$out"
+            base_total=$s_tests
+          fi
+
+          rc=0
+          out=$(run_tests .) || rc=$?
+          echo "$out"
+          summary "$out"
+          echo "Tests run: $s_tests. Passed: $s_pass. Failed: $s_fail. Skipped: $s_skipped. Todo: $s_todo. Cancelled: $s_cancelled." | tee -a "$GITHUB_STEP_SUMMARY"
+          [ "$rc" -eq 0 ] || { echo "::error::The test runner exited with code $rc"; exit 1; }
+          [ "$s_tests" -gt 0 ] || { echo "::error::No tests ran"; exit 1; }
+          [ "$s_fail" -eq 0 ] && [ "$s_cancelled" -eq 0 ] || { echo "::error::Tests failed"; exit 1; }
+          [ "$s_skipped" -eq 0 ] && [ "$s_todo" -eq 0 ] || { echo "::error::Skipped or todo tests are not allowed"; exit 1; }
+          [ "$s_pass" -eq "$s_tests" ] || { echo "::error::Not every test passed"; exit 1; }
+          if [ -n "$base_total" ]; then
+            echo "Tests on main: $base_total. Passing on this PR: $s_pass." | tee -a "$GITHUB_STEP_SUMMARY"
+            [ "$s_pass" -ge "$base_total" ] || { echo "::error::Fewer tests pass here ($s_pass) than exist on main ($base_total)"; exit 1; }
+          fi
 
       - name: Dependency audit (fails on high or critical)
         run: npm audit --audit-level=high
 
       - name: Typecheck
-        run: npm run typecheck
+        run: npx --no-install astro check
 
       - name: Build
         run: npm run build
 
       - name: Build leaves no uncommitted changes
         # build:3d rewrites public/js; the committed bundles must match the sources.
-        run: git diff --exit-code
-
-      - name: Tests
-        run: npm test
+        run: |
+          dirty=$(git status --porcelain)
+          if [ -n "$dirty" ]; then echo "::error::The build changed or created files:"; echo "$dirty"; exit 1; fi
