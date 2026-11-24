@@ -1,0 +1,67 @@
+name: guard
+
+on: pull_request
+
+permissions:
+  contents: read
+
+jobs:
+  guard:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    env:
+      BASE: origin/${{ github.base_ref }}
+      # Files that count as tests.
+      TEST_FILES: '(\.test\.|\.spec\.|_test\.|(^|/)tests?/|__tests__/)'
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: No deleted or renamed test files
+        run: |
+          gone=$(git diff --no-renames --diff-filter=D --name-only "$BASE"...HEAD | grep -E "$TEST_FILES" || true)
+          if [ -n "$gone" ]; then
+            echo "::error::Test files deleted or renamed:"; echo "$gone"; exit 1
+          fi
+
+      - name: No newly skipped or focused tests
+        run: |
+          # Code files only, so docs that mention these markers do not trip it.
+          added=$(git diff --no-renames "$BASE"...HEAD -- '*.ts' '*.tsx' '*.js' '*.jsx' '*.mjs' '*.cjs' '*.astro' | grep -E '^\+[^+]' || true)
+          hits=$(printf '%s\n' "$added" | grep -E '(\.(skip|only|todo)\s*\(|\b(xit|xdescribe|xtest)\s*\(|\b(skip|only|todo)\s*:\s*(true|['"'"'"`]))' || true)
+          if [ -n "$hits" ]; then
+            echo "::error::New skip/only/todo markers found:"; echo "$hits"; exit 1
+          fi
+
+      - name: Test count does not go down
+        run: |
+          count() {
+            git ls-tree -r --name-only "$1" | grep -E "$TEST_FILES" | grep -E '\.(ts|js|mjs|cjs|tsx|jsx)$' \
+              | while read -r f; do git show "$1:$f"; done \
+              | grep -cE '(^|[^.[:alnum:]_])(test|it)\s*\(' || true
+          }
+          before=$(count "$BASE"); after=$(count HEAD)
+          echo "Tests on base: $before. Tests on this PR: $after."
+          echo "Test count: $before on base, $after on this PR." >> "$GITHUB_STEP_SUMMARY"
+          if [ "$after" -lt "$before" ]; then
+            echo "::error::Test count went down from $before to $after"; exit 1
+          fi
+
+      - name: Flag changed existing tests
+        run: |
+          changed=$(git diff --no-renames --diff-filter=M --name-only "$BASE"...HEAD | grep -E "$TEST_FILES" || true)
+          if [ -n "$changed" ]; then
+            echo "::warning::Existing tests were changed: $(echo $changed)"
+            { echo "### Existing tests changed"; echo "$changed"; } >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+      - name: Note changes to protected paths
+        run: |
+          protected=$(git diff --no-renames --name-only "$BASE"...HEAD \
+            | grep -E '^(AGENTS\.md|CLAUDE\.md|CODEOWNERS|\.claude/|\.github/|factory/)' || true)
+          if [ -n "$protected" ]; then
+            echo "::warning::Protected rules files changed (code-owner review required): $(echo $protected)"
+            { echo "### Protected paths changed"; echo "$protected"; } >> "$GITHUB_STEP_SUMMARY"
+          fi
